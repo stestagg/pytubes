@@ -5,3 +5,5 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+pyx/build/
+docs/_build/
