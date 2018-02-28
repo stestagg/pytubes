@@ -21,7 +21,7 @@ Simple Example
         .split()                        # Split the file, line-by-line
         .json()                         # parse json
         .get('country_code', 'null'))   # extract field named 'country_code'
->>> set(set)                            # collect results in a set
+>>> set(tube)                           # collect results in a set
 {'A1', 'AD', 'AE', 'AF', 'AG', 'AL', 'AM', 'AO', 'AP', ...}
 
 More Complex Example 
