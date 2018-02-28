@@ -1,0 +1,4 @@
+cython
+jinja2
+sphinx
+recommonmark

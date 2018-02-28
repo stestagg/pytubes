@@ -1,0 +1,86 @@
+
+from libc.stdint cimport int64_t, uint8_t, uint16_t, uint32_t
+from libcpp.string cimport string
+from libcpp cimport bool as bool_t
+from libcpp.vector cimport vector
+
+{% for file_name, fns in fns %}
+# AUTO GENERATED FROM tools/defn.tmpl
+cdef extern from "{{file_name}}" namespace "ss::iter":
+    {% for fn in fns %}
+    {{ fn }}
+    {% endfor %}
+{% endfor %}
+
+{% for iter in iters.values() %}
+# AUTO GENERATED FROM tools/defn.tmpl
+cdef extern from "{{iter.file_name}}" namespace "ss::iter":
+    cdef cppclass {{iter.templated_name}}:
+        {{iter.name}}({{iter.constructor_args}}) except +
+        {{ iter.extra }}
+{% endfor %}
+
+
+{% for tube in tubes.values() %}
+
+@cython.final
+cdef class {{tube.name}}(Tube):  # AUTO GENERATED FROM tools/defn2.tmpl
+    {% if tube.docstring %}
+    """
+    {{ tube.docstring|indent(4) }}
+    """
+    {% endif %}
+    {%- for prop in tube.props %}
+    cdef public {{prop.type}} {{prop.name}}
+    {%- endfor %}
+
+    def __cinit__(self, {{ tube.init_args }}):
+        {% for prop in tube.props -%}
+        {%- if prop.dtypes %}
+        if {{prop.name}}.dtype[0] not in ({{", ".join(prop.dtypes) }},):
+            raise ValueError(f"Cannot make a {{tube.name}} Tube with '{{prop.name}}' tube of type { {{prop.name}}.dtype[0] }")
+        {% endif -%}
+        self.{{prop.name}} = {{prop.name}}
+        {% endfor %}
+        {{ (tube.init_check or "")|indent(8)}}
+
+    cdef IterWrapper _make_iter(self, args):
+        {% if not tube.no_iter_arglen_check %}
+        expected_args = len(self._inputs) + len(self._chains)
+        if len(args) != expected_args:
+            raise ValueError(f"Expected {expected_args} inputs to _make_iter, got {len(args)}")
+        {% endif %}
+        chains = args[:len(self._chains)]
+        iters = args[len(self._chains):]
+        {% for i, input in enumerate(tube.inputs) -%}
+        cdef IterWrapper {{input.name}} = iters[{{i}}]
+        {% endfor -%}
+        {% if tube.custom_iter %}
+        {{ tube.custom_iter|indent(8)}}
+        {%- else -%}
+        cdef {{tube.iter.name}} *iter = new {{tube.iter.name}}({{ ", ".join(tube.iter_args) }})
+        {% endif %}
+        return wrap(to_any(iter))
+
+    @property
+    def dtype(self):
+        {{tube.dtype}}
+
+    @property
+    def _chains(self):
+        return {{tube.chains or "()"}}
+
+    {% if "def _inputs(self):" not in tube.methods %}
+    @property
+    def _inputs(self):
+        return ({% for prop in tube.props if prop.is_tube %}self.{{prop.name}}, {% endfor %})
+    {% endif %}
+
+    {% if "cpdef _describe_self(self):" not in tube.methods %}
+    cpdef _describe_self(self):
+        return f"{{tube.name}}({% for prop in tube.props if prop.printable %}{repr(self.{{prop.name}})}{% if not loop.last %}, {%endif%}{% endfor %})"
+    {% endif %}
+
+    {{ tube.methods|indent(4) -}}
+
+{% endfor %}
