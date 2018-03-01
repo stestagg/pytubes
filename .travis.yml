@@ -1,21 +1,18 @@
 language: python
 python:
   - "3.6"
-  - "3.7"
-
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
-    - make
-    - g++
-    - libz-dev
+      - make
+      - gcc-7
+      - g++-7
+      - libz-dev
 install:
   - pip install -r build_requirements.txt
+env:
+  - CC=gcc-7 CXX=g++-7 LDSHARED="gcc-7 -pthread -shared -Wl,-O1"
 script:
   - make test
-addons:
-  apt:
-    packages:
-    - make
-    - libz-dev
-    - 

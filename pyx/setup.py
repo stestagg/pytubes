@@ -21,7 +21,7 @@ tube_ops = Extension(
     language="c++",
     include_dirs = ['../vendor', '.'],
     extra_compile_args=["-std=c++1z", '-g', "-O2"],
-    extra_link_args=["-std=c++1z", '-g'],
+    extra_link_args=["-std=c++1z", '-lz', '-g'],
     #undef_macros = [ "NDEBUG" ],
 )
 
