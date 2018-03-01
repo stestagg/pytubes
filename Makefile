@@ -1,7 +1,7 @@
 
 CPP_TEST_FILES = $(shell find ./ -type f -name '*_test.cpp')
 PY_C_FLAGS = $(shell python-config --cflags)
-PY_LD_FLAGS = $(shell python-config --cflags --ldflags)
+PY_LD_FLAGS = $(shell python-config --ldflags)
 CXX := $(or ${CXX},${CXX},g++)
 
 STD = -std=c++1z
@@ -32,7 +32,7 @@ test-cpp: run-tests
 	./run-tests
 
 run-tests: test-run.o $(CPP_TEST_FILES)
-	$(CXX) $(STD) $(PY_LD_FLAGS) -Wno-undefined-internal -Ivendor/  -o run-tests test-run.o $(CPP_TEST_FILES)
+	$(CXX) $(STD) $(PY_C_FLAGS) $(PY_LD_FLAGS) -Wno-undefined-internal -Ivendor/  -o run-tests test-run.o $(CPP_TEST_FILES)
 
 test-run.o:
 	$(CXX) $(STD) $(PY_C_FLAGS) -Ivendor/ -c -o test-run.o src/test.cpp
