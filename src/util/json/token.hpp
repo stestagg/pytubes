@@ -77,7 +77,7 @@ namespace ss::json {
             // find_first returns a pointer to beyond the end of slice if not found
             auto match = source.template find_first_of<'}', '"', '{'>();
             throw_if(InvalidJson, match == source.end(), "Unclosed object");
-            const T *next_end;
+            const T *next_end = source.end();
             switch (*match) {
                 case '}':
                     return match;
@@ -100,7 +100,7 @@ namespace ss::json {
             // find_first returns a pointer to beyond the end of slice if not found
             auto match = source.template find_first_of<']', '"', '['>();
             throw_if(InvalidJson, match == source.end(), "Unclosed array");
-            const T *next_end;
+            const T *next_end = source.end();
             switch (*match) {
                 case ']':
                     return match;

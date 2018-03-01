@@ -7,3 +7,6 @@ develop-eggs/
 dist/
 pyx/build/
 docs/_build/
+
+pyx/tubes.cpp
+pyx/iter_defs.pxi

@@ -24,6 +24,7 @@ namespace ss::iter {
         struct Cmp{
             static inline bool cmp(const T &a, const T &b){ 
                 throw_py<ValueError>("Cannot '", op_name(Op), "' compare ", ScalarType_t<T>::type_name);
+                return false;
             }
         };
 

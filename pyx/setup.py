@@ -20,7 +20,7 @@ tube_ops = Extension(
     ["tubes.pyx"],
     language="c++",
     include_dirs = ['../vendor', '.'],
-    extra_compile_args=["-std=c++1z", '-g', "-O3"],
+    extra_compile_args=["-std=c++1z", '-g', "-O2"],
     extra_link_args=["-std=c++1z", '-g'],
     #undef_macros = [ "NDEBUG" ],
 )

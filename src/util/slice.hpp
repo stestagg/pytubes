@@ -2,10 +2,13 @@
 
 #include <cstdint>
 #include <cstring>
-#include <string>
-#include <experimental/string_view>
 
 #include <ostream>
+#include <string>
+#include <algorithm>
+#include <vector>
+
+#include <cityhash.hpp>
 
 #include "error.hpp"
 
@@ -162,13 +165,10 @@ namespace ss{
 }
 
 namespace std{
-//    template <class T>
-//    using basic_string_view = experimental::fundamentals_v1::basic_string_view<T>;
     template <class T>
     struct hash<ss::Slice<T>>{
         std::size_t operator()(const ss::Slice<T>& val) const {
-            basic_string_view<T> view(val.start, val.len);
-            return hash<basic_string_view<T> >{}(view);
+            return CityHash<sizeof(size_t)>((const char *)val.start, val.len * sizeof(T));
         }
     };
 }

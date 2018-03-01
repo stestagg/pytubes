@@ -45,6 +45,7 @@ namespace ss::json {
             case Type::Array: return "array";
             case Type::Object: return "object";
         }
+        return "unknown";
     }
 
     inline std::ostream& operator<< (std::ostream &out, const json::Value<unsigned char> &v) {

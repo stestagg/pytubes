@@ -214,6 +214,7 @@ namespace ss::iter {
                 "Field lookup has not been implemented on iterators of type ",
                 ScalarType_t<T>::type_name
                 );
+            return NULL;
         } 
     };
 
@@ -228,6 +229,7 @@ namespace ss::iter {
                 "Field lookup has not been implemented on iterators of type ",
                 ScalarType_t<T>::type_name
                 );
+            return NULL;
         } 
     };
 

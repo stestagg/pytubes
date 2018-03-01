@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "scalar.hpp"
 
 namespace ss::iter {
@@ -46,8 +48,8 @@ namespace ss::iter {
         SlotPointer ptr;
         StoredSlot(SlotPointer ptr) : ptr(ptr) {}
 
-        virtual inline void update(SlotPointer) = 0;
-        virtual inline void update(const void *ptr) = 0;
+        virtual void update(SlotPointer) = 0;
+        virtual void update(const void *ptr) = 0;
     };
 
     template<class T>
