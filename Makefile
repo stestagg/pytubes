@@ -2,7 +2,7 @@
 CPP_TEST_FILES = $(shell find ./ -type f -name '*_test.cpp')
 PY_C_FLAGS = $(shell python-config --cflags)
 PY_LD_FLAGS = $(shell python-config --cflags --ldflags)
-CXX := "g++"
+CXX := $(or ${CXX},${CXX},g++)
 
 STD = -std=c++1z
 
@@ -22,7 +22,8 @@ build:
 
 clean: doc-clean
 	(cd pyx && python setup.py clean)
-	
+	rm *.o || true
+	rm run-tests || true
 
 doc-clean:
 	(cd docs && make clean)
