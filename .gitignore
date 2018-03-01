@@ -7,6 +7,7 @@ develop-eggs/
 dist/
 pyx/build/
 docs/_build/
-
+test-run.o
+run-tests
 pyx/tubes.cpp
 pyx/iter_defs.pxi
