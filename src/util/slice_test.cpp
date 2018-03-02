@@ -99,7 +99,6 @@ TEST_CASE( "static_startswith compares elements", "[slice]" ) {
     CHECK( abacus.static_startswith<'a', 'b', 'a', 'c', 'u', 's'>() == true );
     CHECK( abacus.static_startswith<'a', 'b', 'a', 'c', 'u', 'b'>() == false );
 
-    auto ab = Slice<char>("abc", 2);
     CHECK( abacus.static_startswith<'a'>() == true );
     CHECK( abacus.static_startswith<'a', 'b'>() == true );
     CHECK( abacus.static_startswith<'a', 'b', 'c'>() == false );

@@ -13,6 +13,6 @@ addons:
 install:
   - pip install -r build_requirements.txt
 env:
-  - CC=gcc-7 CXX=g++-7 LDSHARED="gcc-7 -pthread -shared -Wl,-O1"
+  - CC=gcc-7 CXX=g++-7 LDSHARED="gcc-7 -pthread -shared -Wl,-O1" PYTHON_CONFIG=python-config
 script:
   - make test
