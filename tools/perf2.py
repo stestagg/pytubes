@@ -7,24 +7,24 @@ import tubes
 import gzip
 import json
 
-DATA_DIR = "../data/extracted"
+DATA_DIR = "/Users/stephenstagg/Dropbox/src/tubes/data/extracted"
 FILES = glob.glob(path.join(DATA_DIR, "*.json"))
 SKIP = 0
-TAKE = 10_000
+TAKE = 1_000_000
 
 KEYS = (
-    ("timestamp", ),
+    # ("timestamp", ),
     ("country_code", ),
     ("url", ),
     ("file", "filename"), 
     ("file", "project"), 
     ("details", "installer", "name"),
     ("details", "python"),
-    ("details", "system"),
+    # ("details", "system"),
     ("details", "system", "name"),
-    ("details", "cpu"),
-    ("details", "distro", "libc", "lib"),
-    ("details", "distro", "libc", "version"),
+    # ("details", "cpu"),
+    # ("details", "distro", "libc", "lib"),
+    # ("details", "distro", "libc", "version"),
 )
 
 def py_version():

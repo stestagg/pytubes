@@ -21,19 +21,28 @@ doc:
 	(cd docs && make html)
 
 install:
-	(cd pyx && python setup.py install)
+	python setup.py install
 
 build:
-	(cd pyx && python setup.py build)
+	python setup.py build
 
-clean: doc-clean
-	(cd pyx && python setup.py clean)
-	find ./ -name *.pyc -delete	
-	rm *.o || true
-	rm run-tests || true
+upload: clean-py
+	python setup.py sdist bdist_wheel
+	twine upload dist/*
 
-doc-clean:
+clean: clean-doc clean-py clean-c
+
+clean-c:
+	-rm *.o
+	-rm run-tests
+
+clean-doc:
 	(cd docs && make clean)
+
+clean-py:
+	python setup.py clean
+	-rm pyx/dist/*
+	find ./ -name *.pyc -delete	
 
 test-cpp: run-tests
 	LD_LIBRARY_PATH=$(PY_LIBRARY_PATH) ./run-tests

@@ -7,16 +7,16 @@ from libcpp.vector cimport vector
 from cpython.object cimport Py_LT, Py_LE, Py_EQ, Py_NE, Py_GT, Py_GE
 
 __doc__ = """
-Tubes
+PyTubes
 -------
 
-Tubes is a library for efficient data loading.  Implemented as a cython/c++
+PyTubes is a library for efficient data loading.  Implemented as a cython/c++
 extension module, it can extract data from large datasets much faster than
 by using traditional python methods.
 
 """
 
-
+include "version.pxi"
 include "iter.pxi"
 
 

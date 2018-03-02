@@ -2,12 +2,17 @@ __pycache__/
 *.py[cod]
 *.so
 .Python
+*.egg-info/
 build/
 develop-eggs/
 dist/
 pyx/build/
 docs/_build/
-test-run.o
 run-tests
+.cache/
+.pytest_cache/
+
+# Generated build files
+test-run.o
 pyx/tubes.cpp
 pyx/iter_defs.pxi
