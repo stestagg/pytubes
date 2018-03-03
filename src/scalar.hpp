@@ -11,8 +11,14 @@ namespace ss{ namespace iter{
     using NullType = std::tuple<>;
     using ByteSlice = Slice<uint8_t>;
     struct Utf8 : ByteSlice {
-        using ByteSlice::ByteSlice;
-        Utf8(const Slice<uint8_t> &src): ByteSlice(src){}
+        Utf8() : ByteSlice() {}
+        Utf8(const uint8_t *start, size_t len): ByteSlice(start, len) {}
+        Utf8(const uint8_t *begin, const uint8_t *end, bool _): ByteSlice(begin, end, _) {}
+        Utf8(const Slice<uint8_t> &src) : ByteSlice(src) {}
+        Utf8(Utf8 &src) : ByteSlice(src.start, src.len) {}
+        Utf8(const std::basic_string<uint8_t> &src) : ByteSlice(src) {}
+    
+        Utf8(const std::vector<uint8_t> &src) : ByteSlice(src) {}
     };
     using JsonUtf8 = json::Value<uint8_t>;
 
@@ -89,6 +95,7 @@ namespace ss{ namespace iter{
             case ScalarType::JsonUtf8: return T<JsonUtf8>()(args...);
             default:  throw_py<RuntimeError>("Got unexpected dtype value:  ", (size_t)type);
         }
+        return T<NullType>()(args...);
     }
 
     inline const char *type_name(ScalarType type) {

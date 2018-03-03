@@ -51,7 +51,7 @@ test-cpp: run-tests
 	LD_LIBRARY_PATH=$(PY_LIBRARY_PATH) ./run-tests
 
 run-tests: test-run.o $(CPP_TEST_FILES)
-	$(CXX) $(STD) $(PY_C_FLAGS) -fPIC -Wno-undefined-internal -Ivendor/  -o run-tests test-run.o $(CPP_TEST_FILES) $(PY_EXTRA_LD_FLAGS) $(PY_LD_FLAGS)
+	$(CXX) $(STD) $(PY_C_FLAGS) -fPIC -Ivendor/  -o run-tests test-run.o $(CPP_TEST_FILES) $(PY_EXTRA_LD_FLAGS) $(PY_LD_FLAGS)
 
 test-run.o:
 	$(CXX) $(STD) $(PY_C_FLAGS) -fPIC -Ivendor/ -c -o test-run.o src/test.cpp

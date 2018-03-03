@@ -29,7 +29,7 @@ namespace ss{
         }
     }
         
-    template <class T, class Variant=struct Basic> struct Slice {
+    template <class T> struct Slice {
 
         /* This is basically a std::basic_string_view */
         using el_t = T;
@@ -46,7 +46,7 @@ namespace ss{
         Slice() : start((T*)slice::empty_array), len(0) {}
         Slice(const T *start, size_t len): start(start), len(len) {}
         Slice(const T *begin, const T *end, bool _): start(begin), len(end - begin) {}
-        Slice(const Slice<T> &src) = default;
+        Slice(const Slice<T> &src) : start(src.start), len(src.len) {}
 
         template<class Q = T, typename std::enable_if<std::is_arithmetic<Q>::value, int>::type = 0>
         Slice(const std::basic_string<T> &src) : start(src.c_str()), len(src.length()) {}

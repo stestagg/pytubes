@@ -3,6 +3,9 @@
 #include <sstream>
 #include <ostream>
 #include <type_traits>
+#include <typeinfo>
+#include <new>
+#include <stdexcept>
 
 // This is a micro-optimization based on throws being unlikely
 // Taken from rapidjson source.
