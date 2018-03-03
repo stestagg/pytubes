@@ -6,7 +6,7 @@
 
 #include "../slice.hpp"
 
-namespace ss::json {
+namespace ss{ namespace json{
 
     class InvalidJson: public std::invalid_argument {
     public:
@@ -65,7 +65,7 @@ namespace ss::json {
         return out;
     }
 
-};
+}}
 
 #include "../error.hpp"
 

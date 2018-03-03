@@ -3,7 +3,7 @@
 #include "../util/mmap.hpp"
 #include "../iter.hpp"
 
-namespace ss::iter{
+namespace ss{ namespace iter{
 
 class FileMapIter : public Iter {
     /*<-
@@ -40,4 +40,4 @@ public:
 
 };
 
-}
+}}

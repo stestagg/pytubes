@@ -2,7 +2,7 @@
 
 #include "../iter.hpp"
 
-namespace ss::iter {
+namespace ss{ namespace iter{
 
     /*<-
         Iter: 
@@ -134,4 +134,4 @@ namespace ss::iter {
 
     };
 
-}
+}}

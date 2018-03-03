@@ -3,7 +3,7 @@
 #include "../util/mmap.hpp"
 #include "../iter.hpp"
 
-namespace ss::iter{
+namespace ss{ namespace iter{
 
 #define BUFFER_SIZE (8 * 1024 * 1024)
 
@@ -56,4 +56,4 @@ public:
 
 };
 
-}
+}}

@@ -28,9 +28,7 @@ TEST_CASE( "Slices can be constructed from iterators", "[slice]" ) {
 }
 
 TEST_CASE( "Slices can be of non POD types", "[slice]" ) {
-    class X{
-        void *y;
-    };
+    struct X{ void *y; };
     Slice<X> foo;
     REQUIRE( foo.len == 0 );
     REQUIRE( foo.is_null() );

@@ -36,8 +36,8 @@ class Iter:
         template = self.spec.get("template")
         if template:
             if isinstance(template, (list, tuple)):
-                return f"{self.name}[{', '.join(template)}]"    
-            return f"{self.name}[{template}]"
+                return "{0}[{1}]".format(self.name, ', '.join(template))
+            return "{0}[{1}]".format(self.name, template)
         return self.name
 
     @property
@@ -94,9 +94,9 @@ class Tube:
         args = []
         for p in self.props:
             if "default" in p.spec:
-                args.append(f"{p.type} {p.name}={p.default}")
+                args.append("{0} {1}={2}".format(p.type, p.name, p.default))
             else:
-                args.append(f"{p.type} {p.name}")
+                args.append("{0} {1}".format(p.type, p.name))
         return ", ".join(args)
 
     @property

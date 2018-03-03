@@ -2,7 +2,7 @@
 
 #include "../iter.hpp"
 
-namespace ss::iter {
+namespace ss{ namespace iter{
 
     static std::vector<SlotPointer> slots_from_parents(std::vector<AnyIter> &parents) {
         std::vector<SlotPointer> out;
@@ -63,4 +63,4 @@ namespace ss::iter {
 
     };
 
-}
+}}

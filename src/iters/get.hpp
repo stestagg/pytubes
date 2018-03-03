@@ -5,7 +5,7 @@
 #include "../util/default.hpp"
 #include "../iter.hpp"
 
-namespace ss::iter {
+namespace ss{ namespace iter{
 
     template<class T> bool is_undefined(T *val){ return false; }
     template<> bool is_undefined(const JsonUtf8 *val) { 
@@ -155,8 +155,8 @@ namespace ss::iter {
     public:
         NameLookupIter(AnyIter parent, std::vector<std::string> &names) 
             : parent(parent->get_slots()[0]),
-              names(std::make_unique<std::string[]>(names.size())), 
-              values(std::make_unique<ValueType[]>(names.size())),
+              names(unique_ptr<std::string[]>(new std::string[names.size()]())), 
+              values(unique_ptr<ValueType[]>(new ValueType[names.size()]())), 
               slots(_make_slots(this->values, names.size()))
         {
             size_t index = 0;
@@ -212,7 +212,7 @@ namespace ss::iter {
         inline Iter *operator()(AnyIter parent, std::vector<std::string> &names) {
             throw_py<ValueError>(
                 "Field lookup has not been implemented on iterators of type ",
-                ScalarType_t<T>::type_name
+                ScalarType_t<T>::type_name()
                 );
             return NULL;
         } 
@@ -227,7 +227,7 @@ namespace ss::iter {
         inline Iter *operator()(AnyIter parent, std::string &name) {
             throw_py<ValueError>(
                 "Field lookup has not been implemented on iterators of type ",
-                ScalarType_t<T>::type_name
+                ScalarType_t<T>::type_name()
                 );
             return NULL;
         } 
@@ -245,4 +245,4 @@ namespace ss::iter {
         return dispatch_type<name_lookup_iter_op>(slots[0].type, parent, names);
     }
 
-}
+}}

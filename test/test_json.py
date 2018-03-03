@@ -6,6 +6,11 @@ import pytest
 
 import tubes
 
+try:
+    RecursionError
+except NameError:
+    RecursionError = RuntimeError
+
 THIS_DIR = path.dirname(__file__)
 
 def read_file(*parts):

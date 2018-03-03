@@ -2,7 +2,7 @@
 
 #include "../iter.hpp"
 
-namespace ss::iter {
+namespace ss{ namespace iter{
 
     class FirstIter : public Iter {
         /*<-
@@ -35,4 +35,4 @@ namespace ss::iter {
 
     };
 
-}
+}}

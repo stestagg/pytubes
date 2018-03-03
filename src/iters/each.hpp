@@ -6,7 +6,7 @@
 #include "../iter.hpp"
 
 
-namespace ss::iter{
+namespace ss{ namespace iter{
 
 class EachIter: public Iter {
     /*<-
@@ -66,4 +66,4 @@ public:
     }
 };
 
-}
+}}

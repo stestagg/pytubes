@@ -4,7 +4,7 @@
 
 #include <zlib.h>
 
-namespace ss::iter{
+namespace ss{ namespace iter{
 
 #define OUT_BUFFER_SIZE (8 * 1024 * 1024)
 
@@ -106,4 +106,4 @@ public:
     }
 };
 
-}
+}}

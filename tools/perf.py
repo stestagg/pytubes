@@ -8,7 +8,7 @@ import json
 DATA_DIR = "../data"
 FILES = [os.path.join(DATA_DIR, f) for f in os.listdir(DATA_DIR) if f.startswith("pypi-downloads") and f.endswith("jsonz")]
 SKIP = 0
-TAKE = 1_000
+TAKE = 100000
 
 KEYS = (
     ("timestamp", ),
@@ -30,7 +30,7 @@ def py_version():
     take = TAKE
     results = []
     for file_name in FILES:
-        with gzip.open(file_name, "r") as fp:
+        with gzip.open(file_name, "rt") as fp:
             for line in fp:
                 data = json.loads(line)
                 if skip:
@@ -89,27 +89,27 @@ def tubes_version_2():
     return list(x)
 
 def compare():
-    print(f"Skipping: {SKIP}, Taking: {TAKE}")
+    print("Skipping: {0}, Taking: {1}".format(SKIP, TAKE))
     print("Tubes v1")
     a = time.perf_counter()
     tube_1_vals = tubes_version()
     b = time.perf_counter()
     tubes_1_time = b - a
-    print(f"Took: {tubes_1_time:.4f} s")
+    print("Took: {0:.4f} s".format(tubes_1_time))
     print("Tubes v2")
     b = time.perf_counter()
     tube_2_vals = tubes_version_2()
     c = time.perf_counter()
     tubes_2_time = c - b
-    print(f"Took: {tubes_2_time:.4f} s")
+    print("Took: {0:.4f} s".format(tubes_2_time))
     print("Py version")
     c = time.perf_counter()
     py_vals = py_version()
     d = time.perf_counter()
     py_time = d - c
-    print(f"Took: {py_time:.4f} s")
+    print("Took: {0:.4f} s".format(py_time))
     best = min(tubes_1_time, tubes_2_time)
-    print(f"Speedup: {py_time/best:.2f} x")
+    print("Speedup: {0:.2f} x".format(py_time/best))
 
     print(py_vals[0])
     print(tube_2_vals[0])
@@ -126,10 +126,10 @@ def main(ty):
     global SKIP, TAKE
     if ty == "perf":
         SKIP = 1
-        TAKE = 2_000_000
+        TAKE = 2000000
         print("Perf test")
         result = tubes_version_2()
-        print(f"Got: {len(result)}")
+        print("Got: {0}".format(len(result)))
     else:
         print("== speed test ==")
         compare()

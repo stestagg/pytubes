@@ -49,11 +49,11 @@ setup(
     ext_modules = cythonize(
         Extension(
             "tubes",
-            ["pyx/tubes.pyx"],
+            sources=["pyx/tubes.pyx"],
             language="c++",
-            include_dirs = ['vendor', 'pyx'],
-            extra_compile_args=["-std=c++1z", '-g', "-O2"],
-            extra_link_args=["-std=c++1z", '-lz', '-g'],
+            include_dirs = ['vendor', 'pyx', 'src'],
+            extra_compile_args=["-std=c++11", '-g', "-O2"],
+            extra_link_args=["-std=c++11", '-lz', '-g'],
         ), 
         compiler_directives={"language_level": 3, 'embedsignature': True},
         include_path=['.']

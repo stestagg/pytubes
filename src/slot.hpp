@@ -4,7 +4,7 @@
 
 #include "scalar.hpp"
 
-namespace ss::iter {
+namespace ss{ namespace iter{
 
     struct SlotPointer{
         ScalarType type;
@@ -20,7 +20,7 @@ namespace ss::iter {
                 "Tried to create ", 
                 type_name(type), 
                 " slot pointer with ",
-                T_t::type_name,
+                T_t::type_name(),
                 " pointer type");
         }
 
@@ -34,7 +34,7 @@ namespace ss::iter {
                 "Tried to dereference ", 
                 type_name(type), 
                 " slot pointer as ",
-                T_t::type_name,
+                T_t::type_name(),
                 " pointer type");
             return (const T*)ptr;
         }
@@ -72,4 +72,4 @@ namespace ss::iter {
     }
 
 
-}
+}}

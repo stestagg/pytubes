@@ -1,10 +1,10 @@
 #pragma once
 
-namespace ss::json{
+namespace ss{ namespace json{
     class InvalidJson;
-}
+}}
 
-namespace ss::json::string {
+namespace ss{ namespace json{ namespace string {
 
     // template <class I, class O> 
     // inline void decode_into(std::basic_string<O> &out, Slice<I> in);
@@ -189,4 +189,4 @@ namespace ss::json::string {
         
     }
 
-}
+}}}

@@ -4,8 +4,7 @@
 
 #include "iters/topy.hpp"
 
-namespace ss::iter {
-    using namespace std::literals;
+namespace ss{ namespace iter{
 
     struct AnyConverter{
         virtual SlotPointer get_slot() = 0;
@@ -21,9 +20,9 @@ namespace ss::iter {
         Converter(const F *from, const std::string &codec) {
             throw_py<ValueError>(
                 "Unsupported conversion from ", 
-                ScalarType_t<F>::type_name,
+                ScalarType_t<F>::type_name(),
                 " to ",
-                ScalarType_t<T>::type_name
+                ScalarType_t<T>::type_name()
             );
         }
         void convert() {}
@@ -119,7 +118,7 @@ namespace ss::iter {
                         "Cannot convert ", 
                         json::json_type_name(from->type),
                         " json value to ", 
-                        ScalarType_t<T>::type_name);
+                        ScalarType_t<T>::type_name());
             }
         }
 
@@ -173,7 +172,7 @@ namespace ss::iter {
                 "Cannot convert from ", 
                 Slice<char>(obj_desc, size), 
                 " to ", 
-                ScalarType_t<T>::type_name
+                ScalarType_t<T>::type_name()
             );
         }
 
@@ -314,4 +313,4 @@ namespace ss::iter {
         current = json::tokenize_entire(slice);
     }
 
-}
+}}

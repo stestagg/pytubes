@@ -3,8 +3,7 @@
 #include "../convert.hpp"
 #include "../iter.hpp"
 
-namespace ss::iter {
-    using namespace std::literals;
+namespace ss{ namespace iter{
 
     namespace cmp {
 
@@ -23,7 +22,7 @@ namespace ss::iter {
         template<class T, int Op, class U=bool> 
         struct Cmp{
             static inline bool cmp(const T &a, const T &b){ 
-                throw_py<ValueError>("Cannot '", op_name(Op), "' compare ", ScalarType_t<T>::type_name);
+                throw_py<ValueError>("Cannot '", op_name(Op), "' compare ", ScalarType_t<T>::type_name());
                 return false;
             }
         };
@@ -83,7 +82,7 @@ namespace ss::iter {
         CompareIter(AnyIter parent, PyObj &value)
             : parent(parent->get_slots()[0]),
               value(value),
-              converter(&this->value, "utf-8"s),
+              converter(&this->value, std::string("utf-8")),
               slot(&this->result)
             {
                 converter.convert();
@@ -119,4 +118,4 @@ namespace ss::iter {
         return dispatch_type<compare_iter_op>(parent->get_slots()[0].type, parent, op, value);
     }
 
-}
+}}

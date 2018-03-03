@@ -3,17 +3,16 @@
 #include "error.hpp"
 
 using namespace ss;
-using namespace std::string_literals;
 
 struct Foo{
-    inline operator std::string() const { return "foo"s; }
+    inline operator std::string() const { return std::string("foo"); }
 };
 
 TEST_CASE( "make_str concatenates strings", "[error]" ) {
-    REQUIRE( make_str(1, 2, 3) == "123"s );
-    REQUIRE( make_str("A", "ba"s, 'c', "us") == "Abacus"s );
-    REQUIRE( make_str("") == ""s );
-    REQUIRE( make_str(Foo()) == "foo"s );
+    REQUIRE( make_str(1, 2, 3) == std::string("123") );
+    REQUIRE( make_str("A", std::string("ba"), 'c', "us") == std::string("Abacus") );
+    REQUIRE( make_str("") == std::string("") );
+    REQUIRE( make_str(Foo()) == std::string("foo") );
 }
 
 TEST_CASE( "throw-if uses condition", "[error]" ) {

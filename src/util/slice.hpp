@@ -29,7 +29,7 @@ namespace ss{
         }
     }
         
-    template <class T> struct Slice {
+    template <class T, class Variant=struct Basic> struct Slice {
 
         /* This is basically a std::basic_string_view */
         using el_t = T;
@@ -48,12 +48,12 @@ namespace ss{
         Slice(const T *begin, const T *end, bool _): start(begin), len(end - begin) {}
         Slice(const Slice<T> &src) = default;
 
-        template<class Q = T, typename std::enable_if_t<std::is_arithmetic<Q>::value, int> = 0>
+        template<class Q = T, typename std::enable_if<std::is_arithmetic<Q>::value, int>::type = 0>
         Slice(const std::basic_string<T> &src) : start(src.c_str()), len(src.length()) {}
         
         Slice(const std::vector<T> &src) : start(src.data()), len(src.size()) {}
 
-        template<class Q = T, typename std::enable_if_t<std::is_arithmetic<Q>::value, int> = 0>
+        template<class Q = T, typename std::enable_if<std::is_arithmetic<Q>::value, int>::type = 0>
         inline operator std::basic_string<Q>() const {
             return std::basic_string<T>(begin(), end());
         }
@@ -71,7 +71,8 @@ namespace ss{
         }
 
         inline bool operator==(const Slice<T> &other) const {
-            return std::equal(begin(), end(), other.begin(), other.end());
+
+            return len == other.len && std::equal(begin(), end(), other.begin());
         }
 
         inline bool operator!=(const Slice<T> &other) const {

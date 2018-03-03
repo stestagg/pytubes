@@ -4,7 +4,6 @@
 
 using namespace ss;
 using namespace ss::iter;
-using namespace std::string_literals;
 
 TEST_CASE( "Slot pointer can be default constructed", "[slot ptr]" ) {
     REQUIRE( SlotPointer().type == ScalarType::Null );

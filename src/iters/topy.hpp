@@ -4,7 +4,7 @@
 #include "../iter.hpp"
 
 
-namespace ss::iter{
+namespace ss{ namespace iter{
 
     using ToPyFn = PyObj (*) (const void *);
 
@@ -101,7 +101,7 @@ namespace ss::iter{
 
     template<class T>
     struct to_py_op{
-        constexpr inline ToPyFn operator()() { return to_py<T>; }
+        constexpr inline ToPyFn operator()() const { return to_py<T>; }
     };
 
 
@@ -130,7 +130,7 @@ namespace ss::iter{
         }
 
         ToPyIter(AnyIter parent) : input_slots(parent.get()->get_slots()) { 
-            values = std::make_unique<PyObj[]>(input_slots.len);
+            values = std::unique_ptr<PyObj[]>(new PyObj[input_slots.len]);
             for (auto slot : input_slots) {
                 fns.push_back(dispatch_type<to_py_op>(slot.type));
             }
@@ -148,4 +148,4 @@ namespace ss::iter{
     };
 
 
-}
+}}

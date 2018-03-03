@@ -10,12 +10,12 @@ PY_EXTRA_LD_FLAGS = -L$(PY_LIBRARY_PATH)
 CXX ?= g++
 LDSHARED ?= g++
 
-STD = -std=c++1z
+STD = -std=c++11
 
 test: test-cpp test-py
 
 test-py: install
-	py.test -s tests
+	py.test -s test
 
 doc:
 	(cd docs && make html)
@@ -30,19 +30,22 @@ upload: clean-py
 	python setup.py sdist bdist_wheel
 	twine upload dist/*
 
-clean: clean-doc clean-py clean-c
+clean: clean-doc clean-py clean-cpp
 
-clean-c:
+clean-cpp:
 	-rm *.o
 	-rm run-tests
+	-find ./ -name *.dSYM -exec rm -r {} ';'
 
 clean-doc:
 	(cd docs && make clean)
 
 clean-py:
 	python setup.py clean
-	-rm pyx/dist/*
+	-rm dist/*
 	find ./ -name *.pyc -delete	
+	-find ./ -name __pycache__ -exec rm -r {} ';'
+	-rm -rf pytubes.egg-info
 
 test-cpp: run-tests
 	LD_LIBRARY_PATH=$(PY_LIBRARY_PATH) ./run-tests

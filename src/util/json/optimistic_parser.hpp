@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ss::json::parse {
+namespace ss{ namespace json{ namespace parse {
 
     template <class T, Type ty> inline void checkType(const Value<T> &val) {
         throw_if(InvalidJson, 
@@ -78,4 +78,4 @@ namespace ss::json::parse {
 
     };
 
-}
+}}}

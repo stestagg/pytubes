@@ -30,6 +30,9 @@
 
 #endif
 
+template<typename... Ts> struct make_void { typedef void type;};
+template<typename... Ts> using void_t = typename make_void<Ts...>::type;
+
 inline std::ostream& operator<< (std::ostream &out, const std::basic_string<unsigned char> &v) {
     out << std::string((const char *)v.c_str(), v.length());
     return out;
@@ -65,8 +68,8 @@ namespace ss{
     template<class T, class Enable=void>
     struct has_ostream_operator : std::false_type {};
     template<class T>
-    struct has_ostream_operator<T, std::void_t<decltype(std::declval<std::ostream&>() << std::declval<T>())> > : std::true_type {};
-    static_assert(has_ostream_operator<int>::value);
+    struct has_ostream_operator<T, void_t<decltype(std::declval<std::ostream&>() << std::declval<T>())> > : std::true_type {};
+    static_assert(has_ostream_operator<int>::value, "has_ostream_operator failed, int has ostream << defined");
 
     inline void _append_item(std::stringstream &ss){}
 
@@ -79,7 +82,7 @@ namespace ss{
     template<class T>
     inline typename std::enable_if<!has_ostream_operator<T>::value, void>::type
     _append_item(std::stringstream &ss, T const &first){ 
-        static_assert(has_ostream_operator<T>::value == false);
+        static_assert(has_ostream_operator<T>::value == false, "enable_if failed");
         ss << std::string(first);
     }
 

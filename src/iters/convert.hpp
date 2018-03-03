@@ -9,7 +9,7 @@
 
 #include "topy.hpp"
 
-namespace ss::iter{
+namespace ss{ namespace iter{
 
     template<class T> struct make_converter_op{
         template<class F> struct make_converter_inner {
@@ -101,4 +101,4 @@ namespace ss::iter{
 
     };
 
-}
+}}

@@ -7,8 +7,7 @@
 
 #include "convert.hpp"
 
-namespace ss::iter{
-using namespace std::literals;
+namespace ss{ namespace iter{
 
 template<class T>
 class SplitIter : public Iter {
@@ -120,7 +119,7 @@ struct split_iter_op{
     inline Iter *operator()(Chain chain, AnyIter parent, PyObject *sep) {
         throw_py<ValueError>(
             "Split has not been implemented on iterators of type ",
-            ScalarType_t<T>::type_name
+            ScalarType_t<T>::type_name()
             );
         return NULL;
     } 
@@ -128,7 +127,7 @@ struct split_iter_op{
 
 template<> inline Iter *split_iter_op<ByteSlice>::operator() (Chain chain, AnyIter parent, PyObject *sep) {
     PyObj s(sep);
-    Converter<PyObj, ByteSlice> converter(&s, "ascii"s);
+    Converter<PyObj, ByteSlice> converter(&s, std::string("ascii"));
     converter.convert();
     ByteSlice converted = *converter.to;
     throw_if(ValueError, converted.len != 1, "Splitting is currently only supported on a single character, not '", converted, "'");
@@ -139,4 +138,4 @@ Iter *split_iter_from_dtype(Chain chain, AnyIter parent, PyObj &sep) {
     return dispatch_type<split_iter_op>(parent->get_slots()[0].type, chain, parent, sep.obj);
 }
 
-}
+}}

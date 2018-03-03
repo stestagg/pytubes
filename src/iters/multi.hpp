@@ -2,7 +2,7 @@
 
 #include "../util/json/json.hpp"
 
-namespace ss::iter{
+namespace ss{ namespace iter{
 
     std::vector<SlotPointer> slots_from_children(std::vector<AnyIter> &children) {
         std::vector<SlotPointer> slots;
@@ -58,4 +58,4 @@ namespace ss::iter{
         void next() {}
     };
 
-}
+}}

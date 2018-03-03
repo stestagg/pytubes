@@ -5,15 +5,14 @@ extern "C" PyObject *UNDEFINED_OBJ;
 
 #include "../iters/convert.hpp"
 
-namespace ss::iter {
-    using namespace std::literals;
+namespace ss{ namespace iter{
 
     template<class T> struct DefaultValue{
         bool have_default;
         Converter<PyObj, T> converter;
         T value;
 
-        DefaultValue(PyObj &value) : have_default(value.obj != UNDEFINED_OBJ), converter(&value, "utf-8"s) {
+        DefaultValue(PyObj &value) : have_default(value.obj != UNDEFINED_OBJ), converter(&value, std::string("utf-8")) {
             if (have_default) {
                 converter.convert();
                 this->value = *converter.to;
@@ -27,4 +26,4 @@ namespace ss::iter {
         }
     };
 
-}
+}}

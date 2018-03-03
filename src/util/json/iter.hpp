@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-namespace ss::json {
+namespace ss{ namespace json{
 
     template<class T> Slice<T> after_value(Slice<T> source, Value<T> &val) {
         switch (val.type) {
@@ -95,4 +95,4 @@ namespace ss::json {
 
     };
 
-}
+}}

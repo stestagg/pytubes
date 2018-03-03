@@ -16,7 +16,7 @@ inline void invoke_debugger() {
     __asm__("int3");
 }
 
-namespace ss::iter {
+namespace ss{ namespace iter{
     template<class T> using vector = std::vector<T>;
 
     class Iter{
@@ -61,7 +61,7 @@ namespace ss::iter {
 
     template<class T>
     inline AnyIter to_any(T *source) {
-        return AnyIter(source, [](auto &p){ delete p;});
+        return AnyIter(source, [](T *p){ delete p;});
     }
 
     inline void convert_stop_iteration() {
@@ -76,5 +76,4 @@ namespace ss::iter {
       }
     }
 
-}
-
+}}

@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace ss::json {
+namespace ss{ namespace json{
 
     using std::make_pair;
 
@@ -210,4 +210,4 @@ namespace ss::json {
         }
     }
  
-}
+}}

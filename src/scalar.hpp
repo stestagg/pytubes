@@ -4,7 +4,7 @@
 #include "util/pyobj.hpp"
 #include "util/json/json.hpp"
 
-namespace ss::iter {
+namespace ss{ namespace iter{
 
     static const char null = 0;
 
@@ -31,63 +31,51 @@ namespace ss::iter {
     template<> struct ScalarType_t<NullType> {
         constexpr static const ScalarType scalar_type = ScalarType::Null;
         using type = NullType; 
-        static const char * const type_name;
+        static const char * const type_name() { return "Null"; };
     };
     template<> struct ScalarType_t<bool> {
         constexpr static const ScalarType scalar_type = ScalarType::Bool;
         using type = bool; 
-        static const char * const type_name;
+        static const char * const type_name() { return "Bool"; };
     };
     template<> struct ScalarType_t<int64_t> {
         constexpr static const ScalarType scalar_type = ScalarType::Int64;
         using type = int64_t; 
-        static const char * const type_name;
+        static const char * const type_name() { return "Int64"; };
     };
     template<> struct ScalarType_t<double> {
         constexpr static const ScalarType scalar_type = ScalarType::Float;
         using type = double; 
-        static const char * const type_name;
+        static const char * const type_name() { return "Float"; };
     };
     template<> struct ScalarType_t<ByteSlice> {
         constexpr static const ScalarType scalar_type = ScalarType::ByteSlice;
         using type = ByteSlice; 
-        static const char * const type_name;
+        static const char * const type_name() { return "Bytes"; };
     };
     template<> struct ScalarType_t<Utf8> {
         constexpr static const ScalarType scalar_type = ScalarType::Utf8;
         using type = Utf8; 
-        static const char * const type_name;
+        static const char * const type_name() { return "Utf8"; };
     };
     template<> struct ScalarType_t<PyObj> {
         constexpr static const ScalarType scalar_type = ScalarType::Object;
         using type = PyObj; 
-        static const char * const type_name;
+        static const char * const type_name() { return "Object"; };
     };
     template<> struct ScalarType_t<JsonUtf8> {
         constexpr static const ScalarType scalar_type = ScalarType::JsonUtf8;
         using type = JsonUtf8; 
-        static const char * const type_name;
+        static const char * const type_name() { return "Json"; };
     };
-
-    template<> struct ScalarType_t<uint8_t> {
-        static const char * const type_name;
-    };
-    constexpr const char * const ScalarType_t<NullType>::type_name = "Null";
-    constexpr const char * const ScalarType_t<bool>::type_name = "Bool";
-    constexpr const char * const ScalarType_t<int64_t>::type_name = "Int64";
-    constexpr const char * const ScalarType_t<double>::type_name = "Float";
-    constexpr const char * const ScalarType_t<ByteSlice>::type_name = "Bytes";
-    constexpr const char * const ScalarType_t<Utf8>::type_name = "Utf8";
-    constexpr const char * const ScalarType_t<PyObj>::type_name = "Object";
-    constexpr const char * const ScalarType_t<JsonUtf8>::type_name = "Json";
 
     template<class T>
     struct type_name_op{
-        constexpr inline const char *operator()() { return ScalarType_t<T>::type_name; }
+        constexpr inline const char *operator()() const { return ScalarType_t<T>::type_name(); }
     };
 
     template<template <class U> class T, class... Args> 
-    constexpr inline
+    /* constexpr(>c++14) */ inline
     decltype(T<NullType>()(std::declval<Args &&>()...))
     dispatch_type(ScalarType type, Args &&... args) {
         switch (type) {
@@ -103,7 +91,7 @@ namespace ss::iter {
         }
     }
 
-    constexpr inline const char *type_name(ScalarType type) {
+    inline const char *type_name(ScalarType type) {
         return dispatch_type<type_name_op>(type);
     }
 
@@ -112,4 +100,4 @@ namespace ss::iter {
         return out << "Null";
     }
 
-}
+}}

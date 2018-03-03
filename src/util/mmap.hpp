@@ -11,7 +11,7 @@
 #include "error.hpp"
 #include "slice.hpp"
 
-namespace ss::mmap{
+namespace ss { namespace mmap{
 
 class OpenFile{
 public:
@@ -100,4 +100,4 @@ public:
 
 };
 
-}
+}}

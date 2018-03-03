@@ -5,8 +5,6 @@
 using namespace ss;
 using namespace ss::json;
 
-using namespace std::string_literals;
-
 inline std::string to_str(Slice<uint8_t> src) {
     return std::string((char *)src.start, src.len);
 }
@@ -119,7 +117,7 @@ TEST_CASE( "test tokenize num", "[json]" ) {
 TEST_CASE( "test tokenize tricky string", "[json]" ) {
     auto val = tokenize<uint8_t>(from_cstr("\"\\uDFAA\""));
     REQUIRE(val.type == Type::String );
-    REQUIRE(to_str(val.slice) == "\\uDFAA"s);
+    REQUIRE(to_str(val.slice) == std::string("\\uDFAA"));
 }
 
 TEST_CASE( "test invalid json", "[json]" ) {

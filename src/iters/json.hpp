@@ -2,7 +2,7 @@
 
 #include "../util/json/json.hpp"
 
-namespace ss::iter{
+namespace ss{ namespace iter{
 
     class JsonParseIter : public Iter {
 
@@ -35,4 +35,4 @@ namespace ss::iter{
 
     };
 
-}
+}}
