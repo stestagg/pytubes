@@ -67,6 +67,9 @@ def main():
         from pprint import pprint
         os.environ['PYENV_VERSION'] = ""
         os.environ['PATH'] = path.join(check_call("pyenv", "root", output=True), "shims") + ":" + os.environ["PATH"]
+    with Log("Getting version") as l:
+        version = check_call("python", "tools/version.py", output=True)
+        l.format("Version: %s", version)
     with Log("Building OSX wheels"):
         build_osx("3.4.8")
         build_osx("3.5.5")
@@ -75,6 +78,9 @@ def main():
         build_anylinux("cp34-cp34m")
         build_anylinux("cp35-cp35m")
         build_anylinux("cp36-cp36m")
+    with Log("Tagging"):
+        check_call("git", "tag", "-a", version, "-m", "build_wheels.py Tagging version %s" % version)
+
 
 
 
