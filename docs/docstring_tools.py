@@ -28,13 +28,13 @@ def test_compatibility(test):
         except ValueError:
             pass
         else:
-            compatible.append(f'``{dtype.name}``')
+            compatible.append('``{0}``'.format(dtype.name))
     return compatible
 
 
 def describe_compatibility(test):
     compatible_types = test_compatibility(test)
-    yield f'Compatible input types: {", ".join(compatible_types)}'
+    yield 'Compatible input types: {0}'.format(", ".join(compatible_types))
     yield ''
 
 
@@ -62,11 +62,11 @@ def describe_cross_compatibility(test):
     yield "| ↓From      | " + " | ".join(t.name.ljust(6) for t in types) + " |"
     yield "+============+" + ("========+" * len(results))
     for from_type in types:
-        line = f"| {from_type.name.ljust(10)} "
+        line = "| {0} ".format(from_type.name.ljust(10))
         for to_type in types:
             result = results[from_type][to_type]
             value = "✓" if result else " "
-            line += f"|   {value}    "
+            line += "|   {0}    ".format(value)
         line += "|"
         yield line
         yield "+------------+" + ("--------+" * len(results))
