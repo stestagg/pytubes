@@ -1,6 +1,7 @@
 cython
 jinja2
-sphinx
-recommonmark
-pyyaml
 pytest
+pyyaml
+recommonmark
+sphinx
+wheel

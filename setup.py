@@ -63,7 +63,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     author="Stephen Stagg",
     author_email="stestagg@gmail.com",
-    python_requires=">=3.6.0",
+    python_requires=">=3.4.0",
     url="https://github.com/stestagg/pytubes",
     install_requires=[],
     include_package_data=True,
@@ -75,6 +75,8 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
 )

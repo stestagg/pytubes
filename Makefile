@@ -1,6 +1,8 @@
 
 PYTHON_CONFIG ?= python3-config
 
+LIB_VERSION = $(shell python tools/version.py)
+
 CPP_TEST_FILES = $(shell find ./ -type f -name '*_test.cpp')
 PY_C_FLAGS = $(shell $(PYTHON_CONFIG) --cflags)
 PY_LD_FLAGS = $(shell $(PYTHON_CONFIG) --ldflags)
@@ -11,6 +13,9 @@ CXX ?= g++
 LDSHARED ?= g++
 
 STD = -std=c++11
+
+wheels: clean
+	python tools/build_wheels.py
 
 test: test-cpp test-py
 
@@ -26,11 +31,10 @@ install:
 build:
 	python setup.py build
 
-upload: clean-py
-	python setup.py sdist bdist_wheel
-	twine upload dist/*
+clean: clean-doc clean-py clean-cpp clean-wheels
 
-clean: clean-doc clean-py clean-cpp
+clean-wheels:
+	-rm wheelhouse/*
 
 clean-cpp:
 	-rm *.o
