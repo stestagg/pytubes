@@ -1,16 +1,19 @@
 pytubes
 =======
 
-A library for loading data into Python
+.. image:: https://travis-ci.org/stestagg/pytubes.svg?branch=master
+    :target: https://travis-ci.org/stestagg/pytubes
 
-.. toctree::
-    :caption: Contents
-    :maxdepth: 3
-    :name: mastertoc
+.. image:: https://readthedocs.org/projects/pytubes/badge/
+    :target: https://pytubes.readthedocs.io/en/latest/
 
-    tubes
-    performance
-    detail
+Source: https://github.com/stestagg/pytubes
+
+Pytubes is a library that optimizes loading datasets into memory.
+
+At it’s core is a set of specialized c++ classes that can be chained together to load and manipulate data using a standard iterator pattern. Around this there is a cython extension module that makes defining and configuring a tube simple and straight-forward.
+
+
 
 Simple Example
 --------------
@@ -57,60 +60,14 @@ More Complex Example
 >>> print(list(x)[-3])
 (15,612,767, '2017-12-14 09:33:31 UTC', 'GB', '/packages/29/9b/25ef61e948321296f029f53c9f67cc2b54e224db509eb67ce17e0df6044a/certifi-2017.11.5-py2.py3-none-any.whl', 'certifi-2017.11.5-py2.py3-none-any.whl', 'certifi', 'pip', '2.7.5', {'name': 'Linux', 'release': '2.6.32-696.10.3.el6.x86_64'}, 'Linux', 'x86_64', 'glibc', '2.17')
 
+Contents
+--------
 
-What is it?
------------
+.. toctree::
+    :maxdepth: 3
+    :name: mastertoc
 
-Pytubes is a library that optimizes loading dataset into memory.
-
-At it's core is a set of specialized c++ classes that can be chained together
-to load and manipulate data using a standard iterator pattern.  Around this
-there is a cython extension module that makes defining and configuring a tube
-simple and straight-forward.
-
-A lot of the cost of loading data using pure python is typically centered around
-function call overhead and allocating/copying object data.  
-
-Pytubes tackles these bottlenecks by using a number of strategies:
-
- - iterator hot-loops are pure c++ function calls
- - zero-copy views onto array data
- - strict epoch-based lifetime rules avoid reference counting or GC during iteration
- - where possible, zero allocations during iteration
- - avoiding creating python objects where possible
-
-These optimizations lead to significant performance improvements over pure python,
-despite offering complex loading functionality.
-
-Usage
------
-
-Usage is very simple:
-
-#. Import ``tubes``
-#. create an input tube (currently either: :class:`tube.Each` or :class:`tube.Count`) to get some data into the tube
-#. continue to methods on the input tube to build up each step of the processing (e.g. ``read_files().split().json()``...)
-#. Iterate over the tube to generate the data, by either:
-
-   - Calling ``list(tube)``
-   - looping over it in a for-loop:  ``for item in tube:``
-   - or: Calling ``x = iter(tube)``, and then ``next(x)`` repeatedly.
-   
-
-Installation
-------------
-
-**From PyPi**::
-
-    $ pip install pytubes
-
-**From source**::
-
-    $ pip install -r build_requirements.txt
-    $ cd pyx
-    $ python setup.py install
-
-API
----
-
-All tube methods are documented here: :ref:`api`
+    intro_usage
+    tubes
+    performance
+    detail

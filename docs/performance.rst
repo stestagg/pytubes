@@ -10,7 +10,7 @@ in native python, and using pytubes, with their results being compared
 
 
 Dataset: Pypi download stats
------------------------
+----------------------------
 
 Pypi provide package download logs via google bigquery.  These tables can be
 downloaded in a number of formats, including gzipped, line-separated JSON files. 

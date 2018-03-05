@@ -14,6 +14,18 @@ causes a number of things to happen:
 #. The resulting chain of Iters are given to a cython Iter wrapper object that has a ``__next__()`` method that
    produces python values for each iteration.
 
+A lot of the cost of loading data using pure python is typically centered around function call overhead and allocating/copying object data.
+
+Pytubes tackles these bottlenecks by using a number of strategies:
+
+    - iterator hot-loops are pure c++ function calls
+    - zero-copy views onto array data
+    - strict epoch-based lifetime rules avoid reference counting or GC during iteration
+    - where possible, zero allocations during iteration
+    - avoiding creating python objects where possible
+
+These optimizations lead to significant performance improvements over pure python, despite offering complex loading functionality.
+
 Concepts
 --------
 
