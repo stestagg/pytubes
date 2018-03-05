@@ -12,8 +12,10 @@ run-tests
 .cache/
 .pytest_cache/
 *.dSYM/
+.DS_Store
 
 # Generated build files
 test-run.o
 pyx/tubes.cpp
 pyx/iter_defs.pxi
+wheelhouse/*

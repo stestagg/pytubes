@@ -5,10 +5,11 @@ A library for loading data into Python
 
 .. toctree::
     :caption: Contents
-    :maxdepth: 2
+    :maxdepth: 3
     :name: mastertoc
 
     tubes
+    performance
     detail
 
 Simple Example
