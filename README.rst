@@ -63,6 +63,10 @@ More Complex Example
 Contents
 --------
 
+.. role:: noshow
+
+:noshow:`If you're viewing this in github, please visit the docs at: https://pytubes.readthedocs.io/en/latest/`
+
 .. toctree::
     :maxdepth: 3
     :name: mastertoc
