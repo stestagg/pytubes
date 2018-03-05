@@ -25,5 +25,4 @@ Installation
 **From source**::
 
     $ pip install -r build_requirements.txt
-    $ cd pyx
     $ python setup.py install
