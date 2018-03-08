@@ -1,1 +1,2 @@
-global-include *.txt *.rst *.pyx *.pxi *.pxd *.hpp *.json *.tmpl
+global-include *.txt *.rst *.pyx *.pxi *.pxd *.hpp *.json
+include tools/*
