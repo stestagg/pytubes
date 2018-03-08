@@ -3,7 +3,9 @@ PYTHON_CONFIG ?= python3-config
 
 LIB_VERSION = $(shell python tools/version.py)
 
-CPP_TEST_FILES = $(shell find ./ -type f -name '*_test.cpp')
+CPP_TEST_FILES = $(shell find ./src -type f -name '*_test.cpp')
+HPP_FILES = $(shell find ./ -type f -name '*.hpp')
+
 PY_C_FLAGS = $(shell $(PYTHON_CONFIG) --cflags)
 PY_LD_FLAGS = $(shell $(PYTHON_CONFIG) --ldflags)
 PY_LIBRARY_PATH = $(shell $(PYTHON_CONFIG) --prefix)/lib
@@ -54,7 +56,7 @@ clean-py:
 test-cpp: run-tests
 	LD_LIBRARY_PATH=$(PY_LIBRARY_PATH) ./run-tests
 
-run-tests: test-run.o $(CPP_TEST_FILES)
+run-tests: test-run.o $(CPP_TEST_FILES) $(HPP_FILES)
 	$(CXX) $(STD) $(PY_C_FLAGS) -fPIC -Ivendor/  -o run-tests test-run.o $(CPP_TEST_FILES) $(PY_EXTRA_LD_FLAGS) $(PY_LD_FLAGS)
 
 test-run.o:
