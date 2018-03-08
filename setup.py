@@ -8,12 +8,16 @@ import sys
 
 from Cython.Build import cythonize
 from setuptools import setup
+from distutils.command.build_clib import build_clib
 from setuptools.extension import Extension
+
 
 PROJECT_ROOT = path.dirname(path.abspath(__file__))
 
+
 with open(path.join(PROJECT_ROOT, "README.rst")) as fh:
     LONG_DESCRIPTION = fh.read()
+
 
 with open(path.join(PROJECT_ROOT, "pyx", "version.pxi")) as fh:
     VERSION = "%s.%s.%s" % re.match(r'__version__\s*=\s*\((\d+),\s*(\d+),\s*(\d+)\)', fh.read()).groups()
@@ -44,6 +48,11 @@ def update_iter_defs():
 
 update_iter_defs()
 
+zlib = ('zlib', {
+    'sources': glob.glob('vendor/zlib/*.c'),
+    'include_dirs':['vendor/zlib'],
+})
+
 setup(
     name='pytubes',
     ext_modules = cythonize(
@@ -53,11 +62,13 @@ setup(
             language="c++",
             include_dirs = ['vendor', 'pyx', 'src'],
             extra_compile_args=["-std=c++11", '-g', "-O2"],
-            extra_link_args=["-std=c++11", '-lz', '-g'],
+            extra_link_args=["-std=c++11", '-g'],
         ), 
         compiler_directives={"language_level": 3, 'embedsignature': True},
         include_path=['.']
     ),
+    libraries=[zlib],
+    cmdclass = {'build_clib': build_clib},
     version=VERSION,
     description="A library for efficiently loading data into Python",
     long_description=LONG_DESCRIPTION,
