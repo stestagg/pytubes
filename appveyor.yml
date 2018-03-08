@@ -14,6 +14,8 @@ install:
   # We need wheel installed to build wheels
   - "%PYTHON%\\python.exe -m pip install wheel"
 
+build: off
+
 test_script:
   # Put your test command here.
   # If you don't need to build C extensions on 64-bit Python 3.3 or 3.4,
