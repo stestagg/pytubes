@@ -26,6 +26,7 @@ public:
     inline PyObj(PyObj&& o) noexcept : obj(o.obj) { o.obj = 0; }
     inline PyObj& operator=(const PyObj& other) { Py_XDECREF(obj); obj = other.obj; Py_INCREF(obj); return *this;}
     inline PyObj& operator=(PyObj&& other) { Py_XDECREF(obj); obj = other.obj; other.obj=0; return *this;}
+
     // give() is used to move the owned pointer to the receiver without calling DECREF
     inline PyObject *give() { auto rv = obj; obj = 0; return rv;}
     inline PyObj acquire() const { return PyObj(obj); }
@@ -33,4 +34,13 @@ public:
     ~PyObj() { Py_XDECREF(obj); }
 };
 
+}
+
+
+namespace std{
+    template<> struct hash<ss::PyObj>{
+        inline std::size_t operator()(const ss::PyObj& val) const {
+            return std::hash<void*>()(val.obj);
+        }
+    };
 }
