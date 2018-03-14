@@ -1,11 +1,12 @@
 from cpython.ref cimport PyObject
 
-cdef extern from "../src/iter.hpp" namespace "ss::iter":
-
-    void invoke_debugger() # TODO: remove
-
+cdef extern from "../src/iter.hpp" namespace "ss":
     cdef cppclass Slice[T]:
+        size_t len;
         T &operator[](size_t);
+
+
+cdef extern from "../src/iter.hpp" namespace "ss::iter":
 
     cdef cppclass SlotPointer:
         scalar_type.ScalarType type

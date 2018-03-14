@@ -4,6 +4,8 @@ cimport cython
 cimport scalar_type
 from scalar_type cimport ScalarType
 from libcpp.vector cimport vector
+from libcpp.map cimport map as map_t
+from libcpp.string cimport string
 from cpython.object cimport Py_LT, Py_LE, Py_EQ, Py_NE, Py_GT, Py_GE
 
 __doc__ = """
@@ -30,6 +32,8 @@ cdef class DType:
 C_DTYPE_TO_Dtype = {}
 
 
+cdef map_t[scalar_type.ScalarType, string] _SCALAR_TYPE_TO_NAME
+
 cdef _make_dtype(scalar_type.ScalarType ty, str name):
     cdef DType dtype = DType()
     dtype.type = ty
@@ -51,6 +55,7 @@ Utf8 = _make_dtype(scalar_type.Utf8, "str")
 Object = _make_dtype(scalar_type.Object, "object")
 JsonUtf8 = _make_dtype(scalar_type.JsonUtf8, "Json")
 TsvRow = _make_dtype(scalar_type.Tsv, "Tsv")
+
 
 cdef object UNDEFINED = object()
 cdef public PyObject *UNDEFINED_OBJ = <PyObject*>UNDEFINED
