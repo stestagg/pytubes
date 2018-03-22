@@ -11,7 +11,7 @@ Source: https://github.com/stestagg/pytubes
 
 Pytubes is a library that optimizes loading datasets into memory.
 
-At it’s core is a set of specialized c++ classes that can be chained together to load and manipulate data using a standard iterator pattern. Around this there is a cython extension module that makes defining and configuring a tube simple and straight-forward.
+At it’s core is a set of specialized C++ classes that can be chained together to load and manipulate data using a standard iterator pattern. Around this there is a cython extension module that makes defining and configuring a tube simple and straight-forward.
 
 
 
