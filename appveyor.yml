@@ -14,6 +14,7 @@ environment:
 
 install:
   - "git submodule update"
+  - "dir vendor/zlib"
   # We need wheel installed to build wheels
   - "%PYTHON%\\python.exe -m pip install wheel"
 
