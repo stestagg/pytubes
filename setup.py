@@ -60,7 +60,7 @@ setup(
             "tubes",
             sources=["pyx/tubes.pyx"],
             language="c++",
-            include_dirs = ['vendor', 'pyx', 'src'],
+            include_dirs = ['vendor', 'pyx', 'src', 'vendor/zlib'],
             extra_compile_args=["-std=c++11", '-g', "-O2"],
             extra_link_args=["-std=c++11", '-g'],
         ), 

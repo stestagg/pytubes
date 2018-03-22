@@ -14,7 +14,7 @@ except NameError:
 THIS_DIR = path.dirname(__file__)
 
 def read_file(*parts):
-    with open(path.join(*parts)) as fh:
+    with open(path.join(*parts), encoding="utf-8") as fh:
         return fh.read()
 
 #SAMPLE_JSON is a corpus of json snippets that should all be parsable.
@@ -77,6 +77,12 @@ def test_passing_json_test_suite_cases(filename):
     assert list(tubes_version)[0] == py_version
 
 
-@pytest.mark.parametrize("sample", SAMPLE_JSON)
-def test_json(sample):
+# Pytest puts the input data into the test name, which is useful for debugging,
+# The current test name is put in the environment in pytest
+# BUT, in this case, the tricky_json.json file is too long for the WIN32 environment
+# so breaks.  Instead, pass the index into the SAMPLE_JSON list as a parameter to the test
+# to avoid putting 100s KB json into the environment
+@pytest.mark.parametrize("sample_num", range(len(SAMPLE_JSON)))
+def test_json(sample_num):
+    sample = SAMPLE_JSON[sample_num]
     assert list(tubes.Each([sample]).to(str).json())[0] == json.loads(sample)
