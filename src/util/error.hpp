@@ -21,7 +21,7 @@
 #define _NOEXCEPT noexcept
 #endif
 
-#if defined(__clang__)
+#if defined(__clang__) || defined(_MSC_VER)
 
 #define NORETURN_A [[noreturn]]
 #define NORETURN_B 
@@ -103,7 +103,7 @@ namespace ss{
     }
 
 
-    #define throw_if(Ty, cond, args...) if(_SS_ERROR_UNLIKELY(cond)) { throw_py<Ty>(args);}
+    #define throw_if(Ty, cond, ...) if(_SS_ERROR_UNLIKELY(cond)) { throw_py<Ty>(__VA_ARGS__);}
 
     template<class T, class ...Args>
     NORETURN_A inline void NORETURN_B throw_py(Args const &... args){

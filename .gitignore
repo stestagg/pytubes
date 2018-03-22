@@ -19,3 +19,4 @@ test-run.o
 pyx/tubes.cpp
 pyx/iter_defs.pxi
 wheelhouse/*
+pyx/tubes.h

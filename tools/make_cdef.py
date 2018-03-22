@@ -144,6 +144,7 @@ def make_cdef(file_names):
         iters=iters,
         tubes=tubes,
         fns=fns,
+        repr=repr,
         enumerate=enumerate,
         len=len
     ))
