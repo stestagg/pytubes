@@ -247,6 +247,16 @@ cdef class Tube:
             resolved.append(slot_type)
         return Convert(self, resolved, codec=codec.encode('ascii'))
 
+    def enum(self, codec="utf-8"):
+        """
+        Convert the input to a python object, storing and returning duplicate
+        values where possible to reduce allocation overhead
+
+        Supported conversions:
+        XCompatibility: from_tube.enum()
+        """
+        return Enum(self, codec=codec.encode('ascii'))
+
     def multi(self, *makers):
         """
         Compatibility: tube.multi(lambda x: (x, ))

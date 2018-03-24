@@ -36,11 +36,6 @@
 template<typename... Ts> struct make_void { typedef void type;};
 template<typename... Ts> using void_t = typename make_void<Ts...>::type;
 
-inline std::ostream& operator<< (std::ostream &out, const std::basic_string<unsigned char> &v) {
-    out << std::string((const char *)v.c_str(), v.length());
-    return out;
-}
-
 namespace ss{
 
     using MemoryError = std::bad_alloc;

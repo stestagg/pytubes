@@ -11,14 +11,21 @@ namespace ss{ namespace iter{
     using NullType = std::tuple<>;
     using ByteSlice = Slice<uint8_t>;
     struct Utf8 : ByteSlice {
+        using el_t = uint8_t;
         Utf8() : ByteSlice() {}
         Utf8(const uint8_t *start, size_t len): ByteSlice(start, len) {}
         Utf8(const uint8_t *begin, const uint8_t *end, bool _): ByteSlice(begin, end, _) {}
         Utf8(const Slice<uint8_t> &src) : ByteSlice(src) {}
-        Utf8(Utf8 &src) : ByteSlice(src.start, src.len) {}
+        Utf8(const Utf8 &src) : ByteSlice(src.start, src.len) {}
         Utf8(const std::basic_string<uint8_t> &src) : ByteSlice(src) {}
     
         Utf8(const std::vector<uint8_t> &src) : ByteSlice(src) {}
+        inline bool operator==(const Utf8 &other) const {
+            return len == other.len && std::equal(begin(), end(), other.begin());
+        }
+        inline bool operator!=(const Utf8 &other) const {
+            return !(*this == other);
+        }
     };
     using JsonUtf8 = json::Value<uint8_t>;
 
@@ -107,4 +114,26 @@ namespace ss{ namespace iter{
         return out << "Null";
     }
 
+    inline std::ostream & operator<< (std::ostream &out, PyObj const &t) {
+        return out << "PyObj[" << t.obj << "]";
+    }
+    inline std::ostream & operator<< (std::ostream &out, std::basic_string<unsigned char> const &v) {
+        return out << std::string((const char *)v.c_str(), v.length());
+    }
+
 }}
+
+
+namespace std{
+    template<> struct hash<ss::iter::NullType>{
+        inline std::size_t operator()(const ss::iter::NullType& val) const {
+            return 0;
+        }
+    };
+
+    template<> struct hash<ss::iter::Utf8>{
+        inline std::size_t operator()(const ss::iter::Utf8& val) const {
+            return CityHash<sizeof(size_t)>((const char *)val.start, val.len);
+        }
+    };
+}
