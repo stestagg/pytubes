@@ -23,6 +23,10 @@ namespace ss{ namespace json{
     public:
         ArrayIter(Slice<T> slice): cur(), slice(slice) {}
 
+        inline bool operator==(const ArrayIter<T, P> &other) const {
+            return slice.is(other.slice);
+        }
+
         inline bool operator!=(const ArrayIter<T, P> &other) const {
             return !slice.is(other.slice);
         }
@@ -53,6 +57,9 @@ namespace ss{ namespace json{
 
         inline bool operator!=(const ObjectIter<T, P> &other) const {
             return !slice.is(other.slice);
+        }
+        inline bool operator==(const ObjectIter<T, P> &other) const {
+            return slice.is(other.slice);
         }
 
         inline ObjectIter<T, P>& operator++() {

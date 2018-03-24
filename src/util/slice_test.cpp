@@ -21,6 +21,16 @@ TEST_CASE( "Slices can be constructed from buffers", "[slice]" ) {
     REQUIRE( Slice<char>(data, 4).start == data );
 }
 
+TEST_CASE( "Slices can be constructed from strings", "[slice]" ) {
+    std::basic_string<uint8_t> data((const uint8_t*)"Hello World");
+    REQUIRE( Slice<uint8_t>(data).len == 11);
+}
+
+TEST_CASE( "Slices can be constructed from strings with alternate sign", "[slice]" ) {
+    std::basic_string<char> data("Hello World");
+    REQUIRE( Slice<uint8_t>(data).len == 11);
+}
+
 TEST_CASE( "Slices can be constructed from iterators", "[slice]" ) {
     const char *data = "test\0me";
     REQUIRE( Slice<char>(data, &data[2], true).len == 2 );
@@ -123,3 +133,39 @@ TEST_CASE( "Slicing a slice using indexes", "[slice]" ) {
     REQUIRE( std::string(Slice<char>(data, 8).slice_to(4)) == std::string("null" ) );
     REQUIRE( std::string(Slice<char>(data, 8).slice_from(4)) == std::string(",end" ) );
 }
+
+
+TEST_CASE( "lstrip removes initial chars", "[slice]" ) {
+    auto data = ByteSlice("abacus", 6);
+    REQUIRE( ByteSlice("", 0).lstrip<'x'>() == ByteSlice("", 0));
+    REQUIRE( data.lstrip<'x'>() == ByteSlice("abacus", 6));
+    REQUIRE( data.lstrip<'a'>() == ByteSlice("bacus", 5));
+    REQUIRE( data.lstrip<'a', 'b'>() == ByteSlice("cus", 3));
+    REQUIRE( data.lstrip<'a', 'b', 'c'>() == ByteSlice("us", 2));
+    REQUIRE( data.lstrip<'a', 'b', 'c', 'u', 's'>() == ByteSlice("", 0));
+    REQUIRE( data.lstrip<'a', 'b', 'c', 'u', 's'>().start == data.start + 6);
+}
+
+
+TEST_CASE( "rstrip removes trailing chars", "[slice]" ) {
+    auto data = ByteSlice("sucaba", 6);
+    REQUIRE( ByteSlice("", 0).rstrip<'x'>() == ByteSlice("", 0));
+    REQUIRE( data.rstrip<'x'>() == ByteSlice("sucaba", 6));
+    REQUIRE( data.rstrip<'a'>() == ByteSlice("sucab", 5));
+    REQUIRE( data.rstrip<'a', 'b'>() == ByteSlice("suc", 3));
+    REQUIRE( data.rstrip<'a', 'b', 'c'>() == ByteSlice("su", 2));
+    REQUIRE( data.rstrip<'a', 'b', 'c', 'u', 's'>() == ByteSlice("", 0));
+    REQUIRE( data.rstrip<'a', 'b', 'c', 'u', 's'>().start == data.start);
+    REQUIRE( data.rstrip<'a', 'b', 'c', 'u', 's'>().len == 0);
+}
+
+
+TEST_CASE( "strip removes chars from both ends", "[slice]" ) {
+    auto data = ByteSlice("abacusucaba", 11);
+    REQUIRE( data.strip<'x'>() == ByteSlice("abacusucaba", 11));
+    REQUIRE( data.strip<'a'>() == ByteSlice("bacusucab", 9));
+    REQUIRE( data.strip<'a', 'b'>() == ByteSlice("cusuc", 5));
+    REQUIRE( data.strip<'a', 'b', 'c'>() == ByteSlice("usu", 3));
+    REQUIRE( data.strip<'a', 'b', 'c', 'u', 's'>() == ByteSlice("", 0));
+}
+

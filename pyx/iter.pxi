@@ -23,6 +23,8 @@ cdef extern from "../src/iter.hpp" namespace "ss::iter":
     void convert_stop_iteration()
     cdef void do_next(const Chain &iters) except +convert_stop_iteration
 
+    ScalarType field_dtype_from_dtype(ScalarType)
+
 
 cdef extern from "../src/util/pyobj.hpp" namespace "ss":
     

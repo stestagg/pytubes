@@ -27,12 +27,19 @@ cdef class DType:
     def __repr__(self):
         return f"DType[{self.name}]"
 
+C_DTYPE_TO_Dtype = {}
+
 
 cdef _make_dtype(scalar_type.ScalarType ty, str name):
     cdef DType dtype = DType()
     dtype.type = ty
     dtype.name = name
+    C_DTYPE_TO_Dtype[<int>ty] = dtype
     return dtype
+
+
+cdef c_dtype_to_dtype(scalar_type.ScalarType ty):
+    return C_DTYPE_TO_Dtype[<int>ty]
 
 
 Null = _make_dtype(scalar_type.Null, "Null")
@@ -43,6 +50,7 @@ ByteSlice = _make_dtype(scalar_type.ByteSlice, "bytes")
 Utf8 = _make_dtype(scalar_type.Utf8, "str")
 Object = _make_dtype(scalar_type.Object, "object")
 JsonUtf8 = _make_dtype(scalar_type.JsonUtf8, "Json")
+TsvRow = _make_dtype(scalar_type.Tsv, "Tsv")
 
 cdef object UNDEFINED = object()
 cdef public PyObject *UNDEFINED_OBJ = <PyObject*>UNDEFINED
@@ -55,7 +63,7 @@ DTYPE_MAP = {
     float: Float,
     bytes: ByteSlice,
     str: Utf8, # Not ideal, but..
-    object: Object 
+    object: Object
 }
 
 include "pyiter.pxi"
@@ -69,6 +77,8 @@ cdef class Tube:
 
     cdef object _name_lookup
     cdef int _name_lookup_inited
+    cdef object _index_lookup
+    cdef int _index_lookup_inited
     
     cdef IterWrapper _make_iter(self, args):
         raise NotImplementedError("_make_iter")
@@ -113,9 +123,18 @@ cdef class Tube:
 
     cdef NameLookup name_lookup(self):
         if not self._name_lookup_inited:
-            self._name_lookup = NameLookup(self, [])
-            self._name_lookup_inited = 1
+            self._set_name_lookup(NameLookup(self, []))
         return self._name_lookup
+
+    cdef _set_index_lookup(self, IndexLookup lookup):
+        assert self._index_lookup_inited == 0
+        self._index_lookup = lookup
+        self._index_lookup_inited = 1
+
+    cdef IndexLookup index_lookup(self):
+        if not self._index_lookup_inited:
+            self._set_index_lookup(IndexLookup(self, []))
+        return self._index_lookup
 
     def first(self, size_t num):
         """
@@ -233,6 +252,28 @@ cdef class Tube:
             return JsonParse(self.to(str, codec="utf-8"))
         return JsonParse(self)
 
+    def tsv(self, headers=True):
+        """
+        Compatibility: tube.tsv()
+        Interpret the input values as rows of a TSV file.
+        Each input to tsv() is treated as a separate row in the file.
+        `headers` (default: `True`) if true, will read the first input value
+        as a tab-separated list of field names, allowing subsequent access
+        to values by name, as well as by index.
+
+        >>> list(Each(['sample.tsv']).read_files().tsv())
+        [(b'abc', b'def'), (b'ghi', b'jkl')]
+        >>> list(Each(['a\tb', 'c\td']).tsv())
+        [(b'a', b'b'), (b'c', b'd')]
+        >>> list(Each(['a\tb', 'c\td']).tsv(headers=True).get('a'))
+        [b'c']
+        >>> list(Each(['a\tb', 'c\td']).tsv(headers=False).get(1).to(str))
+        ['b', 'd']
+        """
+        if self.dtype[0] in {Utf8, Object}:
+            return Tsv(self.to(bytes, codec="utf-8"), headers)
+        return Tsv(self, headers)
+
     def to(self, *types, codec="utf-8"):
         """
         Convert the input to the specified dtype.
@@ -269,7 +310,7 @@ cdef class Tube:
                 tubes.extend(result)
         return Multi(self, tubes)
 
-    def get(self, str key, default=UNDEFINED):
+    def get(self, object key, default=UNDEFINED):
         """
         Compatibility: tube.get("field")
 
@@ -292,7 +333,10 @@ cdef class Tube:
         >>> list(Each(['{"a": 1}', '{"b": 2}']).json().get("a", "null"))
         [1, None]
         """
-        return self.name_lookup().lookup_name(key, default)
+        if isinstance(key, str):
+            return self.name_lookup().lookup_name(key, default)
+        elif isinstance(key, int):
+            return self.index_lookup().lookup_index(key, default)
 
     def slot(self, size_t num, default=UNDEFINED):
         """

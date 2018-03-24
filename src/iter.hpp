@@ -2,8 +2,10 @@
 
 #include <vector>
 
+#include "bytes.hpp"
 #include "slot.hpp"
 #include "scalar.hpp"
+
 
 // This is quite ugly, but I'm unsure of a better way to do this
 // CppExn2Pyerr is the default Cython C++>Python exception converter

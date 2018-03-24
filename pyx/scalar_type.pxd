@@ -12,3 +12,4 @@ cdef extern from "../src/iters/filemap.hpp" namespace "ss::iter::ScalarType":
     cdef ScalarType Utf8
     cdef ScalarType Object
     cdef ScalarType JsonUtf8
+    cdef ScalarType Tsv
