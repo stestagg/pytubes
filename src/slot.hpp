@@ -71,5 +71,14 @@ namespace ss{ namespace iter{
         return dispatch_type<make_typed_slot_op>(type);
     }
 
+    template<class T>
+    Array<SlotPointer> make_slots_from_array(const Array<T> &values) {
+        Array<SlotPointer> slots(values.size);
+        for (size_t index=0; index < values.size; ++index) {
+            slots[index] = &values[index];
+        }
+        return slots;
+    }
+
 
 }}

@@ -48,7 +48,8 @@ clean-doc:
 
 clean-py:
 	python setup.py clean
-	-rm dist/*
+	-rm -rf build
+	-rm -rf dist
 	find ./ -name *.pyc -delete	
 	-find ./ -name __pycache__ -exec rm -r {} ';'
 	-rm -rf pytubes.egg-info

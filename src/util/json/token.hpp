@@ -6,38 +6,20 @@ namespace ss{ namespace json{
     using std::make_pair;
 
     template<class T>
-    Slice<T> stripWhiteSpace(const Slice<T> &in) {
+    inline Slice<T> stripWhiteSpace(const Slice<T> &in) {
         /* Whitespace is: 
           %x20  - Space
           %x09  - Tab
           %x0A  - Line feed
           %x0D  - CR
         */
-        auto cur = in.begin();
-        while (cur != in.end()) {
-            auto val = *cur;
-            if ((val == 0x20) || (val == 0x09) || (val == 0x0a) || (val == 0x0d)) {
-                cur += 1;
-            } else {
-                return in.slice_from_ptr(cur);
-            }
-        }
-        return in.slice_from_ptr(in.end());
+        return in.template lstrip<0x20, 0x09, 0x0a, 0x0d>();
     }
 
     template<class T>
-    Slice<T> stripWhiteSpaceEnd(const Slice<T> &in) {
+    inline Slice<T> stripWhiteSpaceEnd(const Slice<T> &in) {
         // As stripWhiteSpace, but remove trailing whitespace
-        auto cur = in.end();
-        while (cur != in.begin()) {
-            -- cur;
-            auto val = *cur;
-            if ((val == 0x20) || (val == 0x09) || (val == 0x0a) || (val == 0x0d)) {
-            } else {
-                return in.slice_to_ptr(cur+1);
-            }
-        }
-        return in.slice_to(0);
+        return in.template rstrip<0x20, 0x09, 0x0a, 0x0d>();
     }
 
     template<class T> 

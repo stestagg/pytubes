@@ -27,6 +27,17 @@ namespace ss{
         static inline bool _static_startswith_impl(const T *val) {
             return (val[start] == A) && _static_startswith_impl<start+1, T, More...>(val);
         }
+
+        template<class T>
+        static inline bool is_one_of_impl(const T &val) { 
+            return false; 
+        }
+
+        template<class T, char A, size_t...More>
+        static inline bool is_one_of_impl(const T &val) { 
+            return val == A || is_one_of_impl<T, More...>(val); 
+        }
+
     }
         
     template <class T> struct Slice {
@@ -47,6 +58,13 @@ namespace ss{
         Slice(const T *start, size_t len): start(start), len(len) {}
         Slice(const T *begin, const T *end, bool _): start(begin), len(end - begin) {}
         Slice(const Slice<T> &src) : start(src.start), len(src.len) {}
+
+        // Special case char > uint8_t coercion
+        template<class Q = T, typename std::enable_if<std::is_same<Q, uint8_t>::value, int>::type = 0>
+        Slice(const char *start, size_t len): start((const uint8_t *)start), len(len) {}
+
+        template<class Q = T, typename std::enable_if<std::is_same<Q, uint8_t>::value, int>::type = 0>
+        Slice(const basic_string<char> &src): start((const uint8_t *)src.c_str()), len(src.length()) {}
 
         template<class Q = T, typename std::enable_if<std::is_arithmetic<Q>::value, int>::type = 0>
         Slice(const std::basic_string<T> &src) : start(src.c_str()), len(src.length()) {}
@@ -71,7 +89,6 @@ namespace ss{
         }
 
         inline bool operator==(const Slice<T> &other) const {
-
             return len == other.len && std::equal(begin(), end(), other.begin());
         }
 
@@ -100,6 +117,35 @@ namespace ss{
         inline const T*find_first_of() const {
             T match[] = {Chars...};
             return std::find_first_of(begin(), end(), &match[0], &match[sizeof...(Chars)]);
+        }
+
+        template<size_t... Chars>
+        inline Slice<T> lstrip() const {
+            const T *cur = begin();
+            while (cur < end()) {
+                if (!slice::is_one_of_impl<T, Chars...>(*cur)){
+                    break;
+                }
+                ++cur;
+            }
+            return slice_from_ptr(cur);
+        }
+
+        template<size_t... Chars>
+        inline Slice<T> rstrip() const {
+            const T *cur = end();
+            while (cur >= start) {
+                --cur;
+                if (!slice::is_one_of_impl<T, Chars...>(*cur)){
+                    break;
+                }
+            }
+            return slice_to_ptr(cur+1);
+        }
+
+        template<size_t... Chars>
+        inline Slice<T> strip() const {
+            return rstrip<Chars...>().template lstrip<Chars...>();
         }
 
         inline Slice<T> slice_to_ptr(const T *end) const {

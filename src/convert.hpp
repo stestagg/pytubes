@@ -3,6 +3,7 @@
 #include <array>
 
 #include "iters/topy.hpp"
+#include "util/atoi.hpp"
 
 namespace ss{ namespace iter{
 
@@ -76,6 +77,9 @@ namespace ss{ namespace iter{
     simple_convert(bool, Utf8, { current = *from ? ByteSlice((uint8_t*)"True", 4) : ByteSlice((uint8_t*)"False", 5); });
     simple_convert(int64_t, double, { current = *from; });
     simple_convert(double, int64_t, { current = *from; });
+    simple_convert(ByteSlice, TsvRow, { current = TsvRow(*from, NULL); });
+
+    simple_convert(ByteSlice, int64_t, { current = slice_to_int(*from); });
 
 
     #define BYTES_UTF(T, U) typename std::enable_if< \
@@ -89,7 +93,7 @@ namespace ss{ namespace iter{
         const JsonUtf8 *from;
         T current;
         std::array<char, 32> fixed_buffer;
-        std::basic_string<uint8_t> buffer;
+        ByteString buffer;
         const T * const to;
 
         Converter(const JsonUtf8 *from, const std::string &codec)
@@ -311,6 +315,21 @@ namespace ss{ namespace iter{
         if(!buf){ throw PyExceptionRaised; }
         auto slice = ByteSlice((uint8_t *)buf, PyBytes_GET_SIZE(from->obj));
         current = json::tokenize_entire(slice);
+    }
+
+     // PyObj > Tsv
+    py_convert_fn(Py_UNICODE*, TsvRow) {
+        Py_ssize_t size;
+        buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
+        const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &size);
+        current = TsvRow(ByteSlice((uint8_t *)buf, size), NULL);
+    }
+    py_convert_fn(uint8_t*, TsvRow) {
+        buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
+        const char *buf = PyBytes_AsString(from->obj);
+        if(!buf){ throw PyExceptionRaised; }
+        auto slice = ByteSlice((uint8_t *)buf, PyBytes_GET_SIZE(from->obj));
+        current = TsvRow(slice, NULL);
     }
 
 }}

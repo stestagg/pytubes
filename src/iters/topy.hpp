@@ -98,6 +98,17 @@ namespace ss{ namespace iter{
         return PyObj();
     }
 
+    template <> inline PyObj to_py<TsvRow>(const void *_val) {
+        auto row = (TsvRow *)_val;
+        PyObj container= PyObj(PyList_New(0), true);
+        if (!container.obj) { throw std::bad_alloc(); }
+
+        for (auto v : *row) {
+            PyList_Append(container.obj, to_py<ByteSlice>((const void *)&v).obj);
+        }
+        return container;
+    }
+
 
     template<class T>
     struct to_py_op{
@@ -146,6 +157,5 @@ namespace ss{ namespace iter{
             return values[index].acquire().give();
         }
     };
-
 
 }}

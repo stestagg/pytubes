@@ -64,7 +64,7 @@ cdef class {{tube.name}}(Tube):  # AUTO GENERATED FROM tools/defn2.tmpl
 
     @property
     def dtype(self):
-        {{tube.dtype}}
+        {{tube.dtype|indent(8)}}
 
     @property
     def _chains(self):
