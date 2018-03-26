@@ -162,7 +162,7 @@ namespace ss{ namespace iter{
         parent->populate_slots(fields);
     }
 
-    template<class T>
+    template<class T, class Enable>
     struct index_lookup_iter_op{
         inline Iter *operator()(AnyIter parent, std::vector<size_t> &indexes, std::vector<size_t> &skips) {
             throw_py<ValueError>(
@@ -174,15 +174,15 @@ namespace ss{ namespace iter{
     };
 
     template<> 
-    inline Iter *index_lookup_iter_op<JsonUtf8>::operator()(AnyIter parent, std::vector<size_t> &indexes, std::vector<size_t> &skips) {
+    inline Iter *index_lookup_iter_op<JsonUtf8, bool>::operator()(AnyIter parent, std::vector<size_t> &indexes, std::vector<size_t> &skips) {
         return new IndexLookupIter<JsonUtf8>(parent, indexes, skips);
     }
     template<> 
-    inline Iter *index_lookup_iter_op<TsvRow>::operator()(AnyIter parent, std::vector<size_t> &indexes, std::vector<size_t> &skips) {
+    inline Iter *index_lookup_iter_op<TsvRow, bool>::operator()(AnyIter parent, std::vector<size_t> &indexes, std::vector<size_t> &skips) {
         return new IndexLookupIter<TsvRow>(parent, indexes, skips);
     }
 
-    template<class T>
+    template<class T, class Enable>
     struct single_index_lookup_iter_op{
         inline Iter *operator()(AnyIter parent, size_t index) {
             throw_py<ValueError>(
@@ -193,10 +193,10 @@ namespace ss{ namespace iter{
         } 
     };
 
-    template<> inline Iter *single_index_lookup_iter_op<JsonUtf8>::operator() (AnyIter parent, size_t index) {
+    template<> inline Iter *single_index_lookup_iter_op<JsonUtf8, bool>::operator() (AnyIter parent, size_t index) {
         return new SingleIndexLookupIter<JsonUtf8>(parent, index);
     }
-    template<> inline Iter *single_index_lookup_iter_op<TsvRow>::operator() (AnyIter parent, size_t index) {
+    template<> inline Iter *single_index_lookup_iter_op<TsvRow, bool>::operator() (AnyIter parent, size_t index) {
         return new SingleIndexLookupIter<TsvRow>(parent, index);
     }
 

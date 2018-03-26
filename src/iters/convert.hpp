@@ -11,8 +11,8 @@
 
 namespace ss{ namespace iter{
 
-    template<class T> struct make_converter_op{
-        template<class F> struct make_converter_inner {
+    template<class T, class Enable> struct make_converter_op{
+        template<class F, class Enableb> struct make_converter_inner {
             inline AnyConverter *operator()(SlotPointer from_ptr, const std::string &codec) { 
                 return new Converter<F, T>(from_ptr, codec);
             }

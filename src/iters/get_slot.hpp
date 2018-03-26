@@ -60,7 +60,7 @@ namespace ss{ namespace iter{
 
     };
 
-    template<class T>
+    template<class T, class Enable>
     struct slot_get_iter_from_dtype_op{
         inline Iter *operator()(AnyIter parent, size_t index, PyObj &default_val) {
             return new SlotGetIter<T>(parent, index, default_val);

@@ -80,6 +80,7 @@ namespace ss{ namespace iter{
     simple_convert(ByteSlice, TsvRow, { current = TsvRow(*from, NULL); });
 
     simple_convert(ByteSlice, int64_t, { current = slice_to_int(*from); });
+    simple_convert(Utf8, int64_t, { current = slice_to_int(*from); });
 
 
     #define BYTES_UTF(T, U) typename std::enable_if< \

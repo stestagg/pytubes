@@ -60,7 +60,7 @@ namespace ss{ namespace iter{
         inline void update(const void *ptr) { value = *(T*)ptr; }
     };
 
-    template<class T>
+    template<class T, class Enable>
     struct make_typed_slot_op{
         inline std::unique_ptr<StoredSlot> operator()() {
             return std::unique_ptr<StoredSlot>(new TypedStoredSlot<T>());

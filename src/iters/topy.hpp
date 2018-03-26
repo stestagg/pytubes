@@ -110,7 +110,7 @@ namespace ss{ namespace iter{
     }
 
 
-    template<class T>
+    template<class T, class Enable>
     struct to_py_op{
         constexpr inline ToPyFn operator()() const { return to_py<T>; }
     };

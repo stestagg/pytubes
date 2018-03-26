@@ -35,7 +35,7 @@ class ZlibDecodeIter : public Iter {
 
 public:
 
-    ZlibDecodeIter(Chain chain, AnyIter parent, bool is_stream) // <- Iter
+    ZlibDecodeIter(Chain chain, AnyIter parent, bool is_stream)
         : source_data(parent->get_slots()[0]),
           chain(chain),
           is_stream(is_stream),
