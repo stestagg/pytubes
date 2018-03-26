@@ -164,7 +164,7 @@ namespace ss{ namespace iter{
 
     };
 
-    template<class T>
+    template<class T, class Enable>
     struct name_lookup_iter_op{
         inline Iter *operator()(AnyIter parent, std::vector<std::string> &names) {
             throw_py<ValueError>(
@@ -175,14 +175,14 @@ namespace ss{ namespace iter{
         } 
     };
 
-    template<> inline Iter *name_lookup_iter_op<JsonUtf8>::operator() (AnyIter parent, std::vector<std::string> &names) {
+    template<> inline Iter *name_lookup_iter_op<JsonUtf8, bool>::operator() (AnyIter parent, std::vector<std::string> &names) {
         if (names.size() == 1) {
             return new SingleNameLookupIter<JsonUtf8>(parent, names[0]);
         }
         return new NameLookupIter<JsonUtf8>(parent, names);
     }
 
-    template<> inline Iter *name_lookup_iter_op<TsvRow>::operator() (AnyIter parent, std::vector<std::string> &names) {
+    template<> inline Iter *name_lookup_iter_op<TsvRow, bool>::operator() (AnyIter parent, std::vector<std::string> &names) {
         return new NameLookupIter<TsvRow>(parent, names);
     }
 

@@ -5,7 +5,14 @@
 #include "util/json/json.hpp"
 #include "util/tsv.hpp"
 
-namespace ss{ namespace iter{
+namespace ss{
+
+template<class X, typename... Ts> struct make_ignore { typedef X type;};
+template<class X, typename... Ts> using ignore_t = typename make_ignore<X, Ts...>::type;
+template<typename... Ts> using void_t = typename make_ignore<void, Ts...>::type;
+    
+
+namespace iter{
 
     static const char null = 0;
 
@@ -89,7 +96,7 @@ namespace ss{ namespace iter{
         static const char * const type_name() { return "Tsv"; };
     };
 
-    template<class T>
+    template<class T, class Enable>
     struct type_name_op{
         constexpr inline const char *operator()() const { return ScalarType_t<T>::type_name(); }
     };
@@ -97,23 +104,23 @@ namespace ss{ namespace iter{
     template<class T>
     constexpr ScalarType dtype_from_type() { return ScalarType_t<T>::scalar_type; }
 
-    template<template <class U> class T, class... Args> 
+    template<template <class U, class Enable=bool> class T, class... Args> 
     /* constexpr(>c++14) */ inline
-    decltype(T<NullType>()(std::declval<Args &&>()...))
+    decltype(T<NullType, bool>()(std::declval<Args &&>()...))
     dispatch_type(ScalarType type, Args &&... args) {
         switch (type) {
-            case ScalarType::Null: return T<NullType>()(args...);
-            case ScalarType::Bool: return T<bool>()(args...);
-            case ScalarType::Int64: return T<int64_t>()(args...);
-            case ScalarType::Float: return T<double>()(args...);
-            case ScalarType::ByteSlice: return T<ByteSlice>()(args...);
-            case ScalarType::Utf8: return T<Utf8>()(args...);
-            case ScalarType::Object: return T<PyObj>()(args...);
-            case ScalarType::JsonUtf8: return T<JsonUtf8>()(args...);
-            case ScalarType::Tsv: return T<TsvRow>()(args...);
+            case ScalarType::Null: return T<NullType, bool>()(args...);
+            case ScalarType::Bool: return T<bool, bool>()(args...);
+            case ScalarType::Int64: return T<int64_t, bool>()(args...);
+            case ScalarType::Float: return T<double, bool>()(args...);
+            case ScalarType::ByteSlice: return T<ByteSlice, bool>()(args...);
+            case ScalarType::Utf8: return T<Utf8, bool>()(args...);
+            case ScalarType::Object: return T<PyObj, bool>()(args...);
+            case ScalarType::JsonUtf8: return T<JsonUtf8, bool>()(args...);
+            case ScalarType::Tsv: return T<TsvRow, bool>()(args...);
             default:  throw_py<RuntimeError>("Got unexpected dtype value:  ", (size_t)type);
         }
-        return T<NullType>()(args...);
+        return T<NullType, bool>()(args...);
     }
 
 
@@ -127,7 +134,7 @@ namespace ss{ namespace iter{
         return ScalarType_t<field_type>::scalar_type;
     }
 
-    template<class T>
+    template<class T, class Enable>
     struct field_dtype_op{
         constexpr inline ScalarType operator()() const { return field_dtype<T>(); }
     };

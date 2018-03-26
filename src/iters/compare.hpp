@@ -98,7 +98,7 @@ namespace ss{ namespace iter{
 
     };
 
-    template<class T>
+    template<class T, class Enable>
     struct compare_iter_op{
 
         inline Iter *operator()(AnyIter parent, int op, PyObj &value) {

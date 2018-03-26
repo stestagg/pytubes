@@ -29,7 +29,7 @@ namespace ss{ namespace iter{
         SlotPointer slot;
 
     public:
-        CountIter(int64_t start) : cur(start - 1), slot(&cur) {} // <- Iter
+        CountIter(int64_t start) : cur(start - 1), slot(&cur) {}
 
         Slice<SlotPointer> get_slots() {
             return Slice<SlotPointer>(&slot, 1);

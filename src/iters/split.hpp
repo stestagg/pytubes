@@ -114,7 +114,7 @@ public:
     }
 };
 
-template<class T>
+template<class T, class Enable>
 struct split_iter_op{
     inline Iter *operator()(Chain chain, AnyIter parent, PyObject *sep) {
         throw_py<ValueError>(
@@ -125,7 +125,7 @@ struct split_iter_op{
     } 
 };
 
-template<> inline Iter *split_iter_op<ByteSlice>::operator() (Chain chain, AnyIter parent, PyObject *sep) {
+template<> inline Iter *split_iter_op<ByteSlice, bool>::operator() (Chain chain, AnyIter parent, PyObject *sep) {
     PyObj s(sep);
     Converter<PyObj, ByteSlice> converter(&s, std::string("ascii"));
     converter.convert();

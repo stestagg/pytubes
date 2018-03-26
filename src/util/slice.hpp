@@ -33,7 +33,7 @@ namespace ss{
             return false; 
         }
 
-        template<class T, char A, size_t...More>
+        template<class T, T A, T...More>
         static inline bool is_one_of_impl(const T &val) { 
             return val == A || is_one_of_impl<T, More...>(val); 
         }
@@ -119,7 +119,7 @@ namespace ss{
             return std::find_first_of(begin(), end(), &match[0], &match[sizeof...(Chars)]);
         }
 
-        template<size_t... Chars>
+        template<typename std::conditional<std::is_arithmetic<T>::value, T, char>::type... Chars>
         inline Slice<T> lstrip() const {
             const T *cur = begin();
             while (cur < end()) {
@@ -131,7 +131,7 @@ namespace ss{
             return slice_from_ptr(cur);
         }
 
-        template<size_t... Chars>
+        template<typename std::conditional<std::is_arithmetic<T>::value, T, char>::type... Chars>
         inline Slice<T> rstrip() const {
             const T *cur = end();
             while (cur >= start) {
@@ -143,7 +143,7 @@ namespace ss{
             return slice_to_ptr(cur+1);
         }
 
-        template<size_t... Chars>
+        template<typename std::conditional<std::is_arithmetic<T>::value, T, char>::type... Chars>
         inline Slice<T> strip() const {
             return rstrip<Chars...>().template lstrip<Chars...>();
         }

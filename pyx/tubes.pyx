@@ -136,6 +136,10 @@ cdef class Tube:
             self._set_index_lookup(IndexLookup(self, []))
         return self._index_lookup
 
+    @property
+    def one(self):
+        return next(iter(self))
+
     def first(self, size_t num):
         """
         Compatibility: tube.first(5)
@@ -297,6 +301,19 @@ cdef class Tube:
         XCompatibility: from_tube.enum()
         """
         return Enum(self, codec=codec.encode('ascii'))
+
+    def group_id(self):
+        """
+        Compatibility: list(tube.group_id())
+
+        Assuming the input is sorted, for each unique value in the input, return a
+        unique integer ID for that value. If the input isn't sorted, return a value
+        that increments every time the input changes.
+
+        >>> list(Each(['a', 'a', 'b', 'b', 'c', 'd']).group_id())
+        [0, 0, 1, 1, 2, 3]
+        """
+        return GroupId(self)
 
     def multi(self, *makers):
         """

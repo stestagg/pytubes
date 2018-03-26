@@ -23,7 +23,7 @@ class FileMapIter : public Iter {
     SlotPointer slot;
 
 public:
-    FileMapIter(AnyIter parent) // <- Iter
+    FileMapIter(AnyIter parent)
         : filename_slice(parent->get_slots()[0]), cur_map(), slot(&cur_slice)
         {} 
 

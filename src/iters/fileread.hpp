@@ -28,7 +28,7 @@ class ReadFileIter : public Iter {
     SlotPointer slot;
 
 public:
-    ReadFileIter(Chain chain, AnyIter parent) // <- Iter
+    ReadFileIter(Chain chain, AnyIter parent)
         : filename_slice(parent->get_slots()[0]), 
           chain(chain),
           buffer_slice(buffer, BUFFER_SIZE),
