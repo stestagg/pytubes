@@ -14,10 +14,6 @@
 // to allow default exception handling behaviour to kick in.
 static void __Pyx_CppExn2PyErr();
 
-// TODO: remove
-inline void invoke_debugger() {
-    __asm__("int3");
-}
 
 namespace ss{ namespace iter{
     template<class T> using vector = std::vector<T>;

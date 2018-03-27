@@ -21,6 +21,7 @@ namespace ss{ namespace iter{
         size_t len;
 
         StringFiller(SlotPointer slot, size_t offset, size_t len) {            
+            throw_if(ValueError, len == 0, "Zero length strings not supported");
             this->slot = slot;
             this->row_offset = offset;
             this->len = len - 1; // Need 1 char for null terminator
@@ -81,5 +82,33 @@ namespace ss{ namespace iter{
 
 
     };
+
+    void fill_ndarray(PyArrayObject *array, NDArrayFiller *filler, Chain &chain, size_t growth_factor) {
+        int ndims = PyArray_NDIM(array);
+        throw_if(ValueError, ndims < 1, "Array with zero dimensions");
+        PyArray_Dims dims = {
+            new npy_intp[ndims],
+            ndims
+        };
+        npy_intp *initial_dims = PyArray_DIMS(array);
+        std::copy(initial_dims, initial_dims + ndims, dims.ptr);
+
+        size_t cur_index = 0;
+        while(true) {
+            if (cur_index >= dims.ptr[0]) {
+                dims.ptr[0] += growth_factor;
+                static_throw_if(PyExceptionRaised, !PyArray_Resize(array, &dims, 1, NPY_CORDER));
+            }
+            try{
+                do_next(chain);
+            } catch (StopIterationExc &e) {
+                break;
+            }
+            filler->fill_row(array, cur_index);
+            cur_index += 1;
+        }
+        dims.ptr[0] = cur_index;
+        static_throw_if(PyExceptionRaised, !PyArray_Resize(array, &dims, 1, NPY_CORDER));
+    }
 
 }}

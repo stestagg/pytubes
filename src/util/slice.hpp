@@ -50,7 +50,7 @@ namespace ss{
         const T *start;
         size_t len;
 
-        static constexpr Slice<T> Null() {
+        static inline constexpr Slice<T> Null() {
             return Slice<T>((T*)slice::empty_array, 0);
         }
 
@@ -110,7 +110,7 @@ namespace ss{
         }
 
         inline const T *find_first(T value) const {
-            return std::find(begin(), end(), value);
+            return std::find(begin(), &start[len], value);
         }
 
         template<size_t... Chars>
