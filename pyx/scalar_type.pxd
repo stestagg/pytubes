@@ -1,7 +1,10 @@
+from libcpp cimport bool as bool_t
+
 cdef extern from "../src/iters/filemap.hpp" namespace "ss::iter":
     cdef cppclass ScalarType:
         ScalarType()
         ScalarType(ScalarType)
+        bool_t operator==(ScalarType other)
 
 cdef extern from "../src/iters/filemap.hpp" namespace "ss::iter::ScalarType":
     cdef ScalarType Null

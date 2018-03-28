@@ -99,6 +99,7 @@ namespace ss{
 
 
     #define throw_if(Ty, cond, args...) if(_SS_ERROR_UNLIKELY(cond)) { throw_py<Ty>(args);}
+    #define static_throw_if(Ty, cond) if(_SS_ERROR_UNLIKELY(cond)) { throw Ty;}
 
     template<class T, class ...Args>
     NORETURN_A inline void NORETURN_B throw_py(Args const &... args){

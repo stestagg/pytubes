@@ -8,9 +8,10 @@ from libcpp.vector cimport vector
 # AUTO GENERATED FROM tools/defn.tmpl
 cdef extern from "{{file_name}}" namespace "ss::iter":
     {% for fn in fns %}
-    {{ fn }}
+    {{ fn|indent(4) }}
     {% endfor %}
 {% endfor %}
+
 
 {% for iter in iters.values() %}
 # AUTO GENERATED FROM tools/defn.tmpl

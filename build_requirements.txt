@@ -5,3 +5,4 @@ pyyaml
 recommonmark
 sphinx
 wheel
+numpy

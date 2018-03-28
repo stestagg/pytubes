@@ -3,6 +3,7 @@ import os
 import hashlib
 from os import path
 import re
+import numpy
 import subprocess
 import sys
 
@@ -60,7 +61,7 @@ setup(
             "tubes",
             sources=["pyx/tubes.pyx"],
             language="c++",
-            include_dirs = ['vendor', 'pyx', 'src'],
+            include_dirs = ['vendor', 'pyx', 'src', numpy.get_include()],
             extra_compile_args=["-std=c++11", '-g', "-O2"],
             extra_link_args=["-std=c++11", '-g'],
         ), 
@@ -76,7 +77,7 @@ setup(
     author_email="stestagg@gmail.com",
     python_requires=">=3.4.0",
     url="https://github.com/stestagg/pytubes",
-    install_requires=[],
+    install_requires=['numpy'],
     include_package_data=True,
     license='MIT',
     classifiers=[

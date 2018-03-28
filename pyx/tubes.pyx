@@ -4,6 +4,8 @@ cimport cython
 cimport scalar_type
 from scalar_type cimport ScalarType
 from libcpp.vector cimport vector
+from libcpp.map cimport map as map_t
+from libcpp.string cimport string
 from cpython.object cimport Py_LT, Py_LE, Py_EQ, Py_NE, Py_GT, Py_GE
 
 __doc__ = """
@@ -30,6 +32,8 @@ cdef class DType:
 C_DTYPE_TO_Dtype = {}
 
 
+cdef map_t[scalar_type.ScalarType, string] _SCALAR_TYPE_TO_NAME
+
 cdef _make_dtype(scalar_type.ScalarType ty, str name):
     cdef DType dtype = DType()
     dtype.type = ty
@@ -52,6 +56,7 @@ Object = _make_dtype(scalar_type.Object, "object")
 JsonUtf8 = _make_dtype(scalar_type.JsonUtf8, "Json")
 TsvRow = _make_dtype(scalar_type.Tsv, "Tsv")
 
+
 cdef object UNDEFINED = object()
 cdef public PyObject *UNDEFINED_OBJ = <PyObject*>UNDEFINED
 
@@ -67,6 +72,7 @@ DTYPE_MAP = {
 }
 
 include "pyiter.pxi"
+include "ndarray.pxi"
 
 cdef class Tube:
 
@@ -103,6 +109,9 @@ cdef class Tube:
             return TubeSingleIter(made_iters[self], list(made_iters.values()), made_chains[None, self])
         return TubeMultiIter(made_iters[self], list(made_iters.values()), made_chains[None, self], len(self.dtype))
 
+    def ndarray(self, *slot_info, estimated_rows=32768, fields=None):
+        return ndarray_from_tube(self, slot_info, estimated_rows, fields=fields)
+
     cdef _repr(self, stop=None):
         cdef Tube tube_input
         if stop is None:
@@ -138,6 +147,9 @@ cdef class Tube:
 
     @property
     def one(self):
+        """
+        Return just the first value from the tube, useful as a debugging aid
+        """
         return next(iter(self))
 
     def first(self, size_t num):

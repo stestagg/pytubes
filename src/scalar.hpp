@@ -26,7 +26,6 @@ namespace iter{
         Utf8(const Slice<uint8_t> &src) : ByteSlice(src) {}
         Utf8(const Utf8 &src) : ByteSlice(src.start, src.len) {}
         Utf8(const std::basic_string<uint8_t> &src) : ByteSlice(src) {}
-    
         Utf8(const std::vector<uint8_t> &src) : ByteSlice(src) {}
         inline bool operator==(const Utf8 &other) const {
             return len == other.len && std::equal(begin(), end(), other.begin());
