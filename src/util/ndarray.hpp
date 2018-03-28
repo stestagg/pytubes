@@ -63,6 +63,8 @@ namespace ss{ namespace iter{
                     return new ScalarFiller<int64_t>(slot, offset);
                 case NPY_DOUBLE:
                     return new ScalarFiller<double>(slot, offset);
+                case NPY_BOOL:
+                    return new ScalarFiller<bool>(slot, offset);
                 default:
                     throw_py<ValueError>("Unknown dtype: ", dtype->type_num);
             }
@@ -79,11 +81,9 @@ namespace ss{ namespace iter{
                 field_filler->fill_row((uint8_t *)row_ptr);
             }
         }
-
-
     };
 
-    void fill_ndarray(PyArrayObject *array, NDArrayFiller *filler, Chain &chain, size_t growth_factor) {
+    inline void fill_ndarray(PyArrayObject *array, NDArrayFiller *filler, Chain &chain, size_t growth_factor) {
         int ndims = PyArray_NDIM(array);
         throw_if(ValueError, ndims < 1, "Array with zero dimensions");
         PyArray_Dims dims = {

@@ -109,8 +109,8 @@ cdef class Tube:
             return TubeSingleIter(made_iters[self], list(made_iters.values()), made_chains[None, self])
         return TubeMultiIter(made_iters[self], list(made_iters.values()), made_chains[None, self], len(self.dtype))
 
-    def ndarray(self, *slot_info, estimated_rows=32768):
-        return ndarray_from_tube(self, slot_info, estimated_rows)
+    def ndarray(self, *slot_info, estimated_rows=32768, fields=None):
+        return ndarray_from_tube(self, slot_info, estimated_rows, fields=fields)
 
     cdef _repr(self, stop=None):
         cdef Tube tube_input

@@ -19,6 +19,8 @@ cdef np_dtype_from_dtype(ScalarType dtype, slot_info, index):
         return np.int64
     elif dtype == scalar_type.Float:
         return np.double
+    elif dtype == scalar_type.Bool:
+        return np.bool_
     raise TypeError("Cannot convert {} to numpy type".format(c_dtype_to_dtype(dtype).name))
 
 
@@ -60,7 +62,7 @@ cdef setup_dimension_filler(NDArrayFiller *filler, AnyIter input_iter, np.ndarra
         offset += value_stride
 
 
-cdef np.ndarray ndarray_from_tube(Tube tube, tuple slot_info, size_t estimated_rows=32768):
+cdef np.ndarray ndarray_from_tube(Tube tube, tuple slot_info, size_t estimated_rows=32768, fields=None):
     if estimated_rows < 2:
         estimated_rows = 2
     cdef Chains chains = Chains(tube)
@@ -78,11 +80,13 @@ cdef np.ndarray ndarray_from_tube(Tube tube, tuple slot_info, size_t estimated_r
     cdef size_t initial_rowcount = estimated_rows + 1
 
     cdef np.ndarray array
-    if len(set(np_dtypes)) == 1:
+    if len(set(np_dtypes)) == 1 and not fields:
         # All 'columns' are identical types, so create a standard n-dimentional array
         array = np.ndarray((initial_rowcount, len(np_dtypes)), dtype=np_dtypes[0])
         setup_dimension_filler(filler, output_iter.iter, array)
     else:
+        if fields == False:
+            raise ValueError("Cannot create non-field based ndarray with differing dtypes")
         # 'Column' types differ, use fields
         field_dtype = np.dtype([(str(i), d) for i, d in enumerate(np_dtypes)])
         array = np.ndarray((initial_rowcount, ), dtype=field_dtype)

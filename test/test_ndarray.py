@@ -41,6 +41,23 @@ def test_fill_ndarray_same_type():
     assert [tuple(x) for x in nd] == [(0, 5), (1, 6), (2, 7), (3, 8)]
 
 
+def test_fill_ndarray_same_type_fields():
+    nd = tubes.Count(5).first(4).enumerate().ndarray(fields=True)
+    assert nd.shape == (4, )
+    assert [tuple(x) for x in nd] == [(0, 5), (1, 6), (2, 7), (3, 8)]
+
+
+def test_fill_ndarray_with_doubles():
+    nd = tubes.Each([1., 2., 3.14, 4.5]).to(float).ndarray()
+    assert list(nd) == [1.0, 2.0, 3.14, 4.5]
+
+
+def test_fill_ndarray_with_bool():
+    nd = tubes.Each([True, False, True]).to(bool).ndarray()
+    assert nd.dtype == np.bool_
+    assert list(nd) == [True, False, True]
+
+
 if __name__ == '__main__':
     # test_fill_ndarray_chars()
     test_fill_ndarray_many_chars()
