@@ -19,3 +19,8 @@ test-run.o
 pyx/tubes.cpp
 pyx/iter_defs.pxi
 wheelhouse/*
+
+# Cython html files
+pyx/*.html
+# Cython generated header file
+pyx/tubes.h

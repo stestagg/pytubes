@@ -16,7 +16,7 @@ namespace ss{ namespace iter{
                 iter: [SkipUnlessIter, ["iters_to_c_chain(chains[0])", parent.iter, conditional.iter]]
                 methods: |
                     cpdef _describe_self(self):
-                        return f"SkipUnless({self.conditional._repr(self.parent)})"
+                        return f"SkipUnless({self.conditional._repr(stop=set(self.parent))})"
         ->*/
         Chain chain;
         Slice<SlotPointer> parent;

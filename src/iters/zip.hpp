@@ -38,7 +38,7 @@ namespace ss{ namespace iter{
 
                     cpdef _describe_self(self):
                         cdef Tube i
-                        input_reprs = [i._repr(stop=set(self.inputs)) for i in self.inputs]
+                        input_reprs = ", ".join([i._repr(stop=set(self.inputs)) for i in self.inputs])
                         return f"Zip({input_reprs})"
         ->*/
     

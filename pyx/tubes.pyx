@@ -57,7 +57,10 @@ JsonUtf8 = _make_dtype(scalar_type.JsonUtf8, "Json")
 TsvRow = _make_dtype(scalar_type.Tsv, "Tsv")
 
 
-cdef object UNDEFINED = object()
+cdef class _UNDEFINED:
+    def __repr__(self):
+        return "UNDEFINED"
+UNDEFINED = _UNDEFINED()
 cdef public PyObject *UNDEFINED_OBJ = <PyObject*>UNDEFINED
 
 
@@ -110,6 +113,29 @@ cdef class Tube:
         return TubeMultiIter(made_iters[self], list(made_iters.values()), made_chains[None, self], len(self.dtype))
 
     def ndarray(self, *slot_info, estimated_rows=32768, fields=None):
+        """
+        Create a new numpy ``ndarray`` of with appropriate numpy dtype, and 
+        fill it with the results of the tube.
+
+        :param int estimated_rows: A hint to pytubes as to how many rows are 
+                                   expected in the completed array.  This affects
+                                   the way in which the ndarray is resized during
+                                   iteration.
+        :param fields: If ``True``, the created numpy array is 1-dimentional, using 
+                       structured types.  Fields names are string slot numbers.
+                       If ``False``, all slots must have an identical type, produces
+                       an n-dimentional array, with each slot in a different dimension.
+        :param *slot_info: Provide metadata about each slot to help create the ndarray
+                           Currently required by bytes types to set the column size.
+                           The n-th slot_info value is used to affect the numpy
+                           dtype of the n-th slot of the input.
+
+        >>> Each(['abcd', 'efgh']).to(bytes).ndarray(2)
+        array([b'ab', b'ef'], dtype='|S3')
+        >>> Each(['abcd', 'efgh']).to(bytes).ndarray(4)
+        array([b'abcd', b'efgh'], dtype='|S5')
+
+        """
         return ndarray_from_tube(self, slot_info, estimated_rows, fields=fields)
 
     cdef _repr(self, stop=None):
@@ -306,11 +332,10 @@ cdef class Tube:
 
     def enum(self, codec="utf-8"):
         """
+        Compatibility: list(tube.enum())
+
         Convert the input to a python object, storing and returning duplicate
         values where possible to reduce allocation overhead
-
-        Supported conversions:
-        XCompatibility: from_tube.enum()
         """
         return Enum(self, codec=codec.encode('ascii'))
 
