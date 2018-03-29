@@ -126,14 +126,15 @@ cdef class Tube:
                        If ``False``, all slots must have an identical type, produces
                        an n-dimentional array, with each slot in a different dimension.
         :param *slot_info: Provide metadata about each slot to help create the ndarray
-                           Currently required by bytes types to set the column size
-
+                           Currently required by bytes types to set the column size.
+                           The n-th slot_info value is used to affect the numpy
+                           dtype of the n-th slot of the input.
 
         >>> Each(['abcd', 'efgh']).to(bytes).ndarray(2)
         array([b'ab', b'ef'], dtype='|S3')
         >>> Each(['abcd', 'efgh']).to(bytes).ndarray(4)
         array([b'abcd', b'efgh'], dtype='|S5')
-        >>> Each(['abcd', 'efgh']).to(bytes).ndarray(4)
+
         """
         return ndarray_from_tube(self, slot_info, estimated_rows, fields=fields)
 
