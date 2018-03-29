@@ -39,8 +39,8 @@ namespace ss{ namespace iter{
 
                     cpdef _describe_self(self):
                         cdef Tube i
-                        input_reprs = [i._repr(stop=self.parent) for i in self.inputs]
-                        return f"Multi({input_reprs})"
+                        input_reprs = [i._repr(stop=set(self.parent)) for i in self.inputs]
+                        return f"Multi({', '.join(input_reprs)})"
 
                             
     ->*/
