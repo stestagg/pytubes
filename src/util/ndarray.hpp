@@ -5,6 +5,7 @@ namespace ss{ namespace iter{
     struct FieldFiller {
         size_t row_offset;
 
+        FieldFiller(size_t row_offset) : row_offset(row_offset) {}
         virtual ~FieldFiller() = default;
 
         void fill_row(uint8_t *row_start){
@@ -20,10 +21,9 @@ namespace ss{ namespace iter{
         const T *slot;
         size_t len;
 
-        StringFiller(SlotPointer slot, size_t offset, size_t len) {            
+        StringFiller(SlotPointer slot, size_t offset, size_t len) : FieldFiller(offset) {
             throw_if(ValueError, len == 0, "Zero length strings not supported");
             this->slot = slot;
-            this->row_offset = offset;
             this->len = len - 1; // Need 1 char for null terminator
         }
 
@@ -34,14 +34,27 @@ namespace ss{ namespace iter{
         }
     };
 
+    struct PyObjFiller : FieldFiller {
+        const PyObj *slot;
+
+        PyObjFiller(SlotPointer slot, size_t offset) :
+            FieldFiller(offset),
+            slot(slot)
+        {}
+
+        void fill_cell(void *cell) {
+            *(PyObject **)cell = slot->obj;
+        }
+    };
+
     template<class T>
     struct ScalarFiller : FieldFiller {
         const T *slot;
 
-        ScalarFiller(SlotPointer slot, size_t offset) : slot(slot)
-        { 
-            row_offset = offset;
-        }
+        ScalarFiller(SlotPointer slot, size_t offset) :
+            FieldFiller(offset),
+            slot(slot)
+        {}
 
         void fill_cell(void *cell) {
             *(T *)cell = *slot;
@@ -49,7 +62,7 @@ namespace ss{ namespace iter{
     };
 
     class NDArrayFiller {
-    
+
     public:
         std::vector<std::unique_ptr<FieldFiller>> fillers;
 
@@ -65,6 +78,8 @@ namespace ss{ namespace iter{
                     return new ScalarFiller<double>(slot, offset);
                 case NPY_BOOL:
                     return new ScalarFiller<bool>(slot, offset);
+                case NPY_OBJECT:
+                    return new PyObjFiller(slot, offset);
                 default:
                     throw_py<ValueError>("Unknown dtype: ", dtype->type_num);
             }
@@ -93,7 +108,7 @@ namespace ss{ namespace iter{
         npy_intp *initial_dims = PyArray_DIMS(array);
         std::copy(initial_dims, initial_dims + ndims, dims.ptr);
 
-        size_t cur_index = 0;
+        npy_intp cur_index = 0;
         while(true) {
             if (cur_index >= dims.ptr[0]) {
                 dims.ptr[0] += growth_factor;

@@ -7,19 +7,18 @@
 #include "slot.hpp"
 #include "scalar.hpp"
 
-
 // This is quite ugly, but I'm unsure of a better way to do this
 // CppExn2Pyerr is the default Cython C++>Python exception converter
 // We call this if next() raises an exception that isn't StopIteration
 // to allow default exception handling behaviour to kick in.
 static void __Pyx_CppExn2PyErr();
 
-
 namespace ss{ namespace iter{
+
     template<class T> using vector = std::vector<T>;
 
     class Iter{
-        
+
     public:
         virtual Slice<SlotPointer> get_slots() = 0;
         virtual void next() = 0;
@@ -37,23 +36,10 @@ namespace ss{ namespace iter{
         return iters;
     }
 
-    struct Chain {
-        vector<AnyIter> items;
-        vector<Iter *> iters;
-
-        Chain() : items(), iters() {}
-
-        Chain(vector<AnyIter> &items) 
-            : items(items), iters(iters_from_anyiters(this->items)) {}
-
-        void push_back(AnyIter &item) {
-            items.push_back(item);
-            iters.push_back(item.get());
-        }
-    };
+    using Chain = Array<AnyIter>;
 
     inline void do_next(const Chain &chain) {
-        for (auto iter : chain.iters) {
+        for (auto &iter : chain) {
             iter->next();
         }
     }

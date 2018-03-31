@@ -58,6 +58,12 @@ def test_fill_ndarray_with_bool():
     assert list(nd) == [True, False, True]
 
 
+def test_fill_ndarray_with_object():
+    nd = tubes.Each([True, False, 'a', 12]).ndarray()
+    assert nd.dtype == np.object_
+    assert list(nd) == [True, False, 'a', 12]
+
+
 if __name__ == '__main__':
     # test_fill_ndarray_chars()
     test_fill_ndarray_many_chars()

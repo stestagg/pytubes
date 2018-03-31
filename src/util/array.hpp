@@ -10,8 +10,8 @@ namespace ss {
     // over its lifetime, and doesn't support resizing
 
     template<class T>
-    struct Array{ 
-        using iterator = const T*; 
+    struct Array{
+        using iterator = const T*;
         using const_iterator = const T*;
 
         size_t size;
@@ -20,19 +20,19 @@ namespace ss {
         Array() : size(0){}
 
         Array(const std::vector<T> &values) :
-            size(values.size()), 
+            size(values.size()),
             values(new T[values.size()])
         {
             std::copy(values.begin(), values.end(), begin());
         }
 
-        Array(const Array<T> &other) : 
+        Array(const Array<T> &other) :
             size(other.size),
             values(new T[other.size])
         {
             std::copy(other.begin(), other.end(), begin());
         }
-        
+
         Array(size_t size) : size(size), values(new T[size]) {}
 
         inline Array<T> &operator=(const Array<T> &other) {

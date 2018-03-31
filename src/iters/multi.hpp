@@ -17,7 +17,7 @@ namespace ss{ namespace iter{
     class MultiIter : public Iter {
 
         /*<-
-        Iter: 
+        Iter:
             MultiIter: ["vector[AnyIter]"]
         Tube:
             Multi:
@@ -42,7 +42,7 @@ namespace ss{ namespace iter{
                         input_reprs = [i._repr(stop=set(self.parent)) for i in self.inputs]
                         return f"Multi({', '.join(input_reprs)})"
 
-                            
+
     ->*/
         const std::vector<SlotPointer> slots;
 

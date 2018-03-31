@@ -51,7 +51,7 @@ public:
     
 
     EachIter(PyObject *iter): iter(iter), slot(&this->cur) {
-        throw_if(ValueError, !PyIter_Check(iter), "PyIter requires an iterator object");
+        throw_if(ValueError, !PyIter_Check(iter), "PyIter requires an iterable or iterator object");
     }
 
     Slice<SlotPointer> get_slots(){
@@ -59,7 +59,7 @@ public:
     }
 
     void next(){
-        cur = PyObj(PyIter_Next(iter.obj));
+        cur = PyObj(PyIter_Next(iter.obj), true);
         if (!cur.obj) {
             throw StopIteration;
         }
