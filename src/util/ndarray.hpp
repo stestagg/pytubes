@@ -43,6 +43,7 @@ namespace ss{ namespace iter{
         {}
 
         void fill_cell(void *cell) {
+            Py_INCREF(slot->obj);
             *(PyObject **)cell = slot->obj;
         }
     };
