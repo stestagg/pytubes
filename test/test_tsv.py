@@ -68,6 +68,10 @@ def test_reading_tsv_headers_different_orders():
     assert list(tube) == [(1, 2, 3), (4, 5, 6), (7, 8, 9), (10, 11, 12)]
 
 
+def test_tsv_non_tab_separator():
+    tube = tubes.Each(['a|b|c', 'd|e\tf|g']).to(bytes).tsv(headers=False, sep='|')
+    assert list(tube) == [[b'a', b'b', b'c'], [b'd', b'e\tf', b'g']]
+
 
 if __name__ == '__main__':
-    test_tsv_to_py()
+    test_tsv_non_tab_separator()
