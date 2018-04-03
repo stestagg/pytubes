@@ -29,22 +29,22 @@ namespace ss{
         }
 
         template<class T>
-        static inline bool is_one_of_impl(const T &val) { 
-            return false; 
+        static inline bool is_one_of_impl(const T &val) {
+            return false;
         }
 
         template<class T, T A, T...More>
-        static inline bool is_one_of_impl(const T &val) { 
-            return val == A || is_one_of_impl<T, More...>(val); 
+        static inline bool is_one_of_impl(const T &val) {
+            return val == A || is_one_of_impl<T, More...>(val);
         }
 
     }
-        
+
     template <class T> struct Slice {
 
         /* This is basically a std::basic_string_view */
         using el_t = T;
-        using iterator = const T*; 
+        using iterator = const T*;
         using const_iterator = const T*;
 
         const T *start;
@@ -68,7 +68,7 @@ namespace ss{
 
         template<class Q = T, typename std::enable_if<std::is_arithmetic<Q>::value, int>::type = 0>
         Slice(const std::basic_string<T> &src) : start(src.c_str()), len(src.length()) {}
-        
+
         Slice(const std::vector<T> &src) : start(src.data()), len(src.size()) {}
 
         template<class Q = T, typename std::enable_if<std::is_arithmetic<Q>::value, int>::type = 0>
@@ -183,14 +183,14 @@ namespace ss{
     }
 
     template<class T, class U>
-    inline 
+    inline
     typename std::enable_if<
         std::is_same<
-            typename std::make_unsigned<T>::type, 
+            typename std::make_unsigned<T>::type,
             typename std::make_unsigned<U>::type
-        >::value, 
-        std::basic_string<T> 
-    >::type 
+        >::value,
+        std::basic_string<T>
+    >::type
     operator+(const std::basic_string<T> left, const ss::Slice<U> right) {
         return left + std::basic_string<T>((T*)right.start, right.len);
     }

@@ -10,8 +10,8 @@ namespace ss{ namespace iter{
 
 class EachIter: public Iter {
     /*<-
-        Iter: 
-            EachIter: 
+        Iter:
+            EachIter:
                 init: [PyObject *]
                 extra: >
                     PyObj iter
@@ -48,7 +48,7 @@ public:
     PyObj iter;
     PyObj cur;
     SlotPointer slot;
-    
+
 
     EachIter(PyObject *iter): iter(iter), slot(&this->cur) {
         throw_if(ValueError, !PyIter_Check(iter), "PyIter requires an iterable or iterator object");

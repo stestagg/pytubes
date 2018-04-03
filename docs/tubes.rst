@@ -5,7 +5,7 @@ pytubes API
 
 .. module:: tubes
 
-.. toctree:: 
+.. toctree::
 
 
 Tube Base Class

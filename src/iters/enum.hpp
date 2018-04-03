@@ -15,7 +15,7 @@ namespace ss{ namespace iter{
     /*<-
         Fn:
             - "Iter *enum_from_iter(AnyIter, string) except +"
-        EnumIter: 
+        EnumIter:
             template: T
             init: [AnyIter, string]
         Tube:
@@ -32,11 +32,11 @@ namespace ss{ namespace iter{
         PyObj cur_val;
         SlotPointer slot;
         HashTable<T, PyObj, void> enum_values;
-        
+
     public:
 
-        EnumIter(AnyIter parent, const std::string &codec) 
-            : from(parent->get_slots()[0]), 
+        EnumIter(AnyIter parent, const std::string &codec)
+            : from(parent->get_slots()[0]),
               converter(parent->get_slots()[0], codec),
               convert_slot(converter.to),
               slot(&cur_val),
@@ -61,7 +61,7 @@ namespace ss{ namespace iter{
     struct enum_iter_op{
         inline Iter *operator()(const AnyIter parent, const std::string &codec) {
             throw_py<ValueError>("Cannot treat ", ScalarType_t<T>::type_name(), " as enum");
-        } 
+        }
     };
 
     template<class T>

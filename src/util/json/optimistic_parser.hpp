@@ -3,14 +3,14 @@
 namespace ss{ namespace json{ namespace parse {
 
     template <class T, Type ty> inline void checkType(const Value<T> &val) {
-        throw_if(InvalidJson, 
-            val.type != ty, 
-            "Tried to interpret ", 
-            json_type_name(ty), 
-            " as ", 
+        throw_if(InvalidJson,
+            val.type != ty,
+            "Tried to interpret ",
+            json_type_name(ty),
+            " as ",
             json_type_name(val.type)
         );
-    } 
+    }
 
     template <class T>
     class OptimisticParser{
@@ -33,7 +33,7 @@ namespace ss{ namespace json{ namespace parse {
             char *end_ptr;
             auto value = PyOS_string_to_double((char *)val.slice.start, &end_ptr, NULL);
             if (PyErr_Occurred()) { throw PyExceptionRaised; }
-            throw_if(ValueError, (unsigned char*)end_ptr != val.slice.end(), 
+            throw_if(ValueError, (unsigned char*)end_ptr != val.slice.end(),
                 "could not convert string to float:",
                 val.slice);
             return value;
@@ -43,8 +43,8 @@ namespace ss{ namespace json{ namespace parse {
             checkType<T, Type::Number>(val);
             T * endptr = 0;
             int64_t rv = strtol((char *)val.slice.start, (char**)&endptr, 10);
-            throw_if(ValueError, 
-                endptr != val.slice.end(), 
+            throw_if(ValueError,
+                endptr != val.slice.end(),
                 "Number '", val.slice, "' could not be interpreted as integer");
             return rv;
         }

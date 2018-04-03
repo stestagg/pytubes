@@ -20,7 +20,7 @@ namespace ss{ namespace iter{
 
         Converter(const F *from, const std::string &codec) {
             throw_py<ValueError>(
-                "Unsupported conversion from ", 
+                "Unsupported conversion from ",
                 ScalarType_t<F>::type_name(),
                 " to ",
                 ScalarType_t<T>::type_name()
@@ -120,9 +120,9 @@ namespace ss{ namespace iter{
                     break;
                 default:
                     throw_py<ValueError>(
-                        "Cannot convert ", 
+                        "Cannot convert ",
                         json::json_type_name(from->type),
-                        " json value to ", 
+                        " json value to ",
                         ScalarType_t<T>::type_name());
             }
         }
@@ -163,7 +163,7 @@ namespace ss{ namespace iter{
 
         SlotPointer get_slot() { return to; }
 
-        Converter(const PyObj *from, const std::string &codec) : 
+        Converter(const PyObj *from, const std::string &codec) :
             from(from),
             to(&current),
             codec(codec)
@@ -174,9 +174,9 @@ namespace ss{ namespace iter{
             Py_ssize_t size;
             const char * obj_desc = PyUnicode_AsUTF8AndSize(uni.obj, &size);
             throw_py<ValueError>(
-                "Cannot convert from ", 
-                Slice<char>(obj_desc, size), 
-                " to ", 
+                "Cannot convert from ",
+                Slice<char>(obj_desc, size),
+                " to ",
                 ScalarType_t<T>::type_name()
             );
         }
@@ -203,7 +203,7 @@ namespace ss{ namespace iter{
         }
     };
 
-    #define py_convert_fn(F, T) template<> template<> inline void Converter<PyObj, T>::convert_from<F>() 
+    #define py_convert_fn(F, T) template<> template<> inline void Converter<PyObj, T>::convert_from<F>()
 
     // PyObj > Null
     py_convert_fn(NullType, NullType) { current = std::tuple<>(); }

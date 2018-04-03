@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ss{ 
+namespace ss{
 
     template<class T> struct Slice;
 

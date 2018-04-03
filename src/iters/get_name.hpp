@@ -19,7 +19,7 @@ namespace ss{ namespace iter{
         SlotPointer slot;
 
     public:
-        SingleNameLookupIter(AnyIter parent, std::string &name) 
+        SingleNameLookupIter(AnyIter parent, std::string &name)
         : parent(parent->get_slots()[0]),
           name(name),
           name_slice((const uint8_t *)this->name.c_str(), this->name.length()),
@@ -51,7 +51,7 @@ namespace ss{ namespace iter{
         Fn:
             - "Iter *name_lookup_from_dtype(AnyIter, vector[string] &) except +"
         Iter:
-            NameLookupIter: 
+            NameLookupIter:
                 template: T
                 init: [AnyIter, "vector[string]"]
         Tube:
@@ -81,8 +81,8 @@ namespace ss{ namespace iter{
                             self._name_lookups[index] = NameLookup(shared_index_get, [])
                         tube._set_name_lookup(self._name_lookups[index])
                         return tube
-                        
-        ->*/    
+
+        ->*/
 
     template<>
     class NameLookupIter<JsonUtf8> : public Iter {
@@ -96,10 +96,10 @@ namespace ss{ namespace iter{
         std::unordered_map<ByteSlice, JsonUtf8*> fields;
 
     public:
-        NameLookupIter(AnyIter parent, std::vector<std::string> &names) 
+        NameLookupIter(AnyIter parent, std::vector<std::string> &names)
             : parent(parent->get_slots()[0]),
-              names(names), 
-              values(names.size()), 
+              names(names),
+              values(names.size()),
               slots(make_slots_from_array(this->values))
         {
             size_t index = 0;
@@ -137,13 +137,13 @@ namespace ss{ namespace iter{
         const Array<ByteSlice> values;
 
         const Array<SlotPointer> slots;
-        
+
         TsvHeader *cur_header = (TsvHeader *)0x01;
         SkipList<ByteSlice> skip_list;
     public:
         NameLookupIter(AnyIter parent, std::vector<std::string> &names):
             parent(parent->get_slots()[0]),
-            names(names), 
+            names(names),
             name_slices(names.size()),
             values(names.size()),
             slots(make_slots_from_array(this->values))
@@ -172,7 +172,7 @@ namespace ss{ namespace iter{
                 ScalarType_t<T>::type_name()
                 );
             return NULL;
-        } 
+        }
     };
 
     template<> inline Iter *name_lookup_iter_op<JsonUtf8, bool>::operator() (AnyIter parent, std::vector<std::string> &names) {

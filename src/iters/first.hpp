@@ -6,7 +6,7 @@ namespace ss{ namespace iter{
 
     class FirstIter : public Iter {
         /*<-
-        Iter: 
+        Iter:
             FirstIter: [AnyIter, size_t]
         Tube:
             First:

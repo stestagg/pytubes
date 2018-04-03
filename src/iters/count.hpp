@@ -6,7 +6,7 @@ namespace ss{ namespace iter{
 
     class CountIter : public Iter {
         /*<-
-        Iter: 
+        Iter:
             CountIter: [size_t]
         Tube:
             Count:
@@ -15,8 +15,8 @@ namespace ss{ namespace iter{
                 iter: [CountIter, [self._start]]
                 docstring: |
                     Iterator that behaves similarly to :func:`itertools.count`.
-                    
-                    Takes an optional numeric argument ``start`` that sets the 
+
+                    Takes an optional numeric argument ``start`` that sets the
                     first number returned by Count()  [default:0]
 
                     >>> list(Count().first(5))

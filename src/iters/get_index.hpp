@@ -27,7 +27,7 @@ namespace ss{ namespace iter{
         SlotPointer slot;
 
     public:
-        SingleIndexLookupIter(AnyIter parent, size_t index) 
+        SingleIndexLookupIter(AnyIter parent, size_t index)
         : parent(parent->get_slots()[0]),
           index(index),
           slot(&value) {}
@@ -72,7 +72,7 @@ namespace ss{ namespace iter{
         Fn:
             - "Iter *index_lookup_from_dtype(AnyIter, vector[size_t] &, vector[size_t] &) except +"
         Iter:
-            IndexLookupIter: 
+            IndexLookupIter:
                 template: T
                 init: [AnyIter, "vector[size_t]"]
         Tube:
@@ -111,7 +111,7 @@ namespace ss{ namespace iter{
                             self._index_lookups[index] = IndexLookup(shared_index_get, [])
                         tube._set_index_lookup(self._index_lookups[index])
                         return tube
-                        
+
         ->*/
         using ValueType = typename field_type_t<T>::type;
 
@@ -122,7 +122,7 @@ namespace ss{ namespace iter{
         SkipList<ValueType> fields;
 
     public:
-        IndexLookupIter(AnyIter parent, std::vector<size_t> &indexes, std::vector<size_t> &skips) 
+        IndexLookupIter(AnyIter parent, std::vector<size_t> &indexes, std::vector<size_t> &skips)
             : parent(parent->get_slots()[0]),
               values(indexes.size()),
               slots(make_slots_from_array(this->values)),
@@ -170,14 +170,14 @@ namespace ss{ namespace iter{
                 ScalarType_t<T>::type_name()
                 );
             return NULL;
-        } 
+        }
     };
 
-    template<> 
+    template<>
     inline Iter *index_lookup_iter_op<JsonUtf8, bool>::operator()(AnyIter parent, std::vector<size_t> &indexes, std::vector<size_t> &skips) {
         return new IndexLookupIter<JsonUtf8>(parent, indexes, skips);
     }
-    template<> 
+    template<>
     inline Iter *index_lookup_iter_op<TsvRow, bool>::operator()(AnyIter parent, std::vector<size_t> &indexes, std::vector<size_t> &skips) {
         return new IndexLookupIter<TsvRow>(parent, indexes, skips);
     }
@@ -190,7 +190,7 @@ namespace ss{ namespace iter{
                 ScalarType_t<T>::type_name()
                 );
             return NULL;
-        } 
+        }
     };
 
     template<> inline Iter *single_index_lookup_iter_op<JsonUtf8, bool>::operator() (AnyIter parent, size_t index) {

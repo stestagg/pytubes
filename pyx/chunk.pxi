@@ -9,7 +9,7 @@ def update_each_iter(object chunk, IterWrapper wrapped):
 
 
 @cython.final
-cdef class Chunk(Tube): 
+cdef class Chunk(Tube):
     cdef public Tube parent
     cdef size_t chunk_size
 

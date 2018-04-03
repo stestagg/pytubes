@@ -7,7 +7,7 @@ namespace ss{ namespace iter{
     class TsvIter : public Iter {
 
         /*<-
-        Iter: 
+        Iter:
             TsvIter: [Chain, AnyIter, bool_t]
         Tube:
             Tsv:
@@ -26,10 +26,10 @@ namespace ss{ namespace iter{
 
     public:
         TsvIter(Chain chain, AnyIter parent, bool headers)
-            : source(parent->get_slots()[0]), 
+            : source(parent->get_slots()[0]),
               chain(chain),
               header_ptr(headers ? &header_row : NULL),
-              slot(&current_row) 
+              slot(&current_row)
             {}
 
         Slice<SlotPointer> get_slots(){

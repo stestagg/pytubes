@@ -100,4 +100,3 @@ cdef np.ndarray ndarray_from_tube(Tube tube, tuple slot_info, size_t estimated_r
         del filler
 
     return array.squeeze()
-    

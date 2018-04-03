@@ -15,7 +15,7 @@ namespace ss{ namespace iter{
     }
 
     /*<-
-        Iter: 
+        Iter:
             ZipIter: [Chain, "vector[AnyIter]"]
         Tube:
             Zip:
@@ -41,14 +41,14 @@ namespace ss{ namespace iter{
                         input_reprs = ", ".join([i._repr(stop=set(self.inputs)) for i in self.inputs])
                         return f"Zip({input_reprs})"
         ->*/
-    
+
     class ZipIter : public Iter {
         const std::vector<SlotPointer> slots;
         const Chain chain;
 
     public:
-        ZipIter(Chain chain, std::vector<AnyIter> parents) 
-            : slots(slots_from_parents(parents)), 
+        ZipIter(Chain chain, std::vector<AnyIter> parents)
+            : slots(slots_from_parents(parents)),
               chain(chain)
             {}
 

@@ -43,7 +43,7 @@ class Iter:
     @property
     def extra(self):
         return self.spec.get("extra" ,"")
-    
+
 
     @property
     def constructor_args(self):
@@ -72,7 +72,7 @@ class Prop:
     @property
     def is_tube(self):
         return self.type == "Tube"
-    
+
 
 class Tube:
 
@@ -118,7 +118,7 @@ class Tube:
     @property
     def methods(self):
         return self.spec.get("methods", "")
-    
+
 
 
 def make_cdef(file_names):

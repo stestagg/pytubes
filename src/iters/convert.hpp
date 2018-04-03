@@ -13,11 +13,11 @@ namespace ss{ namespace iter{
 
     template<class T, class Enable> struct make_converter_op{
         template<class F, class Enableb> struct make_converter_inner {
-            inline AnyConverter *operator()(SlotPointer from_ptr, const std::string &codec) { 
+            inline AnyConverter *operator()(SlotPointer from_ptr, const std::string &codec) {
                 return new Converter<F, T>(from_ptr, codec);
             }
         };
-        inline AnyConverter *operator()(SlotPointer from_ptr, const std::string &codec) { 
+        inline AnyConverter *operator()(SlotPointer from_ptr, const std::string &codec) {
             return dispatch_type<make_converter_inner>(from_ptr.type, from_ptr, codec);
         }
     };
@@ -54,7 +54,7 @@ namespace ss{ namespace iter{
         /*<-
         Fn:
             - void check_can_convert(ScalarType, ScalarType, string) except +
-        Iter: 
+        Iter:
             ConvertIter: [AnyIter, "vector[ScalarType]", string]
         Tube:
             Convert:
@@ -65,7 +65,7 @@ namespace ss{ namespace iter{
                     if len(parent.dtype) < len(self.dtype):
                         raise ValueError("Convert iter cannot have more elements than parent")
                     cdef DType from_dtype
-                    cdef DType to_dtype 
+                    cdef DType to_dtype
                     for from_dtype, to_dtype in zip(parent.dtype, self.dtype):
                         check_can_convert(from_dtype.type, to_dtype.type, codec)
                 methods: >
@@ -91,7 +91,7 @@ namespace ss{ namespace iter{
             : num_slots(types.size()),
               converters(make_converters(parent->get_slots(), types, codec)),
               slots(make_slots(this->converters))
-        {} 
+        {}
 
         void next() {
             for (auto &converter : converters) {

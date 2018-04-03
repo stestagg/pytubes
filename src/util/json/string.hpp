@@ -6,7 +6,7 @@ namespace ss{ namespace json{
 
 namespace ss{ namespace json{ namespace string {
 
-    // template <class I, class O> 
+    // template <class I, class O>
     // inline void decode_into(std::basic_string<O> &out, Slice<I> in);
 
     template <class I, class O>
@@ -85,8 +85,8 @@ namespace ss{ namespace json{ namespace string {
             uint16_t val = decode_u(out, Slice<I>(in.start+1, 4));
             // UTF-16 surrogate pairs look like this: \uD801\uDC37
             // and should be decoded to a uint32_t value of 150370
-            // The slice starts at the first u (uD801\uDC37), so 
-            // if the val is in the correct ranges, and slice is >= 11 chars, 
+            // The slice starts at the first u (uD801\uDC37), so
+            // if the val is in the correct ranges, and slice is >= 11 chars,
             // there should be a second escape seq.
             if (in.len > 10 && val >= 0xd800 && val < 0xdc00) {
                 uint16_t lowval = decode_u(out, Slice<I>(in.start+7, 4));
@@ -186,7 +186,7 @@ namespace ss{ namespace json{ namespace string {
             out.push_back((0x80 | ((val >> 6) & 0x3f)));
             out.push_back((0x80 | (val & 0x3f)));
         }
-        
+
     }
 
 }}}

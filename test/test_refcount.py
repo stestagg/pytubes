@@ -62,7 +62,7 @@ def test_to_py_handles_refcount_list():
     """
     flag = Flag()
     a = Canary(flag)
-    
+
     assert sys.getrefcount(a) == 2  # a
     tube = tubes.Each([True, a]).to_py()
     assert sys.getrefcount(tube) == 2  # tube
@@ -92,7 +92,7 @@ def test_to_py_handles_refcount_list():
 def test_to_py_handles_refcount_iter():
     flag = Flag()
     a = Canary(flag)
-    
+
     assert sys.getrefcount(a) == 2  # a
     tube = tubes.Each(iter([True, a])).to_py()
     assert sys.getrefcount(tube) == 2  # iter

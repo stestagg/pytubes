@@ -7,7 +7,7 @@ namespace ss{ namespace iter{
     class JsonParseIter : public Iter {
 
         /*<-
-        Iter: 
+        Iter:
             JsonParseIter: [AnyIter]
         Tube:
             JsonParse:
@@ -21,15 +21,15 @@ namespace ss{ namespace iter{
 
     public:
         JsonParseIter(AnyIter parent)
-            : source(parent->get_slots()[0]), 
-              slot(&current_value) 
+            : source(parent->get_slots()[0]),
+              slot(&current_value)
             {}
 
         Slice<SlotPointer> get_slots(){
             return Slice<SlotPointer>(&slot, 1);
         }
 
-        void next() { 
+        void next() {
             current_value = json::tokenize_entire<uint8_t>(*source);
         }
 

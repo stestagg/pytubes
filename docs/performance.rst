@@ -13,10 +13,10 @@ Dataset: Pypi download stats
 ----------------------------
 
 Pypi provide package download logs via google bigquery.  These tables can be
-downloaded in a number of formats, including gzipped, line-separated JSON files. 
+downloaded in a number of formats, including gzipped, line-separated JSON files.
 
-One day's worth of download data for the 14th December 2017 was taken.  Google 
-provided this data as 38 gzip compressed files, totalling 1.2GB (9.3GB uncompressed).  
+One day's worth of download data for the 14th December 2017 was taken.  Google
+provided this data as 38 gzip compressed files, totalling 1.2GB (9.3GB uncompressed).
 How many records?::
 
     import tubes, glob
@@ -87,7 +87,7 @@ The python version::
                 result.append(data.get("country_code"))
 
 with pytubes::
-    
+
     list(tubes.Each(FILES)
         .read_files()
         .gunzip(stream=True)
@@ -129,7 +129,7 @@ Pytubes version::
         .read_files()
         .split(b'\n')
         .json()
-        .get("country_code", "null"))  
+        .get("country_code", "null"))
 
 results:
 
@@ -142,12 +142,12 @@ results:
 Extracting multiple fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rather than just a single field, it may be more useful to extract multiple 
+Rather than just a single field, it may be more useful to extract multiple
 fields from each record.
 
 In this test, the following set of 12 fields are pulled from each record::
 
-    timestamp 
+    timestamp
     country_code
     url
     file → filename
@@ -166,7 +166,7 @@ into a list, as the memory pressure of loading datasets that large complicate th
 Code can be seen in the `Notebook 3 <_static/perf3.html>`_
 
 The performance improvement here isn't great, as the time is dominated
-by python allocation overheads. 
+by python allocation overheads.
 
 +----------+--------------+---------+---------+
 | Version  |  Pure Python | pytubes | Speedup |
@@ -182,7 +182,7 @@ benefits, by avoiding the allocation overhead entirely.
 
 Loading a similar set of fields::
 
-    timestamp 
+    timestamp
     country_code
     url
     file → filename

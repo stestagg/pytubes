@@ -8,7 +8,7 @@
 namespace ss{ namespace iter{
 
     template<class T> bool is_undefined(T *val){ return false; }
-    template<> bool is_undefined(const JsonUtf8 *val) { 
+    template<> bool is_undefined(const JsonUtf8 *val) {
         return val->type == json::Type::Unset;
     }
     template<class T> bool is_undefined(const Slice<T> *val) {
@@ -20,7 +20,7 @@ namespace ss{ namespace iter{
         /*<-
         Fn:
             - "Iter *slot_get_iter_from_dtype(AnyIter, size_t, PyObj&) except +"
-        Iter: 
+        Iter:
             SlotGetIter: [AnyIter, size_t, PyObj]
         Tube:
             SlotGet:
@@ -33,7 +33,7 @@ namespace ss{ namespace iter{
                     cdef PyObj default_ob = PyObj(<PyObject*>self.default_val)
                     cdef Iter *iter = slot_get_iter_from_dtype(parent.iter, self.index, default_ob)
         ->*/
-        
+
         const T *parent;
         T value;
         SlotPointer slot;
@@ -64,7 +64,7 @@ namespace ss{ namespace iter{
     struct slot_get_iter_from_dtype_op{
         inline Iter *operator()(AnyIter parent, size_t index, PyObj &default_val) {
             return new SlotGetIter<T>(parent, index, default_val);
-        } 
+        }
     };
 
 

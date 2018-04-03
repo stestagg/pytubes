@@ -16,7 +16,7 @@ namespace ss{ namespace json{
     }
 
     template<class T, class P> class ArrayIter {
-        
+
         Value<T> cur;
         Slice<T> slice;
 
@@ -46,7 +46,7 @@ namespace ss{ namespace json{
     };
 
     template<class T, class P> class ObjectIter {
-        
+
         Value<T> key;
         Value<T> value;
 
@@ -66,7 +66,7 @@ namespace ss{ namespace json{
             if (slice.is_empty()) { slice = Slice<T>::Null(); return *this; }
             key = tokenize<T>(slice);
             slice = after_value(slice, key);
-            if (slice.is_empty()) { 
+            if (slice.is_empty()) {
                 throw_py<InvalidJson>("Invalid object");
             }
             slice = P::read_key_val_separator(slice);

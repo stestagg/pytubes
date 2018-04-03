@@ -66,7 +66,7 @@ namespace ss{ namespace iter{
             slice = Parser::parse_string(*val, buffer);
             container = PyObj(PyUnicode_Decode((const char *)slice.start, slice.len, "utf-8", "surrogatepass"), true);
             if (!container.obj) { throw PyExceptionRaised; }
-            return container; 
+            return container;
         case json::Type::Number:
             container = py_long_from_string(val->slice);
             if(PyErr_Occurred()){
@@ -117,7 +117,7 @@ namespace ss{ namespace iter{
 
     class ToPyIter : public Iter {
     /*<-
-        Iter: 
+        Iter:
             ToPyIter:
                 init: [AnyIter]
                 extra: >
@@ -139,12 +139,12 @@ namespace ss{ namespace iter{
             return input_slots;
         }
 
-        ToPyIter(AnyIter parent) : input_slots(parent.get()->get_slots()) { 
+        ToPyIter(AnyIter parent) : input_slots(parent.get()->get_slots()) {
             values = std::unique_ptr<PyObj[]>(new PyObj[input_slots.len]);
             for (auto slot : input_slots) {
                 fns.push_back(dispatch_type<to_py_op>(slot.type));
             }
-        } 
+        }
 
         void next() {
             for (size_t i = 0; i < fns.size(); ++i) {

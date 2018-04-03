@@ -29,7 +29,7 @@ public:
     ~OpenFile() {
         close();
     }
-    
+
     inline bool is_open() {
         return fd;
     }
@@ -44,9 +44,9 @@ public:
 
     inline OpenFile& operator=(OpenFile&& other){
         close();
-        fd = other.fd; 
+        fd = other.fd;
         size = other.size;
-        other.fd = 0; 
+        other.fd = 0;
         other.size = 0;
         return *this;
     }
@@ -73,7 +73,7 @@ public:
     size_t size;
 
 public:
-    
+
     Mmap(): file() {}
     Mmap(const char* filename): file(filename){
         size = file.size;

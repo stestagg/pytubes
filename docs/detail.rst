@@ -34,19 +34,19 @@ but the detail is quite subtle.  The main issues are:
 
   - Python's pure dynamic typing is hard to reconcile with type information needed for c-level performant code
 
-  - To be useful, data loaders have to handle a verywide variety of use-cases, 
+  - To be useful, data loaders have to handle a verywide variety of use-cases,
     which can easily lead to quadratic code complexity without careful abstraction management
 
 To implement a natural feeling interface to the library, the python-facing side
 tries to feel pythonic and generally tries to avoid deling with types explicitly.
 By the time the ``Tube`` is converted to an ``Iter``, lots of type information has
-been resolved, and optimally connected.  
+been resolved, and optimally connected.
 
-To achieve this while keeping the implementation managable, pytubes internally 
+To achieve this while keeping the implementation managable, pytubes internally
 has a number of concepts:
 
 Tube:
-    A tube describes a number of steps to load data.  Tubes typically refer to 
+    A tube describes a number of steps to load data.  Tubes typically refer to
     parent tubes recursively, and store any parameters that configure the behaviour
     of the resulting iterator.  By themselves, they are pure cython classes, and
     do not deal with processing the actual data directly.
@@ -57,7 +57,7 @@ Tube:
 Iter:
     A set of C++ classes that implement the data processing implementation.
 
-    They are entirely managed by cython wrappers and the Tube interface, so 
+    They are entirely managed by cython wrappers and the Tube interface, so
     knowledge of them is not required for normal usage of the library.
 
     Internally, ``Iter`` s expose two methods:
@@ -74,14 +74,14 @@ Dtype:
     Each tube exposes a property ``Tube.dtype`` that defines the data type of each ``Slot`` in the iterator.
 
     Tubes can consume/produce multiple values per iteration, so Tube ``dtype`` s are tuples.
-    Most tubes only have a single dtype entry, but some (e.g. :func:`Tube.enumerate`, :func:`Tube.multi`) can 
+    Most tubes only have a single dtype entry, but some (e.g. :func:`Tube.enumerate`, :func:`Tube.multi`) can
     have many.
 
     Most tubes only look at/act on the first item of a dtype when getting values.  The :func:`Tube.slot()` method
     can extract a single slot from a tube with many slots.
 
 Slot:
-    Knowledge of slots is not required for normal usage of pytubes, but may be useful for a more in-depth 
+    Knowledge of slots is not required for normal usage of pytubes, but may be useful for a more in-depth
     understanding of how the library works.
 
     The underlying C++ Iter classes work by sharing pointers to iter-lifetime fixed

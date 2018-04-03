@@ -1,6 +1,6 @@
 import re
 from collections import defaultdict
-import tubes 
+import tubes
 
 
 def setup(app):

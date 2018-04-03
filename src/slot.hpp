@@ -13,26 +13,26 @@ namespace ss{ namespace iter{
         SlotPointer() : type(ScalarType::Null), ptr(&null) {}
         SlotPointer(const SlotPointer &other) : type(other.type), ptr(other.ptr) {}
         SlotPointer(ScalarType type, const void *ptr) : type(type), ptr(ptr) {}
-        
-        template<class T> SlotPointer(ScalarType type, const T *ptr) : type(type), ptr((const void *)ptr) { 
+
+        template<class T> SlotPointer(ScalarType type, const T *ptr) : type(type), ptr((const void *)ptr) {
             using T_t = ScalarType_t<T>;
-            throw_if(ValueError, T_t::scalar_type != type, 
-                "Tried to create ", 
-                type_name(type), 
+            throw_if(ValueError, T_t::scalar_type != type,
+                "Tried to create ",
+                type_name(type),
                 " slot pointer with ",
                 T_t::type_name(),
                 " pointer type");
         }
 
-        template<class T> SlotPointer(const T *ptr) : 
-            type(ScalarType_t<T>::scalar_type), 
+        template<class T> SlotPointer(const T *ptr) :
+            type(ScalarType_t<T>::scalar_type),
             ptr((const void *)ptr) { }
-        
+
         template<class T> inline operator const T*() const {
             using T_t = ScalarType_t<T>;
-            throw_if(ValueError, T_t::scalar_type != type, 
-                "Tried to dereference ", 
-                type_name(type), 
+            throw_if(ValueError, T_t::scalar_type != type,
+                "Tried to dereference ",
+                type_name(type),
                 " slot pointer as ",
                 T_t::type_name(),
                 " pointer type");

@@ -14,8 +14,8 @@ class SplitIter : public Iter {
     /*<-
     Fn:
         - "Iter *split_iter_from_dtype(Chain, AnyIter, PyObj&) except +"
-    Iter: 
-        SplitIter: 
+    Iter:
+        SplitIter:
             template: T
             init: [AnyIter, T sep]
     Tube:
@@ -41,7 +41,7 @@ class SplitIter : public Iter {
 
 public:
 
-    SplitIter(Chain chain, AnyIter parent, T sep): 
+    SplitIter(Chain chain, AnyIter parent, T sep):
         source_data(parent->get_slots()[0]),
         chain(chain),
         slot(&current),
@@ -87,7 +87,7 @@ public:
                 // the whole buffer
                 remaining_source = remaining_source.slice_from_ptr(match + 1);
                 // We've returned the buffer, so not pending any more
-                buffer_pending = false;  
+                buffer_pending = false;
                 current = Slice<T>(buffer.data(), buffer.size());
                 return;
             }
@@ -95,7 +95,7 @@ public:
         // This is the happy-path, find the first separator, and return it..
         const T *match = remaining_source.find_first(sep);
         if (match == remaining_source.end()) {
-            // We reached the end of the upstream chunk without finding a 
+            // We reached the end of the upstream chunk without finding a
             // separator(line end).
             // set buffer to be the remaining data, for later, allowing us
             // to call next() on the parent iter because we've got a copy
@@ -122,7 +122,7 @@ struct split_iter_op{
             ScalarType_t<T>::type_name()
             );
         return NULL;
-    } 
+    }
 };
 
 template<> inline Iter *split_iter_op<ByteSlice, bool>::operator() (Chain chain, AnyIter parent, PyObject *sep) {

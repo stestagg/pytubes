@@ -16,7 +16,7 @@ namespace ss{
         }
     };
 
-    template<class K, class V> 
+    template<class K, class V>
     class HashTable<K, V, void_t<typename K::el_t>> {
         using T = typename K::el_t;
         std::unordered_map<Slice<T>, V> map;
@@ -33,7 +33,7 @@ namespace ss{
         }
 
         inline V& operator[](const K &key){
-            auto match = map.find(key); 
+            auto match = map.find(key);
             if (match == map.end()) {
                 auto stored_key = store_key(key);
                 auto ref = map.emplace(stored_key, PyObj());

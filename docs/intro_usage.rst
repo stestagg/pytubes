@@ -13,7 +13,7 @@ Usage is very simple:
    - Calling ``list(tube)``
    - looping over it in a for-loop:  ``for item in tube:``
    - or: Calling ``x = iter(tube)``, and then ``next(x)`` repeatedly.
-   
+
 
 Installation
 ------------

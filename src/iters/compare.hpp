@@ -19,27 +19,27 @@ namespace ss{ namespace iter{
             }
         }
 
-        template<class T, int Op, class U=bool> 
+        template<class T, int Op, class U=bool>
         struct Cmp{
-            static inline bool cmp(const T &a, const T &b){ 
+            static inline bool cmp(const T &a, const T &b){
                 throw_py<ValueError>("Cannot '", op_name(Op), "' compare ", ScalarType_t<T>::type_name());
                 return false;
             }
         };
 
-        template<class T> 
-        struct Cmp<T, Py_EQ, decltype(std::declval<T>() == std::declval<T>())>{static inline bool cmp(const T &a, const T &b){  
-            return a == b; 
+        template<class T>
+        struct Cmp<T, Py_EQ, decltype(std::declval<T>() == std::declval<T>())>{static inline bool cmp(const T &a, const T &b){
+            return a == b;
         }};
 
-        template<class T> 
-        struct Cmp<T, Py_GT, decltype(std::declval<T>() > std::declval<T>())>{static inline bool cmp(const T &a, const T &b){  
-            return a > b; 
+        template<class T>
+        struct Cmp<T, Py_GT, decltype(std::declval<T>() > std::declval<T>())>{static inline bool cmp(const T &a, const T &b){
+            return a > b;
         }};
 
-        template<class T> 
-        struct Cmp<T, Py_LT, decltype(std::declval<T>() < std::declval<T>())>{static inline bool cmp(const T &a, const T &b){  
-            return a < b; 
+        template<class T>
+        struct Cmp<T, Py_LT, decltype(std::declval<T>() < std::declval<T>())>{static inline bool cmp(const T &a, const T &b){
+            return a < b;
         }};
 
         template<int Op>
@@ -58,7 +58,7 @@ namespace ss{ namespace iter{
         /*<-
         Fn:
             - "Iter *compare_iter_from_cmp_dtype(AnyIter, int, PyObj&) except +"
-        Iter: 
+        Iter:
             CompareIter: {
                 template: [T, Cmp],
                 init: [AnyIter, T]
@@ -71,7 +71,7 @@ namespace ss{ namespace iter{
                     cdef PyObj value_ob = PyObj(<PyObject*>self.value)
                     cdef Iter *iter = compare_iter_from_cmp_dtype(parent.iter, self.op, value_ob)
         ->*/
-        
+
         const T *parent;
         PyObj value;
         Converter<PyObj, T> converter;
@@ -108,10 +108,10 @@ namespace ss{ namespace iter{
                 case Py_EQ: return new CompareIter<T, cmp::Cmp<T, Py_EQ, bool> >(parent, value);
                 case Py_NE: return new CompareIter<T, cmp::Cmp<T, Py_NE, bool> >(parent, value);
                 case Py_GT: return new CompareIter<T, cmp::Cmp<T, Py_GT, bool> >(parent, value);
-                case Py_GE: return new CompareIter<T, cmp::Cmp<T, Py_GE, bool> >(parent, value); 
+                case Py_GE: return new CompareIter<T, cmp::Cmp<T, Py_GE, bool> >(parent, value);
                 default: throw_py<ValueError>("Unknown comparison type");
             }
-        } 
+        }
     };
 
     Iter *compare_iter_from_cmp_dtype(AnyIter parent, int op, PyObj &value) {

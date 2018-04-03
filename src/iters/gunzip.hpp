@@ -10,7 +10,7 @@ namespace ss{ namespace iter{
 
 class ZlibDecodeIter : public Iter {
     /*<-
-    Iter: 
+    Iter:
         ZlibDecodeIter: [Chain, AnyIter, bint]
     Tube:
         Gunzip:
@@ -23,7 +23,7 @@ class ZlibDecodeIter : public Iter {
     const ByteSlice *source_data;
     Chain chain;
     bool is_stream;
-    
+
     ByteSlice encoded_slice;
     ByteSlice decoded_slice;
 
@@ -43,7 +43,7 @@ public:
         {
             init_decoder();
         }
-    
+
     ~ZlibDecodeIter() { inflateEnd(&stream); }
 
     Slice<SlotPointer> get_slots(){
@@ -71,7 +71,7 @@ public:
         stream.next_in = Z_NULL;
         stream.data_type = 0;
         stream.avail_in = 0;
-        throw_if(RuntimeError, 
+        throw_if(RuntimeError,
            inflateInit2(&stream, 15 | 32) != Z_OK,
            "Failed to initialize zlib"
         );
@@ -94,7 +94,7 @@ public:
         auto result = inflate(&stream, Z_SYNC_FLUSH);
         handle_inflate_result(result);
         auto decoded = OUT_BUFFER_SIZE - stream.avail_out;
-        throw_if(ValueError, 
+        throw_if(ValueError,
             stream.avail_out > 0 && stream.avail_in > 0,
             "Trailing data in gzip stream"
         );

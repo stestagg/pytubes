@@ -28,7 +28,7 @@ cdef extern from "../src/iter.hpp" namespace "ss::iter":
 
 
 cdef extern from "../src/util/pyobj.hpp" namespace "ss":
-    
+
     cdef cppclass PyObj:
         PyObj()
         PyObj(PyObject*)

@@ -5,7 +5,7 @@
 namespace ss{ namespace iter{
 
     /*<-
-        Iter: 
+        Iter:
             SkipIter: [Chain, AnyIter, size_t]
         Tube:
             Skip:
@@ -14,24 +14,24 @@ namespace ss{ namespace iter{
                 chains: ((self.parent,), )
                 iter: [SkipIter, ["iters_to_c_chain(chains[0])", parent.iter, self.num]]
         ->*/
-    
+
     class SkipIter : public Iter {
         Slice<SlotPointer> slots;
         Chain chain;
         size_t left;
 
     public:
-        SkipIter(Chain chain, AnyIter parent, size_t left) 
-            : slots(parent->get_slots()), 
-              chain(chain), 
-              left(left) 
+        SkipIter(Chain chain, AnyIter parent, size_t left)
+            : slots(parent->get_slots()),
+              chain(chain),
+              left(left)
             {}
 
         Slice<SlotPointer> get_slots(){
             return slots;
         }
 
-        void next(){            
+        void next(){
             while (left > 0){
                 do_next(chain);
                 left -= 1;

@@ -28,7 +28,7 @@ Simple Example
 >>> set(tube)                           # collect results in a set
 {'A1', 'AD', 'AE', 'AF', 'AG', 'AL', 'AM', 'AO', 'AP', ...}
 
-More Complex Example 
+More Complex Example
 --------------------
 
 >>> from tubes import Each
@@ -46,8 +46,8 @@ More Complex Example
             x.slot(1).get('timestamp', 'null'),
             x.slot(1).get('country_code', 'null'),
             x.slot(1).get('url', 'null'),
-            x.slot(1).get('file', '{}').get('filename', 'null'), 
-            x.slot(1).get('file', '{}').get('project'), 
+            x.slot(1).get('file', '{}').get('filename', 'null'),
+            x.slot(1).get('file', '{}').get('project'),
             x.slot(1).get('details', '{}').get('installer', '{}').get('name', 'null'),
             x.slot(1).get('details', '{}').get('python', 'null'),
             x.slot(1).get('details', '{}').get('system', 'null'),

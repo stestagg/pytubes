@@ -17,7 +17,7 @@ def test_multiple_chunks():
 def test_chunk_with_generator():
     with pytest.raises(ValueError):
         list(tubes.Each(itertools.count()).chunk(2))
-    
+
 
 if __name__ == '__main__':
     test_chunking()

@@ -41,7 +41,7 @@ TEST_CASE( "test parse int", "[json]" ) {
             OptimisticParser<uint8_t>::parse_int(tok),
             msg.c_str()
         );
-    } 
+    }
 }
 
 TEST_CASE( "test parse double", "[json]" ) {
@@ -62,14 +62,14 @@ TEST_CASE( "test invalid double conversion", "[json]" ) {
     for (auto bad: bads) {
         auto tok = tokenize<uint8_t>(from_cstr(bad));
         REQUIRE_THROWS(OptimisticParser<uint8_t>::parse_double(tok));
-    } 
+    }
 }
 
 TEST_CASE( "test string conversion", "[json]" ) {
     const char *samples[] = {
-        "hi", 
-        "hi\\tho", 
-        u8"私は", 
+        "hi",
+        "hi\\tho",
+        u8"私は",
         "\\u03B3\\u03BB\\u03CE\\u03C3\\u03C3\\u03B1",
         "\\uD801\\uDC37"
     };
@@ -111,7 +111,7 @@ TEST_CASE( "test invalid string conversion", "[json]" ) {
         auto tok = tokenize<uint8_t>(from_cstr(bad));
         std::basic_string<uint8_t> buffer;
         REQUIRE_THROWS(OptimisticParser<uint8_t>::parse_string(tok, buffer));
-    } 
+    }
 }
 
 
@@ -122,7 +122,7 @@ TEST_CASE( "test array iteration", "[json]" ) {
     for (auto child: OptimisticParser<uint8_t>::parse_array(tok)) {
         REQUIRE( child.type == Type::Number);
         results.push_back(OptimisticParser<uint8_t>::parse_int(child));
-    } 
+    }
     REQUIRE(results == expected );
 }
 

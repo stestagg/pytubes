@@ -127,7 +127,7 @@ TEST_CASE( "test invalid json", "[json]" ) {
             tokenize<uint8_t>(from_cstr(sample)),
             "Invalid json: 'z'"
         );
-        
+
     }
 
 }

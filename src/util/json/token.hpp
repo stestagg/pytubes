@@ -7,7 +7,7 @@ namespace ss{ namespace json{
 
     template<class T>
     inline Slice<T> stripWhiteSpace(const Slice<T> &in) {
-        /* Whitespace is: 
+        /* Whitespace is:
           %x20  - Space
           %x09  - Tab
           %x0A  - Line feed
@@ -22,14 +22,14 @@ namespace ss{ namespace json{
         return in.template rstrip<0x20, 0x09, 0x0a, 0x0d>();
     }
 
-    template<class T> 
+    template<class T>
     const T *find_string_end(Slice<T> source) {
         while(true) {
             auto end = source.find_first('"');
             throw_if(InvalidJson, end == source.end(), "Unterminated string: '\"", source, "'");
             // Found a ", but was it prefixed by a '\'?
             if (*(end - 1) == '\\') {
-                // It was prefixed by a '\' but this might be ok, if there are an even 
+                // It was prefixed by a '\' but this might be ok, if there are an even
                 // number of \ chars before it
                 auto slash_start = end - 1;
                 size_t slash_count = 0;
@@ -41,7 +41,7 @@ namespace ss{ namespace json{
                 if (slash_count % 2 == 0) {
                     // String looks like this: \\" which terminates it correctly
                     // so return the slice
-                    return end;    
+                    return end;
                 }
                 // we found a \", so false alarm, increment cur_pos and try again
                 source = source.slice_from_ptr(end+1);
@@ -51,7 +51,7 @@ namespace ss{ namespace json{
         }
     }
 
-    template<class T> 
+    template<class T>
     inline  const T *find_object_end(Slice<T> source) {
         while(true) {
             // '}' can occur within strings, or to close a nested object
@@ -74,7 +74,7 @@ namespace ss{ namespace json{
         }
     }
 
-    template<class T> 
+    template<class T>
     inline const T *find_array_end(Slice<T> source) {
         while(true) {
             // ']' can occur within strings, or to close a nested array
@@ -118,9 +118,9 @@ namespace ss{ namespace json{
         /*240*/ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
 
-    template<class T> 
+    template<class T>
     const T *find_num_end(Slice<T> source) {
-        // Num is the fallback type, so it may not actually be a number 
+        // Num is the fallback type, so it may not actually be a number
         // at all, so if the first char isn't valid for a number, just raise
         throw_if(InvalidJson, !num_chars[(uint8_t)*source.start], "Invalid json: '", source, "'");
         for (const T *cur_char = source.begin(); cur_char != source.end(); ++cur_char) {
@@ -146,7 +146,7 @@ namespace ss{ namespace json{
             case 'f':
                 throw_if(InvalidJson, source.len < 5, "Expected false, found '", source, "'");
                 return Value<T>(Type::Bool, source.slice_to(5));
-            case '"': 
+            case '"':
                 source = source.slice_from(1);
                 end = find_string_end<T>(source);
                 return Value<T>(Type::String, source.slice_to_ptr(end));
@@ -154,7 +154,7 @@ namespace ss{ namespace json{
                 source = source.slice_from(1);
                 end = find_object_end<T>(source);
                 return Value<T>(Type::Object, source.slice_to_ptr(end));
-            case '[': 
+            case '[':
                 source = source.slice_from(1);
                 end = find_array_end<T>(source);
                 return Value<T>(Type::Array, source.slice_to_ptr(end));
@@ -178,18 +178,18 @@ namespace ss{ namespace json{
             case 'f':
                 throw_if(InvalidJson, source.len < 5, "Expected false, found '", source, "'");
                 return Value<T>(Type::Bool, source);
-            case '"': 
+            case '"':
                 source = source.slice_from(1);
                 return Value<T>(Type::String, source.slice_to(source.len - 1));
             case '{':
                 source = source.slice_from(1);
                 return Value<T>(Type::Object, source.slice_to(source.len - 1));
-            case '[': 
+            case '[':
                 source = source.slice_from(1);
                 return Value<T>(Type::Array, source.slice_to(source.len - 1));
             default:
                 return Value<T>(Type::Number, source);
         }
     }
- 
+
 }}

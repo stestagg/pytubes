@@ -3,10 +3,10 @@
 #include "../iter.hpp"
 
 namespace ss{ namespace iter{
-    
+
     class SkipUnlessIter : public Iter {
         /*<-
-        Iter: 
+        Iter:
             SkipUnlessIter: [Chain, AnyIter, AnyIter]
         Tube:
             SkipUnless:
@@ -23,9 +23,9 @@ namespace ss{ namespace iter{
         const bool *conditional;
 
     public:
-        SkipUnlessIter(Chain chain, AnyIter parent, AnyIter conditional) 
-            : chain(chain), 
-              parent(parent->get_slots()), 
+        SkipUnlessIter(Chain chain, AnyIter parent, AnyIter conditional)
+            : chain(chain),
+              parent(parent->get_slots()),
               conditional(conditional->get_slots()[0])
             {}
 

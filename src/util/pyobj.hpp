@@ -30,8 +30,8 @@ public:
     inline PyObject *give() { auto rv = obj; obj = 0; return rv;}
     inline PyObj acquire() const { return PyObj(obj); }
     inline void incref() const { Py_INCREF(obj);}
-    ~PyObj() { 
-        Py_XDECREF(obj); 
+    ~PyObj() {
+        Py_XDECREF(obj);
     }
 };
 }

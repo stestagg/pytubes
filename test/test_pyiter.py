@@ -17,7 +17,7 @@ def test_static_tube_takes_an_iter():
 
 def test_static_tube_with_strings():
     tube = tubes.Each(['a', 'b', 'c'])
-    assert list(tube) == ['a', 'b', 'c']    
+    assert list(tube) == ['a', 'b', 'c']
 
 
 def test_static_tube_with_strings():

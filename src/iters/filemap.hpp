@@ -7,7 +7,7 @@ namespace ss{ namespace iter{
 
 class FileMapIter : public Iter {
     /*<-
-        Iter: 
+        Iter:
             FileMapIter: [AnyIter]
         Tube:
             FileMap:
@@ -25,7 +25,7 @@ class FileMapIter : public Iter {
 public:
     FileMapIter(AnyIter parent)
         : filename_slice(parent->get_slots()[0]), cur_map(), slot(&cur_slice)
-        {} 
+        {}
 
     Slice<SlotPointer> get_slots(){
         return Slice<SlotPointer>(&slot, 1);

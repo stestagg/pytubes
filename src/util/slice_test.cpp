@@ -101,7 +101,7 @@ TEST_CASE( "Zero length slices arent always null", "[slice]" ) {
 
 TEST_CASE( "static_startswith compares elements", "[slice]" ) {
     auto abacus = Slice<char>("abacus", 6);
-    
+
     CHECK( abacus.static_startswith<'a'>() == true );
     CHECK( abacus.static_startswith<'b'>() == false );
     CHECK( abacus.static_startswith<'a', 'b', 'a', 'c', 'u', 's'>() == true );
@@ -114,7 +114,7 @@ TEST_CASE( "static_startswith compares elements", "[slice]" ) {
 
 TEST_CASE( "find_first returns pointer to first match", "[slice]" ) {
     auto abacus = Slice<char>("abacus", 6);
-    
+
     CHECK( abacus.find_first('b') == abacus.start+1 );
     CHECK( abacus.find_first('c') == abacus.start+3 );
     CHECK( abacus.find_first('a') == abacus.start );

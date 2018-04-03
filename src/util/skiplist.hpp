@@ -1,7 +1,7 @@
 #pragma once
 
 namespace ss {
-    
+
     template<class T>
     struct SkipListItem{
         const size_t skip;

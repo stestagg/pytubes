@@ -64,7 +64,7 @@ setup(
             include_dirs = ['vendor', 'pyx', 'src', numpy.get_include()],
             extra_compile_args=["-std=c++11", '-g', "-O2"],
             extra_link_args=["-std=c++11", '-g'],
-        ), 
+        ),
         compiler_directives={"language_level": 3, 'embedsignature': True},
         include_path=['.']
     ),

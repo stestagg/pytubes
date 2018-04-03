@@ -88,7 +88,7 @@ cdef class Tube:
     cdef int _name_lookup_inited
     cdef object _index_lookup
     cdef int _index_lookup_inited
-    
+
     cdef IterWrapper _make_iter(self, args):
         raise NotImplementedError("_make_iter")
 
@@ -114,14 +114,14 @@ cdef class Tube:
 
     def ndarray(self, *slot_info, estimated_rows=32768, fields=None):
         """
-        Create a new numpy ``ndarray`` of with appropriate numpy dtype, and 
+        Create a new numpy ``ndarray`` of with appropriate numpy dtype, and
         fill it with the results of the tube.
 
-        :param int estimated_rows: A hint to pytubes as to how many rows are 
+        :param int estimated_rows: A hint to pytubes as to how many rows are
                                    expected in the completed array.  This affects
                                    the way in which the ndarray is resized during
                                    iteration.
-        :param fields: If ``True``, the created numpy array is 1-dimentional, using 
+        :param fields: If ``True``, the created numpy array is 1-dimentional, using
                        structured types.  Fields names are string slot numbers.
                        If ``False``, all slots must have an identical type, produces
                        an n-dimentional array, with each slot in a different dimension.
@@ -234,7 +234,7 @@ cdef class Tube:
         Care must be taken when using this with iterators that have file-level
         context (for example gunzip()) as file boundaries are not communicated.
 
-        `chunk(1)` may be used to process files in isolation before compbining the 
+        `chunk(1)` may be used to process files in isolation before compbining the
         iterators.
 
         >>> list(Each(['file1.txt']).read_files().split())
@@ -249,10 +249,10 @@ cdef class Tube:
     def gunzip(self, stream=False):
         """
         Compatibility: tube.gunzip()
-        zlib/gzip decompress the input bytes, returning a view of up to 16 
+        zlib/gzip decompress the input bytes, returning a view of up to 16
         megabytes of decompressed data.
 
-        By default, this assumes that each input slice is an entire stream 
+        By default, this assumes that each input slice is an entire stream
         (i.e. from map_files).  Setting `stream=True` treats all input values
         as part of a single gzip stream.
 
@@ -358,7 +358,7 @@ cdef class Tube:
 
         Perform multiple operations on a tube, and return a tube with `n` slots
 
-        ``makers`` should be a callable that takes the input tube, and returns a 
+        ``makers`` should be a callable that takes the input tube, and returns a
         tuple of tubes derived from the input.
 
         >>> list(Count().multi(lambda x: (x.lt(1), x.equals(1), x.gt(1))).first(3))
@@ -379,10 +379,10 @@ cdef class Tube:
         Compatibility: tube.get("field")
 
         Efficiently read the field ``key`` from the input object and
-        return it's value.  
+        return it's value.
 
         If field is missing and a ``default`` is provided, return ``default``,
-        otherwise raise.  
+        otherwise raise.
 
         ``default`` must be a valid value for the input type.
         For example, if the input is a Json dtype, default must be a string/bytes
@@ -418,17 +418,17 @@ cdef class Tube:
         """
         Compatibility: tube.skip_unless(lambda x: x.to(bool))
 
-        ``conditional`` must either be a callable that takes a single tube 
+        ``conditional`` must either be a callable that takes a single tube
         argument (the parent), and returns a ``bool`` tube, or a  ``bool`` tube.
 
         Iterates over conditional and the parent together, yielding values only
         where the result of conditional is True.
 
         Stops only when either the input __or__ conditional raise ``StopIteration``.
-        This can be sligtly unexpected in, for example, this case:  
+        This can be sligtly unexpected in, for example, this case:
         :code:`Count().skip_unless(lambda x: x.lt(3))`
-        in which case, the result is :code:`[0, 1, 2]`, but iteration over the 
-        tube will never complete because ``skip_unless`` isn't clever enough to 
+        in which case, the result is :code:`[0, 1, 2]`, but iteration over the
+        tube will never complete because ``skip_unless`` isn't clever enough to
         work out that the condition tube will never return another ``True``.
         In this case, an explicit :code:`.first(n)` will limit the run time.
 
@@ -492,7 +492,7 @@ cdef class Tube:
         Compatibility: list(tube.gt(value))
 
         Return a bool tube, that is True if the input is greater than value, otherwise False
-        
+
         >>> list(Count().skip_unless(lambda x: x.gt(4)).first(2))
         [5, 6]
         """
@@ -503,7 +503,7 @@ cdef class Tube:
         Compatibility: list(tube.lt(value))
 
         Return a bool tube, that is True if the input is less than value, otherwise False
-        
+
         >>> list(Count().skip_unless(lambda x: x.lt(4)).first(100))
         [0, 1, 2, 3]
         """
@@ -518,7 +518,7 @@ cdef class Tube:
         ``num`` sized chunks, and chain them together.
 
         This is a bit of a hack to support some tricky use-cases (for example
-        reading very large g-zipped files requires treating every file as a 
+        reading very large g-zipped files requires treating every file as a
         different gzip stream, so calling .chunk(1) allows this to work)
 
         It's also an experiment to see how multi-threading may work in the future

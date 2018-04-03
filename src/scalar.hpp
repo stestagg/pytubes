@@ -10,7 +10,7 @@ namespace ss{
 template<class X, typename... Ts> struct make_ignore { typedef X type;};
 template<class X, typename... Ts> using ignore_t = typename make_ignore<X, Ts...>::type;
 template<typename... Ts> using void_t = typename make_ignore<void, Ts...>::type;
-    
+
 
 namespace iter{
 
@@ -51,47 +51,47 @@ namespace iter{
     template<class T> struct ScalarType_t {  };
     template<> struct ScalarType_t<NullType> {
         constexpr static const ScalarType scalar_type = ScalarType::Null;
-        using type = NullType; 
+        using type = NullType;
         static const char * const type_name() { return "Null"; };
     };
     template<> struct ScalarType_t<bool> {
         constexpr static const ScalarType scalar_type = ScalarType::Bool;
-        using type = bool; 
+        using type = bool;
         static const char * const type_name() { return "Bool"; };
     };
     template<> struct ScalarType_t<int64_t> {
         constexpr static const ScalarType scalar_type = ScalarType::Int64;
-        using type = int64_t; 
+        using type = int64_t;
         static const char * const type_name() { return "Int64"; };
     };
     template<> struct ScalarType_t<double> {
         constexpr static const ScalarType scalar_type = ScalarType::Float;
-        using type = double; 
+        using type = double;
         static const char * const type_name() { return "Float"; };
     };
     template<> struct ScalarType_t<ByteSlice> {
         constexpr static const ScalarType scalar_type = ScalarType::ByteSlice;
-        using type = ByteSlice; 
+        using type = ByteSlice;
         static const char * const type_name() { return "Bytes"; };
     };
     template<> struct ScalarType_t<Utf8> {
         constexpr static const ScalarType scalar_type = ScalarType::Utf8;
-        using type = Utf8; 
+        using type = Utf8;
         static const char * const type_name() { return "Utf8"; };
     };
     template<> struct ScalarType_t<PyObj> {
         constexpr static const ScalarType scalar_type = ScalarType::Object;
-        using type = PyObj; 
+        using type = PyObj;
         static const char * const type_name() { return "Object"; };
     };
     template<> struct ScalarType_t<JsonUtf8> {
         constexpr static const ScalarType scalar_type = ScalarType::JsonUtf8;
-        using type = JsonUtf8; 
+        using type = JsonUtf8;
         static const char * const type_name() { return "Json"; };
     };
     template<> struct ScalarType_t<TsvRow> {
         constexpr static const ScalarType scalar_type = ScalarType::Tsv;
-        using type = TsvRow; 
+        using type = TsvRow;
         static const char * const type_name() { return "Tsv"; };
     };
 
@@ -103,7 +103,7 @@ namespace iter{
     template<class T>
     constexpr ScalarType dtype_from_type() { return ScalarType_t<T>::scalar_type; }
 
-    template<template <class U, class Enable=bool> class T, class... Args> 
+    template<template <class U, class Enable=bool> class T, class... Args>
     /* constexpr(>c++14) */ inline
     decltype(T<NullType, bool>()(std::declval<Args &&>()...))
     dispatch_type(ScalarType type, Args &&... args) {
@@ -128,7 +128,7 @@ namespace iter{
     template<> struct field_type_t<TsvRow> {using type = ByteSlice;};
 
     template<class T>
-    constexpr inline ScalarType field_dtype() { 
+    constexpr inline ScalarType field_dtype() {
         using field_type = typename field_type_t<T>::type;
         return ScalarType_t<field_type>::scalar_type;
     }

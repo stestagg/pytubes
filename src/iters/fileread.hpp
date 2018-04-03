@@ -9,7 +9,7 @@ namespace ss{ namespace iter{
 
 class ReadFileIter : public Iter {
     /*<-
-        Iter: 
+        Iter:
             ReadFileIter: [Chain, AnyIter]
         Tube:
             ReadFile:
@@ -29,11 +29,11 @@ class ReadFileIter : public Iter {
 
 public:
     ReadFileIter(Chain chain, AnyIter parent)
-        : filename_slice(parent->get_slots()[0]), 
+        : filename_slice(parent->get_slots()[0]),
           chain(chain),
           buffer_slice(buffer, BUFFER_SIZE),
           slot(&buffer_slice)
-        {} 
+        {}
 
     Slice<SlotPointer> get_slots(){
         return Slice<SlotPointer>(&slot, 1);

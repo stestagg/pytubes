@@ -19,7 +19,7 @@ TEST_CASE( "Slot pointer can be constructed from int64_t pointer", "[slot ptr]" 
 TEST_CASE( "Slot pointer can't be constructed from invalid pointer", "[slot ptr]" ) {
     int64_t foo = 4;
     REQUIRE_THROWS_WITH(
-        SlotPointer(ScalarType::Float, &foo), 
+        SlotPointer(ScalarType::Float, &foo),
         "Tried to create Float slot pointer with Int64 pointer type"
     );
 

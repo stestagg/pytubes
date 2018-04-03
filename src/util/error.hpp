@@ -24,11 +24,11 @@
 #if defined(__clang__)
 
 #define NORETURN_A [[noreturn]]
-#define NORETURN_B 
+#define NORETURN_B
 
 #else
 
-#define NORETURN_A 
+#define NORETURN_A
 #define NORETURN_B __attribute__((noreturn))
 
 #endif
@@ -73,13 +73,13 @@ namespace ss{
 
     template<class T>
     inline typename std::enable_if<has_ostream_operator<T>::value, void>::type
-    _append_item(std::stringstream &ss, T const &first){ 
+    _append_item(std::stringstream &ss, T const &first){
         ss << first;
     }
 
     template<class T>
     inline typename std::enable_if<!has_ostream_operator<T>::value, void>::type
-    _append_item(std::stringstream &ss, T const &first){ 
+    _append_item(std::stringstream &ss, T const &first){
         static_assert(has_ostream_operator<T>::value == false, "enable_if failed");
         ss << std::string(first);
     }
@@ -90,7 +90,7 @@ namespace ss{
         _append_item(ss, rest...);
     }
 
-    template<class ...Args> 
+    template<class ...Args>
     inline std::string make_str(Args const &... parts) {
         std::stringstream ss;
         _append_item(ss, parts...);
@@ -104,6 +104,6 @@ namespace ss{
     template<class T, class ...Args>
     NORETURN_A inline void NORETURN_B throw_py(Args const &... args){
         throw T(make_str(args...));
-    }    
+    }
 
 }

@@ -11,8 +11,8 @@ namespace ss{ namespace iter{
         /*<-
         Fn:
             - "Iter *group_id_from_dtype(AnyIter) except +"
-        Iter: 
-            GroupIdIter: 
+        Iter:
+            GroupIdIter:
                 template: T
                 init: [AnyIter]
         Tube:
@@ -61,7 +61,7 @@ namespace ss{ namespace iter{
             ScalarType_t<Q>::type_name()
             );
             return NULL;
-        } 
+        }
     };
 
     template<class T> struct group_id_op<T, ignore_t<bool, decltype(&ValueStorage<T>::get_pointer)>> {

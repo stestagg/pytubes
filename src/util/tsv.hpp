@@ -85,7 +85,7 @@ struct TsvHeader {
             field_vec.emplace_back(val);
         }
         stored_fields = field_vec;
-        fields = Array<ByteSlice>(stored_fields.size);        
+        fields = Array<ByteSlice>(stored_fields.size);
         std::transform(stored_fields.begin(), stored_fields.end(), fields.begin(), [](ByteString &x){ return ByteSlice(x); });
         have_headers = true;
     }
@@ -93,7 +93,7 @@ struct TsvHeader {
     SkipList<ByteSlice> make_skip_list(const Array<ByteSlice> &out_fields, const Array<ByteSlice> &slots) {
         SkipList<ByteSlice> skips;
         throw_if(ValueError, out_fields.size != slots.size, "Tried to apply TSV header with incorrect values");
-        throw_if(ValueError, !have_headers, "Tried to apply uninitialized TSV header"); 
+        throw_if(ValueError, !have_headers, "Tried to apply uninitialized TSV header");
         // This is N*M, but /probably/ doesn't matter, I'm happy to be wrong about this
         size_t last_header_index = 0;
         for (size_t header_index = 0; header_index < stored_fields.size; ++header_index){
