@@ -21,7 +21,6 @@ by using traditional python methods.
 include "version.pxi"
 include "iter.pxi"
 
-
 cdef class DType:
     cdef scalar_type.ScalarType type
     cdef readonly str name
@@ -77,6 +76,7 @@ DTYPE_MAP = {
 include "pyiter.pxi"
 include "ndarray.pxi"
 
+
 cdef class Tube:
 
     """
@@ -106,11 +106,11 @@ cdef class Tube:
     def __iter__(self):
         if not isinstance(self, ToPy):
             return iter(self.to_py())
-        chains = Chains(self)
+        cdef Chains chains = Chains(self)
         made_chains, made_iters = chains.make_chains_iters()
         if len(self.dtype) == 1:
-            return TubeSingleIter(made_iters[self], list(made_iters.values()), made_chains[None, self])
-        return TubeMultiIter(made_iters[self], list(made_iters.values()), made_chains[None, self], len(self.dtype))
+            return TubeSingleIter(made_iters[self], made_chains[None, self])
+        return TubeMultiIter(made_iters[self], made_chains[None, self], len(self.dtype))
 
     def ndarray(self, *slot_info, estimated_rows=32768, fields=None):
         """

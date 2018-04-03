@@ -37,9 +37,8 @@ namespace ss{ namespace iter{
     }
 
     template <> inline PyObj to_py<PyObj>(const void *val) {
-        // TODO, pyobj will incref here, is that right?
         const PyObj *v = (const PyObj *)val;
-        return PyObj(v->obj).give();
+        return PyObj(v->obj);
     }
 
     PyObj py_long_from_string(const ByteSlice &slice) {
@@ -122,7 +121,7 @@ namespace ss{ namespace iter{
             ToPyIter:
                 init: [AnyIter]
                 extra: >
-                    const PyObj get(size_t index)
+                    const PyObj &get(size_t index)
         Tube:
             ToPy:
                 props: [Tube parent]
@@ -153,8 +152,8 @@ namespace ss{ namespace iter{
             }
         }
 
-        const PyObj get(size_t index) {
-            return values[index].acquire().give();
+        const PyObj &get(size_t index) {
+            return values[index];
         }
     };
 

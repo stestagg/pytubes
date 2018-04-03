@@ -5,7 +5,6 @@ cdef extern from "../src/iter.hpp" namespace "ss":
         size_t len;
         T &operator[](size_t);
 
-
 cdef extern from "../src/iter.hpp" namespace "ss::iter":
 
     cdef cppclass SlotPointer:
@@ -17,8 +16,9 @@ cdef extern from "../src/iter.hpp" namespace "ss::iter":
     cdef cppclass AnyIter:
         Iter *get()
 
-    cdef struct Chain:
-        void push_back(AnyIter &)
+    cdef cppclass Chain:
+        Chain()
+        Chain(vector[AnyIter]&)
 
     cdef AnyIter to_any[T](T *source)
     void convert_stop_iteration()
@@ -32,6 +32,7 @@ cdef extern from "../src/util/pyobj.hpp" namespace "ss":
     cdef cppclass PyObj:
         PyObj()
         PyObj(PyObject*)
+        PyObj(PyObject*, bool_t)
 
         PyObject *obj
         PyObj acquire()
@@ -41,6 +42,9 @@ cdef extern from "../src/util/pyobj.hpp" namespace "ss":
 
 cdef class IterWrapper:
     cdef AnyIter iter
+
+    def __repr__(self):
+        return f"<IterWrapper Iter:{hex(<size_t><Iter*>self.iter.get())}>"
 
 cdef inline wrap(AnyIter it):
     cdef IterWrapper wrapper = IterWrapper()

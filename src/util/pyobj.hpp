@@ -2,7 +2,6 @@
 
 #include "Python.h"
 
-#include <iostream>
 namespace ss {
 
 
@@ -31,16 +30,17 @@ public:
     inline PyObject *give() { auto rv = obj; obj = 0; return rv;}
     inline PyObj acquire() const { return PyObj(obj); }
     inline void incref() const { Py_INCREF(obj);}
-    ~PyObj() { Py_XDECREF(obj); }
+    ~PyObj() { 
+        Py_XDECREF(obj); 
+    }
 };
-
 }
 
 
 namespace std{
     template<> struct hash<ss::PyObj>{
         inline std::size_t operator()(const ss::PyObj& val) const {
-            return std::hash<void*>()(val.obj);
+            return std::hash<long>()(val.obj ? PyObject_Hash(val.obj) : 0);
         }
     };
 }

@@ -5,7 +5,7 @@
 namespace ss{ namespace iter{
 
     /*<-
-        Iter: 
+        Iter:
             ChainIter: ["vector[Chain]", "vector[AnyIter]"]
         Tube:
             ChainTubes:
@@ -33,7 +33,7 @@ namespace ss{ namespace iter{
                         for arg in args:
                             its.push_back(arg.iter)
                         return its
-                    
+
                     cdef vector[Chain] _make_chains(self, list args):
                         cdef list arg
                         cdef Chain chain
@@ -60,7 +60,7 @@ namespace ss{ namespace iter{
     std::vector<Slice<SlotPointer>> iters_to_slot_pointers(AnyIter reference, std::vector<AnyIter> &inputs) {
         std::vector<Slice<SlotPointer>> out;
         for (auto &input : inputs) {
-            throw_if(ValueError, 
+            throw_if(ValueError,
                 !slots_are_same(reference, input),
                 "All chain iters must have the same dtype"
             );
@@ -85,7 +85,7 @@ namespace ss{ namespace iter{
         }
         return out;
     }
-    
+
     class ChainIter : public Iter {
         std::vector<Chain> chains;
         std::vector<AnyIter> inputs;
@@ -96,9 +96,9 @@ namespace ss{ namespace iter{
         std::vector<Chain>::iterator cur_chain;
         std::vector<AnyIter>::iterator cur_input;
         Slice<SlotPointer> input_slots;
-        
+
     public:
-        ChainIter(std::vector<Chain> chains, std::vector<AnyIter> inputs) 
+        ChainIter(std::vector<Chain> chains, std::vector<AnyIter> inputs)
             : chains(chains),
               inputs(inputs),
               slots(make_slots(this->inputs[0])),
@@ -112,14 +112,14 @@ namespace ss{ namespace iter{
             return Slice<SlotPointer>(slot_pointers);
         }
 
-        void next(){            
+        void next(){
             try{
                 do_next(*cur_chain);
             } catch (const StopIterationExc &e) {
                 ++cur_chain;
                 if(cur_chain == chains.end()) { throw StopIteration; }
                 ++cur_input;
-                throw_if(RuntimeError, cur_input == inputs.end(), 
+                throw_if(RuntimeError, cur_input == inputs.end(),
                     "Chain Ran out of input iterators, but still has input chains left?!");
                 input_slots = (*cur_input)->get_slots();
                 return next();

@@ -50,6 +50,7 @@ clean-py:
 	python setup.py clean
 	-rm -rf build
 	-rm -rf dist
+	-rm pyx/*.html
 	find ./ -name *.pyc -delete	
 	-find ./ -name __pycache__ -exec rm -r {} ';'
 	-rm -rf pytubes.egg-info

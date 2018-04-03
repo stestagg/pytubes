@@ -21,6 +21,8 @@ cdef np_dtype_from_dtype(ScalarType dtype, slot_info, index):
         return np.double
     elif dtype == scalar_type.Bool:
         return np.bool_
+    elif dtype == scalar_type.Object:
+        return np.object_
     raise TypeError("Cannot convert {} to numpy type".format(c_dtype_to_dtype(dtype).name))
 
 
