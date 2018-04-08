@@ -26,6 +26,13 @@ namespace ss {
             std::copy(values.begin(), values.end(), begin());
         }
 
+        Array(const T *first, size_t size) :
+            size(size),
+            values(new T[size])
+        {
+            std::copy(first, first+size, begin());
+        }
+
         Array(const Array<T> &other) :
             size(other.size),
             values(new T[other.size])
