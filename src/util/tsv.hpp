@@ -12,28 +12,18 @@
 namespace ss {
 
 
+#define TSV_SEP '\t'
+
 struct TsvHeader;
 struct TsvRow;
 
-struct SliceValueReader {
+struct TsvValueIter {
     ByteSlice row;
-
-    SliceValueReader(ByteSlice row) : row(row) {}
-
-    inline bool operator==(const TsvValueIter &other) const {
-        return row.is(other.row);
-    }
-    inline bool operator!=(const TsvValueIter &other) const {
-        return !row.is(other.row);
-    }
-}
-
-struct TsvValueReader : SliceValueReader {
     ByteSlice cur;
 
     uint8_t sep;
 
-    TsvValueIter(ByteSlice row, uint8_t sep) : SliceValueReader(row), sep(sep) {
+    TsvValueIter(ByteSlice row, uint8_t sep) : row(row), sep(sep) {
         cur = row.slice_to_ptr(row.find_first(sep));
     }
 
@@ -51,42 +41,28 @@ struct TsvValueReader : SliceValueReader {
         return cur;
     }
 
+    inline bool operator==(const TsvValueIter &other) const {
+        return row.is(other.row);
+    }
+    inline bool operator!=(const TsvValueIter &other) const {
+        return !row.is(other.row);
+    }
+
 };
 
-struct CsvValueReader : SliceValueReader {
-    // RFC 4180
-     ByteSlice cur;
 
-    CsvValueIter(ByteSlice row) : SliceValueReader(row){}
-
-    inline ByteSlice read_next(ByteSlice &src) {
-        if (src.len == 0) { return src; }
-        while (src[0] == '"') {
-            auto next = src.find_first('"');
-            if (next >= src.end() -1) {
-                throw_if(ValueError, next == src.end(), "Unterminated quoted csv field");
-                return src.slice_from(1).slice_to_ptr(next);
-            }
-            if (*(next+1) == ',') {
-                return src.slice_from(1).slice_to_ptr(next);
-            }
-        }
-     }
-
-}
-
-struct XsvRow{
+struct TsvRow{
     using iterator = TsvValueIter;
     using const_iterator = const TsvValueIter;
 
     ByteSlice row;
-    XsvHeader *header;
+    TsvHeader *header;
 
-    XsvRow() {}
-    XsvRow(ByteSlice row, XsvHeader *header) : row(row), header(header) {}
+    TsvRow() {}
+    TsvRow(ByteSlice row, TsvHeader *header) : row(row), header(header) {}
 
     inline iterator begin() const;
-    inline iterator end() const { return iterator(ByteSlice::Null()); }
+    inline iterator end() const { return iterator(ByteSlice::Null(), TSV_SEP); }
 
     inline void populate_slots(SkipList<ByteSlice> &skips) const {
         auto value = begin();
@@ -102,16 +78,15 @@ struct XsvRow{
 
 };
 
-struct XsvMeta {
+struct TsvHeader {
+    Array<ByteSlice> fields;
+    Array<ByteString> stored_fields;
     bool have_headers = false;
     uint8_t sep;
 
-    Array<ByteSlice> fields;
-    Array<ByteString> stored_fields;
+    TsvHeader(uint8_t sep=TSV_SEP) : sep(sep) {}
 
-    virtual ~XsvMeta() = default;
-
-    void read(XsvRow &row) {
+    void read(TsvRow &row) {
         std::vector<ByteString> field_vec;
         throw_if(ValueError, have_headers, "Trying to read header row, but already have headers");
         for (auto val : row) {
@@ -142,11 +117,8 @@ struct XsvMeta {
         }
         return skips;
     }
-}
-
-struct TsvMeta : XsvMeta {
-    TsvHeader(uint8_t sep=TSV_SEP) : XsvMeta(sep) {}
 };
+
 
 inline TsvRow::iterator TsvRow::begin() const { return iterator(row, header ? header->sep : TSV_SEP); }
 
