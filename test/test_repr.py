@@ -17,7 +17,7 @@ import pytest
     (tubes.Each([]).lt(5), "Each([]).Compare(0, 5)"),
     (tubes.Each([]).map_files(), "Each([]).Convert([DType[bytes]], b'fs').FileMap()"),
     (
-        tubes.Each([]).multi(lambda x: (x.get(0), x.get(1))), 
+        tubes.Each([]).multi(lambda x: (x.get(0), x.get(1))),
         "Each([]).Multi(Each([]).IndexLookup([0, 1]).SlotGet(0, UNDEFINED), Each([]).IndexLookup([0, 1]).SlotGet(1, UNDEFINED))"
     ),
     (tubes.Each([]).read_files(), "Each([]).Convert([DType[bytes]], b'fs').ReadFile()"),
@@ -27,7 +27,7 @@ import pytest
     (tubes.Each([]).to(bytes).split('r'), "Each([]).Convert([DType[bytes]], b'utf-8').Split('r')"),
     (tubes.Each([]).to(float), "Each([]).Convert([DType[float]], b'utf-8')"),
     (tubes.Each([]).to_py(), "Each([]).ToPy()"),
-    (tubes.Each([]).tsv(), "Each([]).Convert([DType[bytes]], b'utf-8').Tsv(True)"),
+    (tubes.Each([]).tsv(), "Each([]).Convert([DType[bytes]], b'utf-8').Tsv(True, '\\t')"),
     (tubes.Each([]).zip(tubes.Each([])), "Each([]).Zip(Each([]), Each([]))"),
 ])
 def test_repr(tube, desc):

@@ -114,7 +114,7 @@ cdef class Tube:
 
     def ndarray(self, *slot_info, estimated_rows=32768, fields=None):
         """
-        Create a new numpy ``ndarray`` of with appropriate numpy dtype, and
+        Create a new numpy ``ndarray`` with appropriate numpy dtype, and
         fill it with the results of the tube.
 
         :param int estimated_rows: A hint to pytubes as to how many rows are
@@ -294,14 +294,16 @@ cdef class Tube:
             return JsonParse(self.to(str, codec="utf-8"))
         return JsonParse(self)
 
-    def tsv(self, headers=True):
+    def tsv(self, headers=True, sep='\t'):
         """
         Compatibility: tube.tsv()
         Interpret the input values as rows of a TSV file.
         Each input to tsv() is treated as a separate row in the file.
-        `headers` (default: `True`) if true, will read the first input value
-        as a tab-separated list of field names, allowing subsequent access
-        to values by name, as well as by index.
+        :param bool headers: [default: `True`] If true, will read the first
+        input value as a tab-separated list of field names,
+        allowing subsequent access to values by name, as well as by index.
+        :param str sep: [default: '\t'] A single-character string that is
+        used as the field separator when reading rows.
 
         >>> list(Each(['sample.tsv']).read_files().tsv())
         [(b'abc', b'def'), (b'ghi', b'jkl')]
@@ -313,8 +315,8 @@ cdef class Tube:
         ['b', 'd']
         """
         if self.dtype[0] in {Utf8, Object}:
-            return Tsv(self.to(bytes, codec="utf-8"), headers)
-        return Tsv(self, headers)
+            return Tsv(self.to(bytes, codec="utf-8"), headers, sep)
+        return Tsv(self, headers, sep)
 
     def to(self, *types, codec="utf-8"):
         """

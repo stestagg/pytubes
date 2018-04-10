@@ -11,6 +11,9 @@
 
 namespace ss {
 
+
+#define TSV_SEP '\t'
+
 struct TsvHeader;
 struct TsvRow;
 
@@ -18,8 +21,10 @@ struct TsvValueIter {
     ByteSlice row;
     ByteSlice cur;
 
-    TsvValueIter(ByteSlice row) : row(row) {
-        cur = row.slice_to_ptr(row.find_first('\t'));
+    uint8_t sep;
+
+    TsvValueIter(ByteSlice row, uint8_t sep) : row(row), sep(sep) {
+        cur = row.slice_to_ptr(row.find_first(sep));
     }
 
     inline void operator++() {
@@ -28,7 +33,7 @@ struct TsvValueIter {
             cur = ByteSlice::Null();
         } else {
             row = row.slice_from(cur.len+1);
-            cur = row.slice_to_ptr(row.find_first('\t'));
+            cur = row.slice_to_ptr(row.find_first(sep));
         }
     }
 
@@ -56,8 +61,8 @@ struct TsvRow{
     TsvRow() {}
     TsvRow(ByteSlice row, TsvHeader *header) : row(row), header(header) {}
 
-    inline iterator begin() const { return iterator(row); }
-    inline iterator end() const { return iterator(ByteSlice::Null()); }
+    inline iterator begin() const;
+    inline iterator end() const { return iterator(ByteSlice::Null(), TSV_SEP); }
 
     inline void populate_slots(SkipList<ByteSlice> &skips) const {
         auto value = begin();
@@ -77,6 +82,9 @@ struct TsvHeader {
     Array<ByteSlice> fields;
     Array<ByteString> stored_fields;
     bool have_headers = false;
+    uint8_t sep;
+
+    TsvHeader(uint8_t sep=TSV_SEP) : sep(sep) {}
 
     void read(TsvRow &row) {
         std::vector<ByteString> field_vec;
@@ -92,8 +100,8 @@ struct TsvHeader {
 
     SkipList<ByteSlice> make_skip_list(const Array<ByteSlice> &out_fields, const Array<ByteSlice> &slots) {
         SkipList<ByteSlice> skips;
-        throw_if(ValueError, out_fields.size != slots.size, "Tried to apply TSV header with incorrect values");
-        throw_if(ValueError, !have_headers, "Tried to apply uninitialized TSV header");
+        throw_if(ValueError, out_fields.size != slots.size, "Tried to apply header with incorrect values");
+        throw_if(ValueError, !have_headers, "Tried to apply uninitialized header");
         // This is N*M, but /probably/ doesn't matter, I'm happy to be wrong about this
         size_t last_header_index = 0;
         for (size_t header_index = 0; header_index < stored_fields.size; ++header_index){
@@ -109,7 +117,9 @@ struct TsvHeader {
         }
         return skips;
     }
-
 };
+
+
+inline TsvRow::iterator TsvRow::begin() const { return iterator(row, header ? header->sep : TSV_SEP); }
 
 }
