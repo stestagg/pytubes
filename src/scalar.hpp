@@ -45,7 +45,8 @@ namespace iter{
         Utf8,
         Object,
         JsonUtf8,
-        Tsv
+        Tsv,
+        Csv
     };
 
     template<class T> struct ScalarType_t {  };
@@ -94,6 +95,11 @@ namespace iter{
         using type = TsvRow;
         static const char * const type_name() { return "Tsv"; };
     };
+    template<> struct ScalarType_t<CsvRow> {
+        constexpr static const ScalarType scalar_type = ScalarType::Csv;
+        using type = CsvRow;
+        static const char * const type_name() { return "Csv"; };
+    };
 
     template<class T, class Enable>
     struct type_name_op{
@@ -117,6 +123,7 @@ namespace iter{
             case ScalarType::Object: return T<PyObj, bool>()(args...);
             case ScalarType::JsonUtf8: return T<JsonUtf8, bool>()(args...);
             case ScalarType::Tsv: return T<TsvRow, bool>()(args...);
+            case ScalarType::Csv: return T<CsvRow, bool>()(args...);
             default:  throw_py<RuntimeError>("Got unexpected dtype value:  ", (size_t)type);
         }
         return T<NullType, bool>()(args...);
@@ -126,6 +133,7 @@ namespace iter{
     template<class T> struct field_type_t {using type = NullType;};
     template<> struct field_type_t<JsonUtf8> {using type = JsonUtf8;};
     template<> struct field_type_t<TsvRow> {using type = ByteSlice;};
+    template<> struct field_type_t<CsvRow> {using type = ByteSlice;};
 
     template<class T>
     constexpr inline ScalarType field_dtype() {

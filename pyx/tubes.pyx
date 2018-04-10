@@ -54,6 +54,7 @@ Utf8 = _make_dtype(scalar_type.Utf8, "str")
 Object = _make_dtype(scalar_type.Object, "object")
 JsonUtf8 = _make_dtype(scalar_type.JsonUtf8, "Json")
 TsvRow = _make_dtype(scalar_type.Tsv, "Tsv")
+CsvRow = _make_dtype(scalar_type.Csv, "Csv")
 
 
 cdef class _UNDEFINED:

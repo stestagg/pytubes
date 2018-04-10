@@ -8,7 +8,7 @@
 
 namespace ss{ namespace iter{
 
-    template<class T>
+    template<class T, class Enable=bool>
     class SingleNameLookupIter : public Iter {
         using ValueType = typename field_type_t<T>::type;
         const T *parent;
@@ -32,7 +32,7 @@ namespace ss{ namespace iter{
         void next();
     };
 
-    template<> void SingleNameLookupIter<JsonUtf8>::next() {
+    template<> void SingleNameLookupIter<JsonUtf8, bool>::next() {
         using Parser = json::parse::OptimisticParser<uint8_t>;
         value = JsonUtf8();
         if (parent->type == json::Type::Object) {
@@ -46,7 +46,7 @@ namespace ss{ namespace iter{
         }
     }
 
-    template<class T> class NameLookupIter;
+    template<class T, class Enable=bool> class NameLookupIter;
     /*<-
         Fn:
             - "Iter *name_lookup_from_dtype(AnyIter, vector[string] &) except +"
@@ -85,7 +85,7 @@ namespace ss{ namespace iter{
         ->*/
 
     template<>
-    class NameLookupIter<JsonUtf8> : public Iter {
+    class NameLookupIter<JsonUtf8, bool> : public Iter {
         using Parser = json::parse::OptimisticParser<uint8_t>;
 
         const JsonUtf8 *parent;
@@ -129,16 +129,20 @@ namespace ss{ namespace iter{
     };
 
 
-    template<> class NameLookupIter<TsvRow> : public Iter {
-
-        const TsvRow *parent;
+    template<class X> class NameLookupIter<X, typename std::enable_if<X::IsXsv::value, bool>::type > : public Iter {
+        using header_t = XsvHeader<typename X::iterator>;
+        const X *parent;
         const Array<std::string> names;
         const Array<ByteSlice> name_slices;
         const Array<ByteSlice> values;
 
         const Array<SlotPointer> slots;
 
-        TsvHeader *cur_header = (TsvHeader *)0x01;
+        // 0x01 is used here as an initial value so that it will always be different
+        // from an XSV row header pointer (which can be null)
+        // This takes the null header check out of the critical path, arguably
+        // saving a few cycles in the hot loop.
+        header_t *cur_header = (header_t *)0x01;
         SkipList<ByteSlice> skip_list;
     public:
         NameLookupIter(AnyIter parent, std::vector<std::string> &names):
@@ -156,7 +160,12 @@ namespace ss{ namespace iter{
         void next() {
             if (cur_header != parent->header) {
                 cur_header = parent->header;
-                throw_if(ValueError, cur_header == NULL, "Getting TSV values by name only supported with a header row");
+                throw_if(ValueError,
+                    cur_header == NULL,
+                    "Getting ",
+                    X::variant_name(),
+                    " values by name only supported with a header row"
+                );
                 skip_list = cur_header->make_skip_list(name_slices, values);
             }
             parent->populate_slots(skip_list);

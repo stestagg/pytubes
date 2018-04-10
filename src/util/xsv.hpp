@@ -11,11 +11,11 @@
 
 namespace ss {
 
-
 #define TSV_SEP '\t'
 
-struct TsvHeader;
-struct TsvRow;
+template<class RowType> struct XsvHeader;
+template<class ValueIter> struct XsvRow;
+
 
 struct TsvValueIter {
     ByteSlice row;
@@ -51,15 +51,96 @@ struct TsvValueIter {
 };
 
 
-struct TsvRow{
-    using iterator = TsvValueIter;
-    using const_iterator = const TsvValueIter;
+struct CsvValueIter {
+    ByteSlice row;
+    std::basic_string<bytes> buffer;
+    const bytes *cur_value_end;
+    ByteSlice cur;
+
+    CsvValueIter(ByteSlice row) : row(row) {}
+
+    inline void buffered_read_next(ByteSlice remaining) {
+        while (true) {
+            auto next = remaining.find_first('"');
+            if (next + 1 == remaining.end() || *(next+1) == ',') {
+                buffer += remaining.slice_to_ptr(next);
+                cur = ByteSlice(buffer);
+                return;
+            } else {
+                throw_if(ValueError, *(next+1) != '"', "Invalid quote in quoted CSV value");
+                buffer += remaining.slice_to_ptr(next+1);
+                remaining = remaining.slice_from_ptr(next+2);
+            }
+        }
+    }
+
+    inline void read_next_val() {
+        // a,b,c
+        // a,"b",c
+        // a,"b""b",c
+        if (row[0] == '"') {
+            // This is a quoted value, remove the leading "
+            auto remaining = row.slice_from(1);
+            // Find the next "
+            auto next = remaining.find_first('"');
+            // If we hit the end of row with no closing ", that's bad
+            throw_if(ValueError, next == remaining.end(), "Untermintaed CSV value");
+            // If the quote is the last char in the row, or is a ',' then that's simple:
+            if (next + 1 == remaining.end() || *(next+1) == ',') {
+                cur = remaining.slice_to_ptr(next);
+                cur_value_end = next + 1;
+                return;
+            } else {
+                // We've got a " that isn't followed by a , or EOL
+                // until we change how whitespace is handled, this must
+                // be another quote character:
+                throw_if(ValueError, *(next+1) != '"', "Invalid quote in quoted CSV value");
+                buffer = remaining.slice_to_ptr(next+1);
+                return buffered_read_next(remaining.slice_from_ptr(next+2));
+            }
+        } else {
+            cur_value_end = row.find_first(',');
+            cur = row.slice_to_ptr(cur_value_end);
+        }
+    }
+
+    inline void operator++() {
+        if (cur_value_end == row.end()) {
+            row = ByteSlice::Null();
+        } else {
+            row = row.slice_from_ptr(cur_value_end);
+            read_next_val();
+        }
+    }
+
+    inline ByteSlice operator*() const {
+        return cur;
+    }
+
+    inline bool operator==(const TsvValueIter &other) const {
+        return row.is(other.row);
+    }
+    inline bool operator!=(const TsvValueIter &other) const {
+        return !row.is(other.row);
+    }
+
+};
+
+template<class ValueIter>
+struct XsvRow{
+    using Cls = XsvRow<ValueIter>;
+    using iterator = ValueIter;
+    using const_iterator = const ValueIter;
+    using IsXsv = std::true_type;
+    using Header = XsvHeader<Cls>;
 
     ByteSlice row;
-    TsvHeader *header;
+    Header *header;
 
-    TsvRow() {}
-    TsvRow(ByteSlice row, TsvHeader *header) : row(row), header(header) {}
+    XsvRow() {}
+    XsvRow(ByteSlice row, Header *header) : row(row), header(header) {}
+
+    static const char* variant_name();
 
     inline iterator begin() const;
     inline iterator end() const { return iterator(ByteSlice::Null(), TSV_SEP); }
@@ -78,7 +159,8 @@ struct TsvRow{
 
 };
 
-struct TsvHeader {
+template<class RowType>
+struct XsvHeader {
     Array<ByteSlice> fields;
     Array<ByteString> stored_fields;
     bool have_headers = false;
@@ -86,7 +168,7 @@ struct TsvHeader {
 
     TsvHeader(uint8_t sep=TSV_SEP) : sep(sep) {}
 
-    void read(TsvRow &row) {
+    void read(RowType &row) {
         std::vector<ByteString> field_vec;
         throw_if(ValueError, have_headers, "Trying to read header row, but already have headers");
         for (auto val : row) {
@@ -119,6 +201,9 @@ struct TsvHeader {
     }
 };
 
+
+using TsvRow = XsvRow<TsvValueIter>;
+using CsvRow = XsvRow<CsvValueIter>;
 
 inline TsvRow::iterator TsvRow::begin() const { return iterator(row, header ? header->sep : TSV_SEP); }
 
