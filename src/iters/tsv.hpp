@@ -25,7 +25,7 @@ namespace ss{ namespace iter{
     ->*/
         const ByteSlice *source;
         const Chain chain;
-        TsvHeader header_row;
+        XsvHeader<TsvRow> header_row;
 
         bool read_headers;
 

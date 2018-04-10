@@ -11,7 +11,7 @@
 
 namespace ss {
 
-#define TSV_SEP '\t'
+#define XSV_SEP '\t'
 
 template<class RowType> struct XsvHeader;
 template<class ValueIter> struct XsvRow;
@@ -57,7 +57,9 @@ struct CsvValueIter {
     const bytes *cur_value_end;
     ByteSlice cur;
 
-    CsvValueIter(ByteSlice row) : row(row) {}
+    uint8_t sep;
+
+    CsvValueIter(ByteSlice row, uint8_t sep) : row(row) {}
 
     inline void buffered_read_next(ByteSlice remaining) {
         while (true) {
@@ -117,10 +119,10 @@ struct CsvValueIter {
         return cur;
     }
 
-    inline bool operator==(const TsvValueIter &other) const {
+    inline bool operator==(const CsvValueIter &other) const {
         return row.is(other.row);
     }
-    inline bool operator!=(const TsvValueIter &other) const {
+    inline bool operator!=(const CsvValueIter &other) const {
         return !row.is(other.row);
     }
 
@@ -140,10 +142,10 @@ struct XsvRow{
     XsvRow() {}
     XsvRow(ByteSlice row, Header *header) : row(row), header(header) {}
 
-    static const char* variant_name();
+    static inline const char* variant_name();
 
     inline iterator begin() const;
-    inline iterator end() const { return iterator(ByteSlice::Null(), TSV_SEP); }
+    inline iterator end() const { return iterator(ByteSlice::Null(), XSV_SEP); }
 
     inline void populate_slots(SkipList<ByteSlice> &skips) const {
         auto value = begin();
@@ -166,7 +168,7 @@ struct XsvHeader {
     bool have_headers = false;
     uint8_t sep;
 
-    TsvHeader(uint8_t sep=TSV_SEP) : sep(sep) {}
+    XsvHeader(uint8_t sep=XSV_SEP) : sep(sep) {}
 
     void read(RowType &row) {
         std::vector<ByteString> field_vec;
@@ -201,10 +203,15 @@ struct XsvHeader {
     }
 };
 
+template<class X>
+inline typename XsvRow<X>::iterator XsvRow<X>::begin() const {
+    return iterator(row, header ? header->sep : XSV_SEP);
+}
 
 using TsvRow = XsvRow<TsvValueIter>;
 using CsvRow = XsvRow<CsvValueIter>;
 
-inline TsvRow::iterator TsvRow::begin() const { return iterator(row, header ? header->sep : TSV_SEP); }
+template<> inline const char *TsvRow::variant_name() { return "TSV"; }
+template<> inline const char *CsvRow::variant_name() { return "CSV"; }
 
 }

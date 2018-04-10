@@ -130,7 +130,6 @@ namespace ss{ namespace iter{
 
 
     template<class X> class NameLookupIter<X, typename std::enable_if<X::IsXsv::value, bool>::type > : public Iter {
-        using header_t = XsvHeader<typename X::iterator>;
         const X *parent;
         const Array<std::string> names;
         const Array<ByteSlice> name_slices;
@@ -142,7 +141,7 @@ namespace ss{ namespace iter{
         // from an XSV row header pointer (which can be null)
         // This takes the null header check out of the critical path, arguably
         // saving a few cycles in the hot loop.
-        header_t *cur_header = (header_t *)0x01;
+        XsvHeader<X> *cur_header = (XsvHeader<X> *)0x01;
         SkipList<ByteSlice> skip_list;
     public:
         NameLookupIter(AnyIter parent, std::vector<std::string> &names):

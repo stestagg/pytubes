@@ -97,8 +97,7 @@ namespace ss{ namespace iter{
         return PyObj();
     }
 
-    template <> inline PyObj to_py<TsvRow>(const void *_val) {
-        auto row = (TsvRow *)_val;
+    template<class T> inline PyObj xsv_to_py(const T *row) {
         PyObj container= PyObj(PyList_New(0), true);
         if (!container.obj) { throw std::bad_alloc(); }
 
@@ -106,6 +105,13 @@ namespace ss{ namespace iter{
             PyList_Append(container.obj, to_py<ByteSlice>((const void *)&v).obj);
         }
         return container;
+    }
+
+    template<>  inline PyObj to_py<TsvRow>(const void *_val){
+        return xsv_to_py<TsvRow>((TsvRow*)_val);
+    }
+    template<>  inline PyObj to_py<CsvRow>(const void *_val){
+        return xsv_to_py<CsvRow>((CsvRow*)_val);
     }
 
 
