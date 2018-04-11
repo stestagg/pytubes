@@ -27,7 +27,7 @@ import pytest
     (tubes.Each([]).to(bytes).split('r'), "Each([]).Convert([DType[bytes]], b'utf-8').Split('r')"),
     (tubes.Each([]).to(float), "Each([]).Convert([DType[float]], b'utf-8')"),
     (tubes.Each([]).to_py(), "Each([]).ToPy()"),
-    (tubes.Each([]).tsv(), "Each([]).Convert([DType[bytes]], b'utf-8').Tsv(True, '\\t')"),
+    (tubes.Each([]).tsv(), "Each([]).Convert([DType[bytes]], b'utf-8').Xsv(True, '\\t', 'tsv')"),
     (tubes.Each([]).zip(tubes.Each([])), "Each([]).Zip(Each([]), Each([]))"),
 ])
 def test_repr(tube, desc):

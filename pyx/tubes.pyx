@@ -316,8 +316,8 @@ cdef class Tube:
         ['b', 'd']
         """
         if self.dtype[0] in {Utf8, Object}:
-            return Tsv(self.to(bytes, codec="utf-8"), headers, sep)
-        return Tsv(self, headers, sep)
+            return Xsv(self.to(bytes, codec="utf-8"), headers, sep, "tsv")
+        return Xsv(self, headers, sep, "tsv")
 
     def to(self, *types, codec="utf-8"):
         """
