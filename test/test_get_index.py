@@ -25,4 +25,4 @@ def test_escaped_multi_index_get_on_json():
         x.get(1),
         x.get(2),
     )).to(str, str, str)
-    assert list(tube) == [('\t', '\b', '\u1234'), ('"', '', 'a'), ('x', 'y\tx\bb\n', 'z')]
+    assert list(tube) == [('\t', '\b', '\u1234'), ('"', '', 'a'), ('x', 'y\ta\bb\n', 'z')]
