@@ -176,7 +176,7 @@ namespace ss{ namespace iter{
     struct name_lookup_iter_op{
         inline Iter *operator()(AnyIter parent, std::vector<std::string> &names) {
             throw_py<ValueError>(
-                "Field lookup has not been implemented on iterators of type ",
+                "Name-based Field lookup has not been implemented on iterators of type ",
                 ScalarType_t<T>::type_name()
                 );
             return NULL;
@@ -192,6 +192,9 @@ namespace ss{ namespace iter{
 
     template<> inline Iter *name_lookup_iter_op<TsvRow, bool>::operator() (AnyIter parent, std::vector<std::string> &names) {
         return new NameLookupIter<TsvRow>(parent, names);
+    }
+    template<> inline Iter *name_lookup_iter_op<CsvRow, bool>::operator() (AnyIter parent, std::vector<std::string> &names) {
+        return new NameLookupIter<CsvRow>(parent, names);
     }
 
 

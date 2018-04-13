@@ -10,6 +10,8 @@ namespace ss{
 template<class X, typename... Ts> struct make_ignore { typedef X type;};
 template<class X, typename... Ts> using ignore_t = typename make_ignore<X, Ts...>::type;
 template<typename... Ts> using void_t = typename make_ignore<void, Ts...>::type;
+template<typename... Ts> using bool_t = typename make_ignore<bool, Ts...>::type;
+template<bool X, class Y> using enable_if_t = typename std::enable_if<X, Y>::type;
 
 
 namespace iter{

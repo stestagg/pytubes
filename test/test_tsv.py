@@ -4,6 +4,10 @@ def test_tsv_to_py():
     tube = tubes.Each(['a\tb\tc', 'd\tef']).to(tubes.TsvRow)
     assert list(tube) == [[b'a', b'b', b'c'], [b'd', b'ef']]
 
+def test_empty_tsv():
+    tube = tubes.Each(['']).to(tubes.CsvRow)
+    assert list(tube) == [[b'']]
+
 def test_tsv_one_row():
     tube = tubes.Each(['a\tb\tc']).to(tubes.TsvRow).get(1)
     assert list(tube) == [b'b']
@@ -40,6 +44,10 @@ def test_tsv_multi():
     )).to(str, str, str, str)
     assert list(tube) == [('a', 'b', 'c', 'xx'), ('d', 'e', 'f', 'xx')]
 
+
+def test_tsv_headers_get_single():
+    tube = tubes.Each(['a\tb\tc', 'd\te\tf']).tsv(headers=True).get('a').to(str)
+    assert list(tube) == ['d']
 
 def test_tsv_headers_one_row():
     tube = tubes.Each(['a\tb\tc', 'd\te\tf']).tsv(headers=True).multi(lambda x:(

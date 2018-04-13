@@ -73,11 +73,12 @@ namespace ss{ namespace iter{
     simple_convert(double, bool, { current = *from != 0; });
     simple_convert(ByteSlice, bool, { current = from->len != 0; });
     simple_convert(Utf8, bool, { current = from->len != 0; });
-    simple_convert(bool, ByteSlice, { current = *from ? ByteSlice((uint8_t*)"True", 4) : ByteSlice((uint8_t*)"False", 5); });
-    simple_convert(bool, Utf8, { current = *from ? ByteSlice((uint8_t*)"True", 4) : ByteSlice((uint8_t*)"False", 5); });
+    simple_convert(bool, ByteSlice, { current = *from ? ByteSlice((bytes*)"True", 4) : ByteSlice((bytes*)"False", 5); });
+    simple_convert(bool, Utf8, { current = *from ? ByteSlice((bytes*)"True", 4) : ByteSlice((bytes*)"False", 5); });
     simple_convert(int64_t, double, { current = *from; });
     simple_convert(double, int64_t, { current = *from; });
     simple_convert(ByteSlice, TsvRow, { current = TsvRow(*from, NULL); });
+    simple_convert(ByteSlice, CsvRow, { current = CsvRow(*from, NULL); });
 
     simple_convert(ByteSlice, int64_t, { current = slice_to_int(*from); });
     simple_convert(Utf8, int64_t, { current = slice_to_int(*from); });
@@ -89,7 +90,7 @@ namespace ss{ namespace iter{
     , U>::type
 
     template<class T> struct Converter<BYTES_UTF(T, JsonUtf8), T> : AnyConverter {
-        using Parser = json::parse::OptimisticParser<uint8_t>;
+        using Parser = json::parse::OptimisticParser<bytes>;
 
         const JsonUtf8 *from;
         T current;
@@ -106,13 +107,13 @@ namespace ss{ namespace iter{
             switch(from->type){
                 case json::Type::Null:
                     Parser::parse_null(*from);
-                    current = T((uint8_t*)"None", 4);
+                    current = T((bytes*)"None", 4);
                     break;
                 case json::Type::Bool:
                     if (Parser::parse_bool(*from)) {
-                        current = T((uint8_t*)"True", 4);
+                        current = T((bytes*)"True", 4);
                     } else {
-                        current = T((uint8_t*)"False", 5);
+                        current = T((bytes*)"False", 5);
                     }
                     break;
                 case json::Type::String:
@@ -192,7 +193,7 @@ namespace ss{ namespace iter{
             } else if (PyUnicode_Check(p)) {
                 convert_from<Py_UNICODE*>();
             } else if (PyBytes_Check(p)) {
-                convert_from<uint8_t*>();
+                convert_from<bytes*>();
             } else if (PyFloat_Check(p)) {
                 convert_from<double>();
             } else if (PyLong_Check(p)) {
@@ -209,73 +210,73 @@ namespace ss{ namespace iter{
     py_convert_fn(NullType, NullType) { current = std::tuple<>(); }
 
     // PyObj > Bytes
-    py_convert_fn(std::true_type, ByteSlice) { current = ByteSlice((const uint8_t*)"True", 4); }
-    py_convert_fn(std::false_type, ByteSlice) { current = ByteSlice((const uint8_t*)"False", 5); }
-    py_convert_fn(NullType, ByteSlice) { current = ByteSlice((const uint8_t*)"None", 4); }
+    py_convert_fn(std::true_type, ByteSlice) { current = ByteSlice((const bytes*)"True", 4); }
+    py_convert_fn(std::false_type, ByteSlice) { current = ByteSlice((const bytes*)"False", 5); }
+    py_convert_fn(NullType, ByteSlice) { current = ByteSlice((const bytes*)"None", 4); }
     py_convert_fn(Py_UNICODE*, ByteSlice){
         buffer = encode_str(from->obj, codec);
         const char *buf = PyBytes_AsString(buffer.obj); // Owned by buffer
-        current = ByteSlice((const uint8_t*)buf, PyBytes_GET_SIZE(buffer.obj));
+        current = ByteSlice((const bytes*)buf, PyBytes_GET_SIZE(buffer.obj));
     }
-    py_convert_fn(uint8_t*, ByteSlice) {
+    py_convert_fn(bytes*, ByteSlice) {
         buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
         const char *buf = PyBytes_AsString(from->obj);
         if(!buf){ throw PyExceptionRaised; }
-        current = ByteSlice((const uint8_t*)buf, PyBytes_GET_SIZE(from->obj));
+        current = ByteSlice((const bytes*)buf, PyBytes_GET_SIZE(from->obj));
     }
     py_convert_fn(int64_t, ByteSlice) {
         buffer = PyObj(PyObject_Str(from->obj), true);
         Py_ssize_t len;
         const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &len);
         if(!buf){ throw PyExceptionRaised; }
-        current = ByteSlice((const uint8_t*)buf, len);
+        current = ByteSlice((const bytes*)buf, len);
     }
     py_convert_fn(double, ByteSlice) {
         buffer = PyObj(PyObject_Str(from->obj), true);
         Py_ssize_t len;
         const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &len);
         if(!buf){ throw PyExceptionRaised; }
-        current = ByteSlice((const uint8_t*)buf, len);
+        current = ByteSlice((const bytes*)buf, len);
     }
 
     // PyObj > str
-    py_convert_fn(std::true_type, Utf8) { current = Utf8((const uint8_t*)"True", 4); }
-    py_convert_fn(std::false_type, Utf8) { current = Utf8((const uint8_t*)"False", 5); }
-    py_convert_fn(NullType, Utf8) { current = Utf8((const uint8_t*)"None", 4); }
+    py_convert_fn(std::true_type, Utf8) { current = Utf8((const bytes*)"True", 4); }
+    py_convert_fn(std::false_type, Utf8) { current = Utf8((const bytes*)"False", 5); }
+    py_convert_fn(NullType, Utf8) { current = Utf8((const bytes*)"None", 4); }
     py_convert_fn(Py_UNICODE*, Utf8) {
         Py_ssize_t size;
         buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
         const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &size);
         if (!buf) { throw PyExceptionRaised; }
-        current = Utf8((const uint8_t*)buf, size);
+        current = Utf8((const bytes*)buf, size);
     }
-    py_convert_fn(uint8_t*, Utf8) {
+    py_convert_fn(bytes*, Utf8) {
         buffer = decode_str(from->obj, codec);
         Py_ssize_t size;
         const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &size);
         if (!buf) { throw PyExceptionRaised; }
-        current = Utf8((const uint8_t*)buf, size);
+        current = Utf8((const bytes*)buf, size);
     }
     py_convert_fn(int64_t, Utf8) {
         buffer = PyObj(PyObject_Str(from->obj), true);
         Py_ssize_t len;
         const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &len);
         if(!buf){ throw PyExceptionRaised; }
-        current = Utf8((const uint8_t*)buf, len);
+        current = Utf8((const bytes*)buf, len);
     }
     py_convert_fn(double, Utf8) {
         buffer = PyObj(PyObject_Str(from->obj), true);
         Py_ssize_t len;
         const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &len);
         if(!buf){ throw PyExceptionRaised; }
-        current = Utf8((const uint8_t*)buf, len);
+        current = Utf8((const bytes*)buf, len);
     }
 
     // PyObj > bool
     py_convert_fn(std::true_type, bool) { current = true; }
     py_convert_fn(std::false_type, bool) { current = false; }
     py_convert_fn(int64_t, bool) { current = PyLong_AsLongLong(from->obj); }
-    py_convert_fn(uint8_t*, bool) { current = PyBytes_Size(from->obj) > 0; }
+    py_convert_fn(bytes*, bool) { current = PyBytes_Size(from->obj) > 0; }
     py_convert_fn(Py_UNICODE*, bool) {
         PyUnicode_READY(from->obj);
         current = PyUnicode_GET_LENGTH(from->obj) > 0;
@@ -308,13 +309,13 @@ namespace ss{ namespace iter{
         Py_ssize_t size;
         buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
         const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &size);
-        current = json::tokenize_entire(ByteSlice((uint8_t *)buf, size));
+        current = json::tokenize_entire(ByteSlice((bytes *)buf, size));
     }
-    py_convert_fn(uint8_t*, JsonUtf8) {
+    py_convert_fn(bytes*, JsonUtf8) {
         buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
         const char *buf = PyBytes_AsString(from->obj);
         if(!buf){ throw PyExceptionRaised; }
-        auto slice = ByteSlice((uint8_t *)buf, PyBytes_GET_SIZE(from->obj));
+        auto slice = ByteSlice((bytes *)buf, PyBytes_GET_SIZE(from->obj));
         current = json::tokenize_entire(slice);
     }
 
@@ -323,14 +324,27 @@ namespace ss{ namespace iter{
         Py_ssize_t size;
         buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
         const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &size);
-        current = TsvRow(ByteSlice((uint8_t *)buf, size), NULL);
+        current = TsvRow(ByteSlice((bytes *)buf, size), NULL);
     }
-    py_convert_fn(uint8_t*, TsvRow) {
+    py_convert_fn(bytes*, TsvRow) {
         buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
         const char *buf = PyBytes_AsString(from->obj);
         if(!buf){ throw PyExceptionRaised; }
-        auto slice = ByteSlice((uint8_t *)buf, PyBytes_GET_SIZE(from->obj));
+        auto slice = ByteSlice((bytes *)buf, PyBytes_GET_SIZE(from->obj));
         current = TsvRow(slice, NULL);
+    }
+    py_convert_fn(Py_UNICODE*, CsvRow) {
+        Py_ssize_t size;
+        buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
+        const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &size);
+        current = CsvRow(ByteSlice((bytes *)buf, size), NULL);
+    }
+    py_convert_fn(bytes*, CsvRow) {
+        buffer = PyObj(from->obj); // keep a ref, to make sure it doesn't go away
+        const char *buf = PyBytes_AsString(from->obj);
+        if(!buf){ throw PyExceptionRaised; }
+        auto slice = ByteSlice((bytes *)buf, PyBytes_GET_SIZE(from->obj));
+        current = CsvRow(slice, NULL);
     }
 
 }}

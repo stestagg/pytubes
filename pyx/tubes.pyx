@@ -319,6 +319,30 @@ cdef class Tube:
             return Xsv(self.to(bytes, codec="utf-8"), headers, sep, "tsv")
         return Xsv(self, headers, sep, "tsv")
 
+    def csv(self, headers=True, sep=','):
+        """
+        Compatibility: tube.csv()
+        Interpret the input values as rows of a CSV file.
+        Each input to csv() is treated as a separate row in the file.
+        :param bool headers: [default: `True`] If true, will read the first
+        input value as a tab-separated list of field names,
+        allowing subsequent access to values by name, as well as by index.
+        :param str sep: [default: ','] A single-character string that is
+        used as the field separator when reading rows.
+
+        >>> list(Each(['sample.csv']).read_files().csv())
+        [(b'abc', b'def'), (b'ghi', b'jkl')]
+        >>> list(Each(['a,b', 'c,d']).csv())
+        [(b'a', b'b'), (b'c', b'd')]
+        >>> list(Each(['a,b', 'c,d']).csv(headers=True).get('a'))
+        [b'c']
+        >>> list(Each(['a,b', 'c,d']).csv(headers=False).get(1).to(str))
+        ['b', 'd']
+        """
+        if self.dtype[0] in {Utf8, Object}:
+            return Xsv(self.to(bytes, codec="utf-8"), headers, sep, "csv")
+        return Xsv(self, headers, sep, "csv")
+
     def to(self, *types, codec="utf-8"):
         """
         Convert the input to the specified dtype.
