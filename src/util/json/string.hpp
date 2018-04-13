@@ -38,6 +38,7 @@ namespace ss{ namespace json{ namespace string {
         if (first_bs == in.end()) {
             return in;
         }
+        buf.clear();
         std::copy(in.begin(), first_bs, std::back_inserter(buf));
         auto remain = decode_escape<I, O>(buf, in.slice_from_ptr(first_bs+1), in);
         if (remain.len) {
