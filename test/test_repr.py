@@ -20,6 +20,10 @@ import pytest
         tubes.Each([]).multi(lambda x: (x.get(0), x.get(1))),
         "Each([]).Multi(Each([]).IndexLookup([0, 1]).SlotGet(0, UNDEFINED), Each([]).IndexLookup([0, 1]).SlotGet(1, UNDEFINED))"
     ),
+    (
+        tubes.Each([]).multi(lambda x: [x.get(0), x.get(1)]),
+        "Each([]).Multi(Each([]).IndexLookup([0, 1]).SlotGet(0, UNDEFINED), Each([]).IndexLookup([0, 1]).SlotGet(1, UNDEFINED))"
+    ),
     (tubes.Each([]).read_files(), "Each([]).Convert([DType[bytes]], b'fs').ReadFile()"),
     (tubes.Each([]).skip(3), "Each([]).Skip(3)"),
     (tubes.Each([]).skip_unless(lambda x: x.gt(4)), "Each([]).SkipUnless(Each([]).Compare(4, 4))"),

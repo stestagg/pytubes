@@ -134,6 +134,7 @@ namespace ss{ namespace iter{
         const Array<std::string> names;
         const Array<ByteSlice> name_slices;
         const Array<ByteSlice> values;
+        Array<ByteString> value_buffers;
 
         const Array<SlotPointer> slots;
 
@@ -149,6 +150,7 @@ namespace ss{ namespace iter{
             names(names),
             name_slices(names.size()),
             values(names.size()),
+            value_buffers(names.size()),
             slots(make_slots_from_array(this->values))
         {
             std::transform(this->names.begin(), this->names.end(), name_slices.begin(), [](std::string &x){ return ByteSlice(x); });
@@ -167,7 +169,7 @@ namespace ss{ namespace iter{
                 );
                 skip_list = cur_header->make_skip_list(name_slices, values);
             }
-            parent->populate_slots(skip_list);
+            parent->populate_slots(skip_list, value_buffers);
         }
 
     };

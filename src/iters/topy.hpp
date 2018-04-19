@@ -1,4 +1,4 @@
- #pragma once
+#pragma once
 
 #include "../util/pyobj.hpp"
 #include "../iter.hpp"
@@ -100,9 +100,12 @@ namespace ss{ namespace iter{
     template<class T> inline PyObj xsv_to_py(const T *row) {
         PyObj container= PyObj(PyList_New(0), true);
         if (!container.obj) { throw std::bad_alloc(); }
-
-        for (auto v : *row) {
-            PyList_Append(container.obj, to_py<ByteSlice>((const void *)&v).obj);
+        ByteString buffer;
+        auto iter = row->iter();
+        while (true) {
+            auto should_continue = iter.next(buffer);
+            PyList_Append(container.obj, to_py<ByteSlice>((const void *)&iter.cur).obj);
+            if (!should_continue) { break; }
         }
         return container;
     }

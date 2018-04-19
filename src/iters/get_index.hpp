@@ -32,6 +32,7 @@ namespace ss{ namespace iter{
                         }
                     }
                     *(field.destination) = *cur_field;
+                    ++cur_field;
                 }
             }
         }
@@ -40,11 +41,12 @@ namespace ss{ namespace iter{
     template<class T> struct index_get_impl<T, enable_if_t<T::IsXsv::value, bool> > {
         using Enabled = true_type;
         SkipList<ByteSlice> skips;
+        Array<ByteString> buffers;
 
-        index_get_impl(SkipList<ByteSlice> skips) : skips(skips) {}
+        index_get_impl(SkipList<ByteSlice> skips) : skips(skips), buffers(skips.size()) {}
 
         inline void read(const T &parent) {
-            parent.populate_slots(skips);
+            parent.populate_slots(skips, buffers);
         }
     };
 
@@ -77,12 +79,18 @@ namespace ss{ namespace iter{
                     cdef vector[size_t] skips
                     cdef size_t slot_index
                     cdef size_t row_index
+                    cdef size_t last_row_index
                     by_row_index = [(r_i, s_i) for (s_i, r_i) in enumerate(self.indexes)]
-                    cdef size_t last_row_index = 0
-                    for row_index, slot_index in sorted(by_row_index):
-                        indexes.push_back(slot_index)
-                        skips.push_back(row_index - last_row_index)
-                        last_row_index = row_index
+                    if by_row_index:
+                        by_row_index = sorted(by_row_index)
+                        first_row_index, first_slot_index = by_row_index[0]
+                        indexes.push_back(first_slot_index)
+                        skips.push_back(first_row_index)
+                        last_row_index = first_row_index
+                        for row_index, slot_index in by_row_index[1:]:
+                            indexes.push_back(slot_index)
+                            skips.push_back(row_index - last_row_index - 1)
+                            last_row_index = row_index
                     cdef Iter *iter = index_lookup_from_dtype(parent.iter, indexes, skips)
                 methods: >
                     cdef lookup_index(self, size_t val_index, default):
@@ -129,27 +137,6 @@ namespace ss{ namespace iter{
             impl.read(*parent);
         }
     };
-
-    // template<> void IndexLookupIter<JsonUtf8>::next() {
-    //     using Parser = json::parse::OptimisticParser<uint8_t>;
-    //     for(size_t index=0; index < slots.size; ++index) {
-    //         values[index] = JsonUtf8();
-    //     }
-    //     if (parent->type == json::Type::Array) {
-    //         auto field_iter = Parser::parse_array(*parent);
-    //         auto cur_field = field_iter.begin();
-    //         for (auto &field : fields) {
-    //             auto to_skip = field.skip;
-    //             while(to_skip--){
-    //                 ++cur_field;
-    //                 if (cur_field == field_iter.end()) {
-    //                     return;
-    //                 }
-    //             }
-    //             *(field.destination) = *cur_field;
-    //         }
-    //     }
-    // }
 
     template<class T, class Enable>
     struct index_lookup_iter_op{

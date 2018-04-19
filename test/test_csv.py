@@ -1,3 +1,4 @@
+import pytest
 import tubes
 
 def test_csv_to_py():
@@ -8,8 +9,16 @@ def test_empty_csv():
     tube = tubes.Each(['']).to(tubes.CsvRow)
     assert list(tube) == [[b'']]
 
+def test_csv_two_values():
+    tube = tubes.Each(['a,b']).to(tubes.CsvRow)
+    assert list(tube) == [[b'a', b'b']]
+
+def test_csv_trailing_comma():
+    tube = tubes.Each(['a,']).to(tubes.CsvRow)
+    assert list(tube) == [[b'a', b'']]
+
 def test_csv_one_row():
-    tube = tubes.Each(['a,b,c']).to(tubes.CsvRow).get(1)
+    tube = tubes.Each(['a,b,c']).to(tubes.CsvRow).get(1, 'x')
     assert list(tube) == [b'b']
 
 def test_csv_two_rows():
@@ -18,24 +27,23 @@ def test_csv_two_rows():
 
 def test_csv_escaping():
     tube = tubes.Each(['a"x","b",""', '"d","e,f",g']).to(tubes.CsvRow).multi(lambda x: (
-        x.get(0),
-        x.get(1),
-        x.get(2),
+        x.get(0, 'xx'),
+        x.get(1, 'xx'),
+        x.get(2, 'xx'),
     ))
     assert list(tube) == [(b'a"x"', b'b', b''), (b'd', b'e,f', b'g')]
 
 def test_csv_quote_escaping():
-    tube = tubes.Each(['"a""b","""", """"""', '"c""""d",e""f']).to(tubes.CsvRow).multi(lambda x: (
-        x.get(0, 'x'),
-        x.get(1, 'x'),
+    tube = tubes.Each(['"a""b","""",""""""', '"c""""d",e""f']).to(tubes.CsvRow).multi(lambda x: (
+        x.get(0),
+        x.get(1),
         x.get(2, 'x'),
     ))
-    print(">>>", list(tube))
-    assert list(tube) == [(b'a"b"', b'"', b'""'), (b'c""d', b'e"f')]
+    assert list(tube) == [(b'a"b', b'"', b'""'), (b'c""d', b'e""f', b'x')]
 
 def test_csv_uneven_rows():
-    tube = tubes.Each(['a', 'b,c', 'd,e,', 'f,g,h']).to(tubes.CsvRow).get(2, 'xx')
-    assert list(tube) == [b'xx', b'xx', b'', b'h']
+    tube = tubes.Each(['a', 'b,c', 'd,e,', 'f,g,h']).to(tubes.CsvRow).get(2, 'xx').to(str)
+    assert list(tube) == ['xx', 'xx', '', 'h']
 
 def test_csv_uneven_rows_get_many():
     tube = tubes.Each(['a', 'b,c', 'd,e,', 'f,g,h']).to(tubes.CsvRow).multi(lambda x: (
@@ -92,6 +100,5 @@ def test_csv_non_comma_separator():
     assert list(tube) == [[b'a', b'b', b'c'], [b'd', b'e,f', b'g']]
 
 
-
 if __name__ == '__main__':
-    test_csv_quote_escaping()
+    test_csv_one_row()
