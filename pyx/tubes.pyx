@@ -126,7 +126,7 @@ cdef class Tube:
                        structured types.  Fields names are string slot numbers.
                        If ``False``, all slots must have an identical type, produces
                        an n-dimentional array, with each slot in a different dimension.
-        :param *slot_info: Provide metadata about each slot to help create the ndarray
+        :param slot_info: Provide metadata about each slot to help create the ndarray
                            Currently required by bytes types to set the column size.
                            The n-th slot_info value is used to affect the numpy
                            dtype of the n-th slot of the input.
@@ -299,20 +299,25 @@ cdef class Tube:
         """
         Compatibility: tube.tsv()
         Interpret the input values as rows of a TSV file.
-        Each input to tsv() is treated as a separate row in the file.
-        :param bool headers: [default: `True`] If true, will read the first
-        input value as a tab-separated list of field names,
-        allowing subsequent access to values by name, as well as by index.
+
+        :param bool headers: [default: ``True``] If ``True``, will read the first
+            input value as a tab-separated list of field names,
+            allowing subsequent access to values by name, as well as by index.
         :param str sep: [default: '\t'] A single-character string that is
-        used as the field separator when reading rows.
+            used as the field separator when reading rows.
+        :param bool split: [default: ``True``] If ``True``, split the input bytes
+            on newlines, to identify rows.  If ``False``, each input value is assumed
+            to be a separate row.
+        :param bool skip_empty_rows: Skip over blank rows in the in input (note
+            whitespace causes a row to be considered non-blank)
 
         >>> list(Each(['sample.tsv']).read_files().tsv())
         [(b'abc', b'def'), (b'ghi', b'jkl')]
-        >>> list(Each(['a\tb', 'c\td']).tsv())
+        >>> list(Each(['a\\tb', 'c\\td']).tsv())
         [(b'a', b'b'), (b'c', b'd')]
-        >>> list(Each(['a\tb', 'c\td']).tsv(headers=True).get('a'))
+        >>> list(Each(['a\\tb', 'c\\td']).tsv(headers=True).get('a'))
         [b'c']
-        >>> list(Each(['a\tb', 'c\td']).tsv(headers=False).get(1).to(str))
+        >>> list(Each(['a|b', 'c|d']).tsv(headers=False, sep='|').get(1).to(str))
         ['b', 'd']
         """
         if self.dtype[0] in {Utf8, Object}:
@@ -324,11 +329,17 @@ cdef class Tube:
         Compatibility: tube.csv()
         Interpret the input values as rows of a CSV file.
         Each input to csv() is treated as a separate row in the file.
+
         :param bool headers: [default: `True`] If true, will read the first
-        input value as a tab-separated list of field names,
-        allowing subsequent access to values by name, as well as by index.
+            input value as a tab-separated list of field names,
+            allowing subsequent access to values by name, as well as by index.
         :param str sep: [default: ','] A single-character string that is
-        used as the field separator when reading rows.
+            used as the field separator when reading rows.
+        :param bool split: [default: True] If `True`, split the input bytes
+            on newlines, to identify rows.  If `False`, each input value is assumed
+            to be a separate row.
+        :param bool skip_empty_rows: Skip over blank rows in the in input (note
+            whitespace causes a row to be considered non-blank)
 
         >>> list(Each(['sample.csv']).read_files().csv())
         [(b'abc', b'def'), (b'ghi', b'jkl')]
