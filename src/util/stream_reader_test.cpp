@@ -101,6 +101,7 @@ TEST_CASE("can store data across chunks", "[stream reader]") {
     const char * full = "The quick brown fox jumped over the lazy dog";
     auto reader = make_reader({"The quick ",  "brown", " fox jumped ", "over the lazy", " dog."});
     REQUIRE(reader.read_until_char('.') == ByteSlice(full, strlen(full)));
+    REQUIRE(reader.read_until_char('.') == ByteSlice("", 0));
     REQUIRE_THROWS(reader.read_until_char(','));
 }
 

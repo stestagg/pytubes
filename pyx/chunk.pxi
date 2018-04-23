@@ -50,7 +50,7 @@ cdef class Chunk(Tube):
         return its
 
     cpdef _describe_self(self):
-        return f"Chunk({self.parent._repr()}, {self.chunk_size})"
+        return f"Chunk({self.parent._repr()}, chunk_size={self.chunk_size})"
 
     @property
     def dtype(self):

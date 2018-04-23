@@ -30,7 +30,7 @@ for i in range(1, 10, 2):
     SAMPLE_JSON.append('"' + ('\\' * i) + '"1"')
 
 
-# Please note, the tubes json parser is *not* validating.  It assumes that the 
+# Please note, the tubes json parser is *not* validating.  It assumes that the
 # json is valid unless it is forced not to.  Therefore, many invalid JSONs may
 # be accepted as valid.
 
@@ -39,7 +39,7 @@ for i in range(1, 10, 2):
 # json.loads() call can (and produce same output)
 
 TEST_CASE_DIR = path.join(THIS_DIR, "JSONTestSuite_parse_tests")
-BLACKLIST = {  # Generally speaking, json.loads() is very permissive about 
+BLACKLIST = {  # Generally speaking, json.loads() is very permissive about
                # Utf-8 reading, but python string conversion fns aren't
                # so these produce errors/inconsistent outputs
     "i_string_overlong_sequence_6_bytes.json",

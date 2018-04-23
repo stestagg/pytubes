@@ -8,7 +8,7 @@
 
 namespace ss{ namespace iter{
 
-    template<class T>
+    template<class T, class Enable=bool>
     class SingleNameLookupIter : public Iter {
         using ValueType = typename field_type_t<T>::type;
         const T *parent;
@@ -32,7 +32,7 @@ namespace ss{ namespace iter{
         void next();
     };
 
-    template<> void SingleNameLookupIter<JsonUtf8>::next() {
+    template<> void SingleNameLookupIter<JsonUtf8, bool>::next() {
         using Parser = json::parse::OptimisticParser<uint8_t>;
         value = JsonUtf8();
         if (parent->type == json::Type::Object) {
@@ -46,7 +46,7 @@ namespace ss{ namespace iter{
         }
     }
 
-    template<class T> class NameLookupIter;
+    template<class T, class Enable=bool> class NameLookupIter;
     /*<-
         Fn:
             - "Iter *name_lookup_from_dtype(AnyIter, vector[string] &) except +"
@@ -57,6 +57,7 @@ namespace ss{ namespace iter{
         Tube:
             NameLookup:
                 props: [Tube parent, list items, {type: dict, name: _name_lookups, default: None, print: False}]
+                unnamed_props: [items]
                 dtype: |
                     cdef DType dt = self.parent.dtype[0]
                     return (c_dtype_to_dtype(field_dtype_from_dtype(dt.type)), ) * len(self.items)
@@ -85,7 +86,7 @@ namespace ss{ namespace iter{
         ->*/
 
     template<>
-    class NameLookupIter<JsonUtf8> : public Iter {
+    class NameLookupIter<JsonUtf8, bool> : public Iter {
         using Parser = json::parse::OptimisticParser<uint8_t>;
 
         const JsonUtf8 *parent;
@@ -129,16 +130,20 @@ namespace ss{ namespace iter{
     };
 
 
-    template<> class NameLookupIter<TsvRow> : public Iter {
-
-        const TsvRow *parent;
+    template<class X> class NameLookupIter<X, typename std::enable_if<X::IsXsv::value, bool>::type > : public Iter {
+        const X *parent;
         const Array<std::string> names;
         const Array<ByteSlice> name_slices;
         const Array<ByteSlice> values;
+        Array<ByteString> value_buffers;
 
         const Array<SlotPointer> slots;
 
-        TsvHeader *cur_header = (TsvHeader *)0x01;
+        // 0x01 is used here as an initial value so that it will always be different
+        // from an XSV row header pointer (which can be null)
+        // This takes the null header check out of the critical path, arguably
+        // saving a few cycles in the hot loop.
+        XsvHeader<X> *cur_header = (XsvHeader<X> *)0x01;
         SkipList<ByteSlice> skip_list;
     public:
         NameLookupIter(AnyIter parent, std::vector<std::string> &names):
@@ -146,6 +151,7 @@ namespace ss{ namespace iter{
             names(names),
             name_slices(names.size()),
             values(names.size()),
+            value_buffers(names.size()),
             slots(make_slots_from_array(this->values))
         {
             std::transform(this->names.begin(), this->names.end(), name_slices.begin(), [](std::string &x){ return ByteSlice(x); });
@@ -156,10 +162,15 @@ namespace ss{ namespace iter{
         void next() {
             if (cur_header != parent->header) {
                 cur_header = parent->header;
-                throw_if(ValueError, cur_header == NULL, "Getting TSV values by name only supported with a header row");
+                throw_if(ValueError,
+                    cur_header == NULL,
+                    "Getting ",
+                    X::variant_name(),
+                    " values by name only supported with a header row"
+                );
                 skip_list = cur_header->make_skip_list(name_slices, values);
             }
-            parent->populate_slots(skip_list);
+            parent->populate_slots(skip_list, value_buffers);
         }
 
     };
@@ -168,7 +179,7 @@ namespace ss{ namespace iter{
     struct name_lookup_iter_op{
         inline Iter *operator()(AnyIter parent, std::vector<std::string> &names) {
             throw_py<ValueError>(
-                "Field lookup has not been implemented on iterators of type ",
+                "Name-based Field lookup has not been implemented on iterators of type ",
                 ScalarType_t<T>::type_name()
                 );
             return NULL;
@@ -184,6 +195,9 @@ namespace ss{ namespace iter{
 
     template<> inline Iter *name_lookup_iter_op<TsvRow, bool>::operator() (AnyIter parent, std::vector<std::string> &names) {
         return new NameLookupIter<TsvRow>(parent, names);
+    }
+    template<> inline Iter *name_lookup_iter_op<CsvRow, bool>::operator() (AnyIter parent, std::vector<std::string> &names) {
+        return new NameLookupIter<CsvRow>(parent, names);
     }
 
 

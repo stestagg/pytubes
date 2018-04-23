@@ -40,9 +40,9 @@ namespace ss{ namespace iter{
         Slice<T>
         read_until(Finder &finder, Args &&... args) {
             while(true) {
-                if (remaining_source.is_empty()) {
-                    // Nothing left in the upstream chunk, so clean up and stop
+                if (remaining_source.is_null()) {
                     if (done) {
+                        // Nothing left in the upstream chunk, so clean up and stop
                         throw StopIteration;
                     }
                     try{
@@ -52,7 +52,6 @@ namespace ss{ namespace iter{
                     } catch (StopIterationExc e) {
                         // Parent has no more to give, so set done state, but check if
                         // there's anything left over that was unterminated..
-                        // just to be safe, nuke cur_slice
                         remaining_source = Slice<T>::Null();
                         done = true;
                         if (buffer_pending) {
@@ -64,22 +63,23 @@ namespace ss{ namespace iter{
                     }
                     // Now we've got a chunk, but there may be some data left from the
                     // last chunk, and these have to be joined, so special case that
-                    if (buffer_pending) {
-                        const T *match = finder.find_next(remaining_source, args...);
-                        auto this_part = remaining_source.slice_to_ptr(match);
-                        buffer.insert(buffer.end(), this_part.begin(), this_part.end());
-                        // Adjust the rest of the slice to compensate, and return
-                        // the whole buffer
-                        if (match == remaining_source.end()) {
-                            // There was no match in the whole chunk, so loop again
-                            remaining_source = Slice<T>::Null();
-                            continue;
-                        }
-                        remaining_source = finder.get_remaining(remaining_source, match);
-                        // We've returned the buffer, so not pending any more
-                        buffer_pending = false;
-                        return Slice<T>(buffer.data(), buffer.size());
+                    if (buffer_pending && buffer.size()) {
+                            const T *match = finder.find_next(remaining_source, args...);
+                            auto this_part = remaining_source.slice_to_ptr(match);
+                            buffer.insert(buffer.end(), this_part.begin(), this_part.end());
+                            // Adjust the rest of the slice to compensate, and return
+                            // the whole buffer
+                            if (match == remaining_source.end()) {
+                                // There was no match in the whole chunk, so loop again
+                                remaining_source = Slice<T>::Null();
+                                continue;
+                            }
+                            remaining_source = finder.get_remaining(remaining_source, match);
+                            // We've returned the buffer, so not pending any more
+                            buffer_pending = false;
+                            return Slice<T>(buffer);
                     }
+                    buffer_pending = false;
                 }
 
                 // This is the happy-path: look for a match

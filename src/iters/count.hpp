@@ -10,9 +10,9 @@ namespace ss{ namespace iter{
             CountIter: [size_t]
         Tube:
             Count:
-                props: [{type: size_t, name: _start, default: 0}]
+                props: [{type: size_t, name: start, default: 0}]
                 dtype: return (Int64,)
-                iter: [CountIter, [self._start]]
+                iter: [CountIter, [self.start]]
                 docstring: |
                     Iterator that behaves similarly to :func:`itertools.count`.
 

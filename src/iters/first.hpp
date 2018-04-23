@@ -11,6 +11,7 @@ namespace ss{ namespace iter{
         Tube:
             First:
                 props: [Tube parent, size_t num]
+                unnamed_props: [num]
                 dtype: return self.parent.dtype
                 iter: [FirstIter, [parent.iter, self.num]]
         ->*/

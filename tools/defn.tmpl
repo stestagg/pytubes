@@ -79,7 +79,17 @@ cdef class {{tube.name}}(Tube):  # AUTO GENERATED FROM tools/defn2.tmpl
 
     {% if "cpdef _describe_self(self):" not in tube.methods %}
     cpdef _describe_self(self):
-        return f"{{tube.name}}({% for prop in tube.props if prop.printable %}{repr(self.{{prop.name}})}{% if not loop.last %}, {%endif%}{% endfor %})"
+        arg_desc = []
+        {% for prop in tube.props if prop.printable %}
+        {% if prop.has_default %}
+        if self.{{prop.name}} != {{prop.default}}:
+            {%endif%}{% if prop.name in (tube.unnamed_props or ()) -%}
+            arg_desc.append(f"{repr(self.{{prop.name}})}")
+            {%- else -%}
+            arg_desc.append(f"{{prop.name}}={repr(self.{{prop.name}})}")
+            {%- endif %}
+        {% endfor %}
+        return f"{{tube.name}}({', '.join(arg_desc)})"
     {% endif %}
 
     {{ tube.methods|indent(4) -}}

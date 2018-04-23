@@ -4,6 +4,10 @@ def test_tsv_to_py():
     tube = tubes.Each(['a\tb\tc', 'd\tef']).to(tubes.TsvRow)
     assert list(tube) == [[b'a', b'b', b'c'], [b'd', b'ef']]
 
+def test_empty_tsv():
+    tube = tubes.Each(['']).to(tubes.CsvRow)
+    assert list(tube) == [[b'']]
+
 def test_tsv_one_row():
     tube = tubes.Each(['a\tb\tc']).to(tubes.TsvRow).get(1)
     assert list(tube) == [b'b']
@@ -41,8 +45,12 @@ def test_tsv_multi():
     assert list(tube) == [('a', 'b', 'c', 'xx'), ('d', 'e', 'f', 'xx')]
 
 
+def test_tsv_headers_get_single():
+    tube = tubes.Each(['a\tb\tc', 'd\te\tf']).tsv(headers=True, split=False).get('a').to(str)
+    assert list(tube) == ['d']
+
 def test_tsv_headers_one_row():
-    tube = tubes.Each(['a\tb\tc', 'd\te\tf']).tsv(headers=True).multi(lambda x:(
+    tube = tubes.Each(['a\tb\tc', 'd\te\tf']).tsv(headers=True, split=False).multi(lambda x:(
         x.get('a'),
         x.get(1),
         x.get(2),
@@ -60,7 +68,7 @@ def test_reading_tsv_headers_different_orders():
 9\t7\t8
 12\t10\t11
 """
-    tube = tubes.Each([tsv_1, tsv_2]).to(bytes).split().tsv(headers=True).chunk(1).multi(lambda x:(
+    tube = tubes.Each([tsv_1, tsv_2]).to(bytes).split().tsv(headers=True, split=False).chunk(1).multi(lambda x:(
         x.get('a'),
         x.get('b'),
         x.get('c')
@@ -69,7 +77,7 @@ def test_reading_tsv_headers_different_orders():
 
 
 def test_tsv_non_tab_separator():
-    tube = tubes.Each(['a|b|c', 'd|e\tf|g']).to(bytes).tsv(headers=False, sep='|')
+    tube = tubes.Each(['a|b|c\n', 'd|e\tf|g']).to(bytes).tsv(headers=False, sep='|')
     assert list(tube) == [[b'a', b'b', b'c'], [b'd', b'e\tf', b'g']]
 
 

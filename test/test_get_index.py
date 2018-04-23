@@ -6,7 +6,7 @@ def test_single_index_get_on_json_value():
     assert list(tube) == [None, 2]
 
 
-def test_single_index_get_on_json_value():
+def test_multi_index_get_on_json_value():
     tube = tubes.Each(["[1,2,3]", "[8,9,10]", '["a", "b", "c"]']).json().multi(lambda x: (
         x.get(0),
         x.get(2),
