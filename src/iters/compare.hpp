@@ -65,11 +65,22 @@ namespace ss{ namespace iter{
             }
         Tube:
             Compare:
-                props: [Tube parent, int op, object value]
+                props: [Tube parent, str op, object value]
                 dtype: return (Bool, )
                 custom_iter: |
                     cdef PyObj value_ob = PyObj(<PyObject*>self.value)
-                    cdef Iter *iter = compare_iter_from_cmp_dtype(parent.iter, self.op, value_ob)
+                    cdef int op_val = self.constant_from_op()
+                    cdef Iter *iter = compare_iter_from_cmp_dtype(parent.iter, op_val, value_ob)
+                methods: |
+                    cpdef int constant_from_op(self):
+                        return {
+                            "==": Py_EQ,
+                            "<": Py_LT,
+                            "<=": Py_LE,
+                            ">": Py_GT,
+                            ">=": Py_GE,
+                            "!=": Py_NE,
+                        }[self.op]
         ->*/
 
         const T *parent;

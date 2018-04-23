@@ -71,6 +71,7 @@ namespace ss{ namespace iter{
         Tube:
             IndexLookup:
                 props: [Tube parent, list indexes, {type: dict, name: _index_lookups, default: None, print: False}]
+                unnamed_props: [indexes]
                 dtype: |
                     cdef DType dt = self.parent.dtype[0]
                     return (c_dtype_to_dtype(field_dtype_from_dtype(dt.type)), ) * len(self.indexes)

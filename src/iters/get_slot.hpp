@@ -24,7 +24,8 @@ namespace ss{ namespace iter{
             SlotGetIter: [AnyIter, size_t, PyObj]
         Tube:
             SlotGet:
-                props: [Tube parent, size_t index, object default_val]
+                props: [Tube parent, size_t index, object default_val=UNDEFINED]
+                unnamed_props: [index]
                 dtype: return (self.parent.dtype[self.index], )
                 init_check: |
                     if index > <size_t>len(parent.dtype):

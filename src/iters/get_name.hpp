@@ -57,6 +57,7 @@ namespace ss{ namespace iter{
         Tube:
             NameLookup:
                 props: [Tube parent, list items, {type: dict, name: _name_lookups, default: None, print: False}]
+                unnamed_props: [items]
                 dtype: |
                     cdef DType dt = self.parent.dtype[0]
                     return (c_dtype_to_dtype(field_dtype_from_dtype(dt.type)), ) * len(self.items)

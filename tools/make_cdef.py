@@ -54,12 +54,21 @@ class Prop:
     def __init__(self, spec):
         if isinstance(spec, str):
             ty, name = spec.split(" ", 1)
-            self.spec = {"type": ty, "name": name}
+            if "=" in name:
+                name, default = name.split("=", 1)
+                self.spec = {"type": ty, "name": name, "default": default}
+            else:
+                self.spec = {"type": ty, "name": name}
+
         else:
             self.spec = spec
 
     def __getattr__(self, name):
         return self.spec[name]
+
+    @property
+    def has_default(self):
+        return "default" in self.spec
 
     @property
     def dtypes(self):

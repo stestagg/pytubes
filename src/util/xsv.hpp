@@ -62,7 +62,7 @@ struct CsvValueIter {
     inline bool buffered_read_next(ByteString &buffer) {
         while (true) {
             auto next = row.find_first('"');
-            throw_if(ValueError, next == row.end(), "Unterminated CSV value");
+            throw_if(ValueError, next == row.end(), "Unterminated CSV value: ", row);
             if (next + 1 == row.end()) {
                 buffer += row.slice_to_ptr(next);
                 cur = ByteSlice(buffer);
@@ -106,7 +106,7 @@ struct CsvValueIter {
             // Find the next "
             auto next = row.find_first('"');
             // If we hit the end of row with no closing ", that's bad
-            throw_if(ValueError, next == row.end(), "Unterminated CSV value");
+            throw_if(ValueError, next == row.end(), "Unterminated CSV value:", row);
             // If the quote is the last char in the row...
             if (next + 1 == row.end()){
                 cur = row.slice_to_ptr(next);
@@ -150,7 +150,7 @@ struct CsvValueIter {
             row = row.slice_from(1);
             while (true) {
                 auto next = row.find_first('"');
-                throw_if(ValueError, next == row.end(), "Unterminated CSV value");
+                throw_if(ValueError, next == row.end(), "Unterminated CSV value", row);
                 if (next + 1 == row.end()) {
                     return false;
                 } else if (*(next+1) == sep) {

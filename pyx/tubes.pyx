@@ -295,7 +295,7 @@ cdef class Tube:
             return JsonParse(self.to(str, codec="utf-8"))
         return JsonParse(self)
 
-    def tsv(self, headers=True, sep='\t'):
+    def tsv(self, headers=True, sep='\t', split=True, skip_empty_rows=True):
         """
         Compatibility: tube.tsv()
         Interpret the input values as rows of a TSV file.
@@ -316,10 +316,10 @@ cdef class Tube:
         ['b', 'd']
         """
         if self.dtype[0] in {Utf8, Object}:
-            return Xsv(self.to(bytes, codec="utf-8"), headers, sep, "tsv")
-        return Xsv(self, headers, sep, "tsv")
+            return Xsv(self.to(bytes, codec="utf-8"), "tsv", sep, headers, split, skip_empty_rows)
+        return Xsv(self, "tsv", sep, headers, split, skip_empty_rows)
 
-    def csv(self, headers=True, sep=','):
+    def csv(self, headers=True, sep=',', split=True, skip_empty_rows=True):
         """
         Compatibility: tube.csv()
         Interpret the input values as rows of a CSV file.
@@ -340,8 +340,8 @@ cdef class Tube:
         ['b', 'd']
         """
         if self.dtype[0] in {Utf8, Object}:
-            return Xsv(self.to(bytes, codec="utf-8"), headers, sep, "csv")
-        return Xsv(self, headers, sep, "csv")
+            return Xsv(self.to(bytes, codec="utf-8"), "csv", sep, headers, split, skip_empty_rows)
+        return Xsv(self, "csv", sep, headers, split, skip_empty_rows)
 
     def to(self, *types, codec="utf-8"):
         """
@@ -512,7 +512,7 @@ cdef class Tube:
         >>> list(Each([False, 0, '']).equals(False))
         [True, True, False]
         """
-        return Compare(self, Py_EQ, value)
+        return Compare(self, '==', value)
 
     def gt(self, value):
         """
@@ -523,7 +523,7 @@ cdef class Tube:
         >>> list(Count().skip_unless(lambda x: x.gt(4)).first(2))
         [5, 6]
         """
-        return Compare(self, Py_GT, value)
+        return Compare(self, '>', value)
 
     def lt(self, value):
         """
@@ -534,7 +534,7 @@ cdef class Tube:
         >>> list(Count().skip_unless(lambda x: x.lt(4)).first(100))
         [0, 1, 2, 3]
         """
-        return Compare(self, Py_LT, value)
+        return Compare(self, '<', value)
 
     def chunk(self, size_t num):
         """

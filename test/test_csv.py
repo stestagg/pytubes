@@ -69,12 +69,17 @@ def test_csv_multi():
 
 
 def test_csv_headers_one_row():
-    tube = tubes.Each(['a,b,c', 'd,e,f']).csv(headers=True).multi(lambda x:(
-        x.get('a'),
-        x.get(1),
-        x.get(2),
-        x.get('c')
-    )).to(str, str, str, str)
+    tube = (tubes
+        .Each(['a,b,c', 'd,e,f'])
+        .csv(headers=True, split=False)
+        .multi(lambda x:(
+            x.get('a'),
+            x.get(1),
+            x.get(2),
+            x.get('c')
+        ))
+        .to(str, str, str, str)
+    )
     assert list(tube) == [('d', 'e', 'f', 'f')]
 
 
@@ -87,7 +92,7 @@ def test_reading_csv_headers_different_orders():
 9,7,8
 12,10,11
 """
-    tube = tubes.Each([tsv_1, tsv_2]).to(bytes).split().csv(headers=True).chunk(1).multi(lambda x:(
+    tube = tubes.Each([tsv_1, tsv_2]).to(bytes).csv(headers=True).chunk(1).multi(lambda x:(
         x.get('a'),
         x.get('b'),
         x.get('c')
@@ -96,8 +101,18 @@ def test_reading_csv_headers_different_orders():
 
 
 def test_csv_non_comma_separator():
-    tube = tubes.Each(['a|b|c', 'd|e,f|g']).to(bytes).csv(headers=False, sep='|')
+    tube = tubes.Each(['a|b|c', 'd|e,f|g']).to(bytes).csv(headers=False, sep='|', split=False)
     assert list(tube) == [[b'a', b'b', b'c'], [b'd', b'e,f', b'g']]
+
+
+def test_csv_line_splitting():
+    tube = tubes.Each(["a,b\nc,d\ne", ",f"]).csv(headers=False)
+    assert list(tube) == [[b'a', b'b'], [b'c', b'd'], [b'e', b'f']]
+
+
+def test_csv_line_splitting_embedded_nl():
+    tube = tubes.Each(['a,b\n"c\nd",e\nf', ',g']).csv(headers=False)
+    assert list(tube) == [[b'a', b'b'], [b'c\nd', b'e'], [b'f', b'g']]
 
 
 if __name__ == '__main__':

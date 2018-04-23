@@ -22,7 +22,7 @@ def test_split_on_first_char():
 
 def test_empty_splits():
     tube = tubes.Each(['|||', '|||', '|']).to(bytes).split('|').to(str)
-    assert list(tube) == [''] * 7
+    assert list(tube) == [''] * 8
 
 
 def test_split_across_three():
