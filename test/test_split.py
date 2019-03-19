@@ -24,6 +24,10 @@ def test_empty_splits():
     tube = tubes.Each(['|||', '|||', '|']).to(bytes).split('|').to(str)
     assert list(tube) == [''] * 8
 
+def test_skipping_empty_splits():
+    tube = tubes.Each(['||a|', '|||b', '|']).to(bytes).split('|', skip_empty=True).to(str)
+    assert list(tube) == ['a', 'b']
+
 
 def test_split_across_three():
     tube = tubes.Each(['a|bc', 'def', 'g|h']).to(bytes).split('|').to(str)

@@ -64,6 +64,8 @@ def _valid(f):
     return f.endswith(".json") and not f.startswith("n_")
 
 TEST_CASES = [f for f in os.listdir(TEST_CASE_DIR) if _valid(f)]
+
+
 @pytest.mark.parametrize("filename", TEST_CASES)
 def test_passing_json_test_suite_cases(filename):
     test_path = path.join(TEST_CASE_DIR, filename)

@@ -53,7 +53,7 @@ namespace ss{ namespace iter{
     std::basic_string<uint8_t> buffer;
     Slice<uint8_t> slice;
     PyObj container;
-    using Parser = json::parse::OptimisticParser<uint8_t>;
+    using Parser = json::parse::FailsafeParser<uint8_t>;
     switch(val->type) {
         case json::Type::Unset:
             throw_py<MissingValue>("Missing Json value");

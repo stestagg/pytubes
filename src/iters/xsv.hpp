@@ -25,13 +25,13 @@ namespace ss{ namespace iter{
                     case BEGIN:
                     case MID_FIELD:
                         match = slice.find_first_of<'"', '\n'>();
-                        // New line with no " means we found a full row
                         if (match == slice.end()) {
                             // We hit the end of current chunk, look at last char
                             // to see if we ended on a start of field char
                             state = *(match-1) == sep ? BEGIN : MID_FIELD;
                             return match;
                         }
+                        // New line with no " means we found a full row
                         if (*match == '\n') { return match; }
                         // If it's a quote, this only matters if start of field:
                         if(state == BEGIN && match == slice.start){
@@ -124,7 +124,7 @@ namespace ss{ namespace iter{
         {}
 
         inline void next_row(){
-            current = reader.read_until(finder);
+            current = reader.read_until(finder).rstrip<'\r'>();
         }
     };
 

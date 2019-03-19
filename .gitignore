@@ -17,6 +17,7 @@ run-tests
 # Generated build files
 test-run.o
 pyx/tubes.cpp
+pyx/ctubes.cpp
 pyx/iter_defs.pxi
 wheelhouse/*
 

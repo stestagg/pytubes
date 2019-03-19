@@ -29,7 +29,7 @@ import pytest
     (tubes.Each([]).skip(3), "Each([]).Skip(num=3)"),
     (tubes.Each([]).skip_unless(lambda x: x.gt(99)), "Each([]).SkipUnless(Each([]).Compare(op='>', value=99))"),
     (tubes.Each([]).slot(0), "Each([]).SlotGet(0)"),
-    (tubes.Each([]).to(bytes).split('r'), "Each([]).Convert(to_types=[DType[bytes]]).Split(sep='r')"),
+    (tubes.Each([]).to(bytes).split('r'), "Each([]).Convert(to_types=[DType[bytes]]).Split(sep='r', skip_empty=False)"),
     (tubes.Each([]).to(float), "Each([]).Convert(to_types=[DType[float]])"),
     (tubes.Each([]).to_py(), "Each([]).ToPy()"),
     (tubes.Each([]).tsv(), "Each([]).Convert(to_types=[DType[bytes]]).Xsv('tsv', sep='\\t')"),

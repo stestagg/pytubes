@@ -4,6 +4,7 @@ import hashlib
 from os import path
 import re
 import numpy
+import pyarrow
 import subprocess
 import sys
 
@@ -14,6 +15,7 @@ from setuptools.extension import Extension
 
 
 PROJECT_ROOT = path.dirname(path.abspath(__file__))
+
 
 
 with open(path.join(PROJECT_ROOT, "README.rst")) as fh:
@@ -58,10 +60,18 @@ setup(
     name='pytubes',
     ext_modules = cythonize(
         Extension(
-            "tubes",
-            sources=["pyx/tubes.pyx"],
+            "ctubes",
+            sources=["pyx/ctubes.pyx"],
             language="c++",
-            include_dirs = ['vendor', 'pyx', 'src', numpy.get_include()],
+            libraries=pyarrow.get_libraries(),
+            library_dirs=pyarrow.get_library_dirs(),
+            include_dirs = [
+                'vendor',
+                'pyx',
+                'src',
+                numpy.get_include(),
+                pyarrow.get_include()
+            ],
             extra_compile_args=["-std=c++11", '-g', "-O2"],
             extra_link_args=["-std=c++11", '-g'],
         ),
@@ -69,6 +79,7 @@ setup(
         include_path=['.']
     ),
     libraries=[zlib],
+    py_modules=['tubes'],
     cmdclass = {'build_clib': build_clib},
     version=VERSION,
     description="A library for efficiently loading data into Python",
@@ -77,7 +88,7 @@ setup(
     author_email="stestagg@gmail.com",
     python_requires=">=3.4.0",
     url="https://github.com/stestagg/pytubes",
-    install_requires=['numpy'],
+    install_requires=['numpy', 'pyarrow'],
     include_package_data=True,
     license='MIT',
     classifiers=[

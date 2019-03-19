@@ -33,7 +33,7 @@ namespace ss{ namespace iter{
     };
 
     template<> void SingleNameLookupIter<JsonUtf8, bool>::next() {
-        using Parser = json::parse::OptimisticParser<uint8_t>;
+        using Parser = json::parse::FailsafeParser<uint8_t>;
         value = JsonUtf8();
         if (parent->type == json::Type::Object) {
             for (auto item : Parser::parse_object(*parent)){
@@ -87,7 +87,7 @@ namespace ss{ namespace iter{
 
     template<>
     class NameLookupIter<JsonUtf8, bool> : public Iter {
-        using Parser = json::parse::OptimisticParser<uint8_t>;
+        using Parser = json::parse::FailsafeParser<uint8_t>;
 
         const JsonUtf8 *parent;
         const Array<std::string> names;

@@ -143,6 +143,17 @@ namespace ss{
             return slice_to_ptr(cur+1);
         }
 
+        inline Slice<T> rstrip(T value) {
+            const T *cur = end();
+            while (cur >= start) {
+                --cur;
+                if (*cur != value){
+                    break;
+                }
+            }
+            return slice_to_ptr(cur+1);
+        }
+
         template<typename std::conditional<std::is_arithmetic<T>::value, T, char>::type... Chars>
         inline Slice<T> strip() const {
             return rstrip<Chars...>().template lstrip<Chars...>();

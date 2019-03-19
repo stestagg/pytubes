@@ -76,6 +76,7 @@ DTYPE_MAP = {
 
 include "pyiter.pxi"
 include "ndarray.pxi"
+include "arrow.pxi"
 
 
 cdef class Tube:
@@ -138,6 +139,21 @@ cdef class Tube:
 
         """
         return ndarray_from_tube(self, slot_info, estimated_rows, fields=fields)
+
+    def pa_table(self, fields):
+        """
+        Create a new pyarrow ``Array`` or ``Table``, and fill it with the
+        results of the tube.
+
+        :param fields: The names of the Table columns
+
+        >>> Each(['abcd', 'efgh']).to(bytes).pa_table()
+        array([b'ab', b'ef'], dtype='|S3')
+        >>> Each(['abcd', 'efgh']).to(bytes).ndarray(4)
+        array([b'abcd', b'efgh'], dtype='|S5')
+
+        """
+        return pa_from_tube(self, fields)
 
     cdef _repr(self, stop=None):
         cdef Tube tube_input
@@ -247,6 +263,17 @@ cdef class Tube:
             return ReadFile(self.to(ByteSlice, codec="fs"))
         return ReadFile(self)
 
+    def read_fileobj(self):
+        """
+        Compatible Dtypes: ``object``
+
+        Each item in the input must be a binary file obj.
+
+        Returns an iterator that reads the contents of each file obj in chunks,
+        and returns it.
+        """
+        return ReadFileObj(self)
+
     def gunzip(self, stream=False):
         """
         Compatibility: tube.gunzip()
@@ -264,7 +291,7 @@ cdef class Tube:
         """
         return Gunzip(self, stream)
 
-    def split(self, sep="\n"):
+    def split(self, sep="\n", trim='', skip_empty=False):
         """
         Compatibility: tube.split()
         Split the input view  on the character `sep`.  This behaves similarly
@@ -278,7 +305,7 @@ cdef class Tube:
         >>> list(Each(['ab\\ncd', 'ef\\ngh']).split())
         ['ab', 'cd', 'ef', 'gh']
         """
-        return Split(self, sep)
+        return Split(self, sep, trim, skip_empty)
 
     def json(self):
         """
@@ -556,7 +583,7 @@ cdef class Tube:
         ``num`` sized chunks, and chain them together.
 
         This is a bit of a hack to support some tricky use-cases (for example
-        reading very large g-zipped files requires treating every file as a
+        reading very large gzipped files requires treating every file as a
         different gzip stream, so calling .chunk(1) allows this to work)
 
         It's also an experiment to see how multi-threading may work in the future

@@ -90,7 +90,7 @@ namespace ss{ namespace iter{
     , U>::type
 
     template<class T> struct Converter<BYTES_UTF(T, JsonUtf8), T> : AnyConverter {
-        using Parser = json::parse::OptimisticParser<bytes>;
+        using Parser = json::parse::FailsafeParser<bytes>;
 
         const JsonUtf8 *from;
         T current;
@@ -120,11 +120,7 @@ namespace ss{ namespace iter{
                     current = T(Parser::parse_string(*from, buffer));
                     break;
                 default:
-                    throw_py<ValueError>(
-                        "Cannot convert ",
-                        json::json_type_name(from->type),
-                        " json value to ",
-                        ScalarType_t<T>::type_name());
+                    current = from->slice;
             }
         }
 

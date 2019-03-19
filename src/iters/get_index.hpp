@@ -13,7 +13,7 @@ namespace ss{ namespace iter{
 
     template<> struct index_get_impl<JsonUtf8, bool> {
         using Enabled = true_type;
-        using Parser = json::parse::OptimisticParser<uint8_t>;
+        using Parser = json::parse::FailsafeParser<uint8_t>;
 
         SkipList<JsonUtf8> skips;
 

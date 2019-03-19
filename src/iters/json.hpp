@@ -11,7 +11,9 @@ namespace ss{ namespace iter{
             JsonParseIter: [AnyIter]
         Tube:
             JsonParse:
-                props: [{type: Tube, name: parent, dtypes: [Utf8]}]
+                props: [
+                    {type: Tube, name: parent, dtypes: [Utf8]},
+                ]
                 dtype: return (JsonUtf8,)
                 iter: [JsonParseIter, [parent.iter]]
     ->*/

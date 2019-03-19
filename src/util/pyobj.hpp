@@ -22,6 +22,10 @@ public:
         if(obj) { Py_INCREF(obj); }
     }
 
+    inline bool has_attr(const char *attr) const {
+        return PyObject_HasAttrString(obj, attr);
+    }
+
     inline PyObj(PyObj&& o) noexcept : obj(o.obj) { o.obj = 0; }
     inline PyObj& operator=(const PyObj& other) { Py_XDECREF(obj); obj = other.obj; Py_INCREF(obj); return *this;}
     inline PyObj& operator=(PyObj&& other) { Py_XDECREF(obj); obj = other.obj; other.obj=0; return *this;}

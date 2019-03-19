@@ -6,3 +6,4 @@ recommonmark
 sphinx
 wheel
 numpy
+pyarrow

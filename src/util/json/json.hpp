@@ -73,3 +73,4 @@ namespace ss{ namespace json{
 #include "token.hpp"
 #include "iter.hpp"
 #include "optimistic_parser.hpp"
+#include "failsafe_parser.hpp"
