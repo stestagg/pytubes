@@ -9,6 +9,7 @@ addons:
     packages:
       - make
       - libz-dev
+      - python3-arrow
 install:
   - pip install -r build_requirements.txt
 env:
