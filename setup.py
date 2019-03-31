@@ -4,14 +4,19 @@ import hashlib
 from os import path
 import re
 import numpy
-import pyarrow
+try:
+    import pyarrowxx
+except ImportError:
+    HAVE_PYARROW = False
+else:
+    HAVE_PYARROW = True
+
 import subprocess
 import sys
 
 from Cython.Build import cythonize
-from setuptools import setup
 from distutils.command.build_clib import build_clib
-from setuptools.extension import Extension
+from distutils.core import setup, Extension
 
 
 PROJECT_ROOT = path.dirname(path.abspath(__file__))
@@ -34,6 +39,13 @@ def hash_file(*parts):
         return hashlib.sha1(fh.read().strip()).hexdigest()
 
 
+def write_pyx_defs(args):
+    script = path.join(PROJECT_ROOT, "pyx", "config.pxi")
+    with open(script, 'w') as fh:
+        for key, value in args.items():
+            fh.write("DEF %s=%s\n" % (key, value))
+
+
 def update_iter_defs():
     """
     Cython wrapper classes are generated for each iterator, (make_cdef.py)
@@ -49,34 +61,47 @@ def update_iter_defs():
         with open(path.join(PROJECT_ROOT, "pyx", "iter_defs.pxi"), "wb") as fh:
             fh.write(result)
 
+
 update_iter_defs()
+write_pyx_defs({
+    'HAVE_PYARROW': HAVE_PYARROW
+})
 
 zlib = ('zlib', {
     'sources': glob.glob('vendor/zlib/*.c'),
-    'include_dirs':['vendor/zlib'],
+    'include_dirs': ['vendor/zlib'],
 })
+
+CTUBES_OPTIONS = {
+    'sources': ["pyx/ctubes.pyx"],
+    'language': "c++",
+    'include_dirs':  [
+        'vendor',
+        'vendor/zlib',
+        'src',
+        numpy.get_include(),
+    ],
+    'libraries': [],
+    'extra_compile_args': ['-std=c++11', '-g', '-O2'],
+    'extra_link_args': ['-std=c++11', '-g'],
+}
+
+if HAVE_PYARROW:
+    CTUBES_OPTIONS['libraries'].extend(pyarrow.get_libraries())
+    CTUBES_OPTIONS['library_dirs'] = pyarrow.get_library_dirs()
+    CTUBES_OPTIONS['include_dirs'].append(pyarrow.get_include())
+    CTUBES_OPTIONS['define_macros'] = [('HAVE_PYARROW', )]
+    CTUBES_OPTIONS['extra_compile_args'].append('-DHAVE_PYARROW')
 
 setup(
     name='pytubes',
     ext_modules = cythonize(
         Extension(
             "ctubes",
-            sources=["pyx/ctubes.pyx"],
-            language="c++",
-            libraries=pyarrow.get_libraries(),
-            library_dirs=pyarrow.get_library_dirs(),
-            include_dirs = [
-                'vendor',
-                'pyx',
-                'src',
-                numpy.get_include(),
-                pyarrow.get_include()
-            ],
-            extra_compile_args=["-std=c++11", '-g', "-O2"],
-            extra_link_args=["-std=c++11", '-g'],
+            **CTUBES_OPTIONS
         ),
         compiler_directives={"language_level": 3, 'embedsignature': True},
-        include_path=['.']
+        include_path=['.'],
     ),
     libraries=[zlib],
     py_modules=['tubes'],

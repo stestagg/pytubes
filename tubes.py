@@ -1,2 +1,4 @@
-import pyarrow
-from ctubes import *
+try:
+    import pyarrow
+finally:
+    from ctubes import *

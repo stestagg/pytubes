@@ -1,8 +1,6 @@
 #!/bin/bash
 set -ex
 
-yum install -y zlib-devel
-
 export PATH=/opt/python/$1/bin:$PATH
 
 cd /pytubes

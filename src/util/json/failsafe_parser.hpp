@@ -71,7 +71,7 @@ namespace ss{ namespace json{ namespace parse {
                 case Type::Object:
                     return ObjectView(val.slice);
                 default:
-                    return ObjectView(Slice<T>());
+                    return ObjectView(Slice<T>::Null());
             }
         }
 

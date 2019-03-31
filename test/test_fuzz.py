@@ -34,7 +34,9 @@ def test_fuzz_csv(seed, do_split):
         csv_row = []
         expected_row = (['xx'] * len(cols_to_read))
         for col_no in range(random.randint(30)):
-            data = rand_chars()
+            data = '\r'
+            while data.endswith('\r'):
+                data = rand_chars()
             if col_no in cols_to_read:
                 expected_row[cols_to_read.index(col_no)] = data
             data = data.encode("utf8")
@@ -77,7 +79,7 @@ def test_fuzz_tsv(seed):
         expected_row = (['xx'] * len(cols_to_read))
         for col_no in range(random.randint(30)):
             data = '\t'
-            while '\t' in data:
+            while '\t' in data or data.endswith('\r'):
                 data = rand_chars()
             if col_no in cols_to_read:
                 expected_row[cols_to_read.index(col_no)] = data
@@ -99,6 +101,7 @@ def test_fuzz_tsv(seed):
                 actual = actual_rows[row_num][col_num]
             assert expected == actual
     assert len(expected_rows) == len(actual_rows)
+
 
 if __name__ == '__main__':
     for i in range(1000):
