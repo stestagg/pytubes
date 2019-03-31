@@ -3,9 +3,15 @@ import os
 import hashlib
 from os import path
 import re
-import numpy
 try:
-    import pyarrowxx
+    import numpy
+except ImportError:
+    np_get_include = lambda: 'src'
+else:
+    np_get_include = numpy.get_include
+
+try:
+    import pyarrow
 except ImportError:
     HAVE_PYARROW = False
 else:
@@ -79,7 +85,7 @@ CTUBES_OPTIONS = {
         'vendor',
         'vendor/zlib',
         'src',
-        numpy.get_include(),
+        np_get_include(),
     ],
     'libraries': [],
     'extra_compile_args': ['-std=c++11', '-g', '-O2'],
