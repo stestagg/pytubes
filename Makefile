@@ -1,7 +1,7 @@
-
+PYTHON = python3
 PYTHON_CONFIG ?= python3-config
 
-LIB_VERSION = $(shell python tools/version.py)
+LIB_VERSION = $(shell $PYTHON tools/version.py)
 
 CPP_TEST_FILES = $(shell find ./src -type f -name '*_test.cpp')
 HPP_FILES = $(shell find ./ -type f -name '*.hpp')
@@ -17,7 +17,7 @@ LDSHARED ?= g++
 STD = -std=c++11
 
 wheels: clean
-	python tools/build_wheels.py
+	${PYTHON} tools/build_wheels.py
 
 test: test-cpp test-py
 
@@ -28,10 +28,10 @@ doc:
 	(cd docs && make html)
 
 install:
-	python setup.py install
+	${PYTHON} setup.py install
 
 build:
-	python setup.py build
+	${PYTHON} setup.py build
 
 clean: clean-doc clean-py clean-cpp clean-wheels
 
@@ -47,7 +47,7 @@ clean-doc:
 	(cd docs && make clean)
 
 clean-py:
-	python setup.py clean
+	${PYTHON} setup.py clean
 	-rm -rf build
 	-rm -rf dist
 	-rm pyx/*.html

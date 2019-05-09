@@ -1,5 +1,6 @@
 import glob
 import os
+os.environ['CFLAGS'] = os.environ.get('CFLAGS', '') + ' -msse4'
 import hashlib
 from os import path
 import re
@@ -88,7 +89,7 @@ CTUBES_OPTIONS = {
         np_get_include(),
     ],
     'libraries': [],
-    'extra_compile_args': ['-std=c++11', '-g', '-O2'],
+    'extra_compile_args': ['-std=c++11', '-g', '-O2', '-msse4'],
     'extra_link_args': ['-std=c++11', '-g'],
 }
 
@@ -96,7 +97,7 @@ if HAVE_PYARROW:
     CTUBES_OPTIONS['libraries'].extend(pyarrow.get_libraries())
     CTUBES_OPTIONS['library_dirs'] = pyarrow.get_library_dirs()
     CTUBES_OPTIONS['include_dirs'].append(pyarrow.get_include())
-    CTUBES_OPTIONS['define_macros'] = [('HAVE_PYARROW', )]
+    CTUBES_OPTIONS['define_macros'] = [('HAVE_PYARROW', ), ("_GLIBCXX_USE_CXX11_ABI", "0")]
     CTUBES_OPTIONS['extra_compile_args'].append('-DHAVE_PYARROW')
 
 setup(
@@ -123,11 +124,10 @@ setup(
     include_package_data=True,
     license='MIT',
     classifiers=[
-        # Trove classifiers
-        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
