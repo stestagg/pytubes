@@ -6,4 +6,6 @@ recommonmark
 sphinx
 wheel
 numpy
+
+pandas
 pyarrow
