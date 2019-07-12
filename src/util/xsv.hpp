@@ -166,6 +166,12 @@ struct CsvValueIter {
 
 };
 
+inline void fill_remaining(SkipList<ByteSlice>::iterator cur, SkipList<ByteSlice>::const_iterator end) {
+    for(; cur != end; ++cur) {
+        *(cur->destination) = ByteSlice::Null();
+    }
+}
+
 template<class ValueIter>
 struct XsvRow{
     using Cls = XsvRow<ValueIter>;
@@ -185,17 +191,17 @@ struct XsvRow{
     inline void populate_slots(SkipList<ByteSlice> &skips, Array<ByteString> &buffers) const {
         auto iter = this->iter();
         auto cur_buffer = buffers.begin();
-         // __asm__("int3");
-        for (auto &skip : skips) {
-            size_t to_skip = skip.skip;
+        for (auto skip = skips.begin(); skip != skips.end(); ++skip) {
+            size_t to_skip = skip->skip;
             while(to_skip--){
-                if (!iter.skip_next()) { return; }
+                if (!iter.skip_next()) { return fill_remaining(skip, skips.end()); }
             }
             bool should_continue = iter.next(*cur_buffer);
-            *(skip.destination) = iter.cur;
-            if(!should_continue) { return ; }
+            *(skip->destination) = iter.cur;
+            if(!should_continue) { ++skip; return fill_remaining(skip, skips.end()); }
             ++cur_buffer;
         }
+        
     }
 
     inline ValueIter iter() const {

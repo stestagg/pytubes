@@ -29,9 +29,9 @@ class ReadFileObjIter : public Iter {
 public:
     ReadFileObjIter(Chain chain, AnyIter parent)
         : file_obj(parent->get_slots()[0]),
-          file_finished(true),
-          read_str(PyUnicode_FromString("read")),
           buffer_size(PyLong_FromLong(BUFFER_SIZE)),
+          read_str(PyUnicode_FromString("read")),
+          file_finished(true),
           chain(chain),
           buffer_slice(),
           slot(&buffer_slice)

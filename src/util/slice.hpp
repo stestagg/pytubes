@@ -16,7 +16,7 @@
 namespace ss{
 
     namespace slice {
-        static const uint8_t empty_array[0] = {};
+        static const uint8_t empty_array[] = {0};
 
         // Template based element-wise comparison function for int/char based slices.
         // Should allow the optimizer to do its best on small comparisons.

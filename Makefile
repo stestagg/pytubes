@@ -22,7 +22,7 @@ wheels: clean
 test: test-cpp test-py
 
 test-py: install
-	py.test -s test
+	py.test -vs test
 
 doc:
 	(cd docs && make html)
@@ -31,7 +31,7 @@ install:
 	${PYTHON} setup.py install
 
 build:
-	${PYTHON} setup.py build
+	CFLAGS="-Wno-unused-variable" ${PYTHON} setup.py build
 
 clean: clean-doc clean-py clean-cpp clean-wheels
 
@@ -61,7 +61,7 @@ test-cpp: run-tests
 run-tests: test-run.o $(CPP_TEST_FILES) $(HPP_FILES)
 	LD_LIBRARY_PATH=$(PY_LIBRARY_PATH) $(CXX) $(STD) $(PY_C_FLAGS) -fPIC -Ivendor/  -o run-tests test-run.o $(CPP_TEST_FILES) $(PY_EXTRA_LD_FLAGS) $(PY_LD_FLAGS)
 
-test-run.o:
+test-run.o: src/test.cpp
 	$(CXX) $(STD) $(PY_C_FLAGS) -fPIC -Ivendor/ -c -o test-run.o src/test.cpp
 
 .PHONY: build

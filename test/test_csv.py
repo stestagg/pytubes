@@ -45,6 +45,13 @@ def test_csv_uneven_rows():
     tube = tubes.Each(['a', 'b,c', 'd,e,', 'f,g,h']).to(tubes.CsvRow).get(2, 'xx').to(str)
     assert list(tube) == ['xx', 'xx', '', 'h']
 
+def test_csv_uneven_rows_named():
+    file = "\n".join(['a,b,c', '1,2,3', '4,5,', '6,7', '8,', '9', ','])
+    tube = tubes.Each([file]).csv().get('b', 'xx').to(str)
+    assert list(tube) == ['2', '5', '7', '', 'xx', '']
+    tube = tubes.Each([file]).csv().get('c', '99').to(str)
+    assert list(tube) == ['3', '', '99', '99', '99', '99']
+
 def test_csv_uneven_rows_get_many():
     tube = tubes.Each(['a', 'b,c', 'd,e,', 'f,g,h']).to(tubes.CsvRow).multi(lambda x: (
         x.get(0),
@@ -113,6 +120,17 @@ def test_csv_line_splitting():
 def test_csv_line_splitting_embedded_nl():
     tube = tubes.Each(['a,b\n"c\nd",e\nf', ',g']).csv(headers=False)
     assert list(tube) == [[b'a', b'b'], [b'c\nd', b'e'], [b'f', b'g']]
+
+
+def test_csv_latin1():
+    tube = tubes.Each([b'a,\xff\n\xfe,\xfa\nf']).csv(headers=False)
+    assert list(tube) == [[b'a', b'\xff'], [b'\xfe', b'\xfa'], [b'f']]
+
+
+def test_csv_latin1_get_by_name():
+    tube = tubes.Each([b'a,\xff\n\xfe,\xdf\nf']).csv().get(b'\xff', '').to(str, codec='latin1')
+    #import pdb; pdb.set_trace()
+    assert list(tube) == ['ß', '']
 
 
 if __name__ == '__main__':

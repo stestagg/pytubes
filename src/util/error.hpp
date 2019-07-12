@@ -23,13 +23,11 @@
 
 #if defined(__clang__)
 
-#define NORETURN_A [[noreturn]]
-#define NORETURN_B
+#define NORETURN(x) [[noreturn]] x
 
 #else
 
-#define NORETURN_A
-#define NORETURN_B __attribute__((noreturn))
+#define NORETURN(x) x __attribute__((noreturn))
 
 #endif
 
@@ -102,7 +100,7 @@ namespace ss{
     #define static_throw_if(Ty, cond) if(_SS_ERROR_UNLIKELY(cond)) { throw Ty;}
 
     template<class T, class ...Args>
-    NORETURN_A inline void NORETURN_B throw_py(Args const &... args){
+    NORETURN(inline void) throw_py(Args const &... args){
         throw T(make_str(args...));
     }
 

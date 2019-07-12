@@ -444,7 +444,7 @@ cdef class Tube:
                 tubes.extend(result)
         return Multi(self, tubes)
 
-    def get(self, object key, default=UNDEFINED):
+    def get(self, object key, default=UNDEFINED, codec='utf-8'):
         """
         Compatibility: tube.get("field")
 
@@ -468,10 +468,11 @@ cdef class Tube:
         [1, None]
         """
         if isinstance(key, str):
+            return self.name_lookup().lookup_name_str(key, default, codec)
+        if isinstance(key, bytes):
             return self.name_lookup().lookup_name(key, default)
-        elif isinstance(key, int):
-            return self.index_lookup().lookup_index(key, default)
-
+        return self.index_lookup().lookup_index(key, default)
+        
     def slot(self, size_t num, default=UNDEFINED):
         """
         Compatibility: tube.slot(0)

@@ -62,6 +62,7 @@ TEST_CASE( "test invalid double conversion", "[json]" ) {
     for (auto bad: bads) {
         auto tok = tokenize<uint8_t>(from_cstr(bad));
         REQUIRE_THROWS(OptimisticParser<uint8_t>::parse_double(tok));
+        PyErr_Clear();
     }
 }
 
@@ -130,6 +131,7 @@ TEST_CASE( "test empty array iteration", "[json]" ) {
     auto tok = tokenize<uint8_t>(from_cstr("[]"));
     for (auto child: OptimisticParser<uint8_t>::parse_array(tok)) {
         REQUIRE(false);
+        REQUIRE( child.type == Type::Number); // To make child be used
     }
 }
 

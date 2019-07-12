@@ -33,7 +33,7 @@ cdef np_dtypes_from_iter(AnyIter input_iter, tuple slot_info):
     cdef SlotPointer slot
     for slot_index in range(slots.len):
         slot = slots[slot_index]
-        this_slot_info = None if slot_index >= len(slot_info) else slot_info[slot_index]
+        this_slot_info = None if slot_index >= <size_t>len(slot_info) else slot_info[slot_index]
         np_dtype = np_dtype_from_dtype(slot.type, this_slot_info, slot_index)
         np_dtypes.append(np_dtype)
     return np_dtypes

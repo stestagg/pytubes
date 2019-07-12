@@ -59,7 +59,7 @@ namespace ss{ namespace iter{
 
     template<class T, class Enable=bool>
     struct enum_iter_op{
-        inline Iter *operator()(const AnyIter parent, const std::string &codec) {
+        NORETURN(inline Iter *)operator()(const AnyIter parent, const std::string &codec) {
             throw_py<ValueError>("Cannot treat ", ScalarType_t<T>::type_name(), " as enum");
         }
     };

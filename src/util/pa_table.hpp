@@ -96,11 +96,12 @@ namespace ss{ namespace iter{
 
     template<class T, class Enable>
     struct make_pa_filler{
-        inline std::unique_ptr<PaArrayFiller> operator()(const SlotPointer ptr) {
+        NORETURN(inline std::unique_ptr<PaArrayFiller>) operator()(const SlotPointer ptr) {
             throw_py<ValueError>(
                 "Unable to create pa table from ",
                 ScalarType_t<T>::type_name()
                 );
+
         }
     };
 
@@ -114,7 +115,7 @@ namespace ss{ namespace iter{
     ///
     template<class T, class Enable>
     struct pa_datatype_from_dtype{
-        inline std::shared_ptr<arrow::DataType> operator()() {
+        NORETURN(inline std::shared_ptr<arrow::DataType>) operator()() {
             throw_py<ValueError>(
                 "Unable to create pa table from ",
                 ScalarType_t<T>::type_name()
