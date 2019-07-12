@@ -8,4 +8,4 @@ wheel
 numpy
 
 pandas
-pyarrow
+pyarrow==0.13.0

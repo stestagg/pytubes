@@ -7,6 +7,8 @@ build/
 develop-eggs/
 dist/
 pyx/build/
+pyx/config.pxi
+pyx/ctubes.h
 docs/_build/
 run-tests
 .cache/

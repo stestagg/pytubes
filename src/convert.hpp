@@ -4,8 +4,10 @@
 
 #include "iters/topy.hpp"
 #include "util/atoi.hpp"
+#include "util/codec.hpp"
 
 namespace ss{ namespace iter{
+
 
     struct AnyConverter{
         virtual SlotPointer get_slot() = 0;
@@ -38,12 +40,27 @@ namespace ss{ namespace iter{
 
     template<> struct Converter<ByteSlice, Utf8> : AnyConverter{
         Utf8 *to;
-        Converter(const ByteSlice *from, const std::string &codec) : to((Utf8*)from) {
-            throw_if(ValueError, codec != "utf-8", "Conversion from bytes to ",
-                "str using the '", codec, "' codec is not supported")
+        std::unique_ptr<ss::codec::ToUtf8Encoder> encoder;
+        bool transparent;
+
+        Converter(const ByteSlice *from, const std::string &codec) 
+            : encoder(codec::get_encoder(codec, from))
+        {
+            transparent = encoder->is_transparent();
+            if (transparent) {
+                to = (Utf8*)from;
+            } else {
+                to = &(encoder->to);
+            }
+
         }
+
         SlotPointer get_slot() { return to; }
-        void convert() {};
+        
+        void convert() {
+            if(transparent) { return; }
+            encoder->encode();
+        };
     };
 
     template<class F> struct Converter<F, typename std::enable_if<!std::is_same<F, PyObj>::value, PyObj>::type> : AnyConverter{
@@ -129,11 +146,10 @@ namespace ss{ namespace iter{
     inline PyObj encode_str(PyObject *from, const std::string &codec) {
         PyObj encoded;
         if (codec == "fs") {
-            encoded = PyObj(PyUnicode_EncodeFSDefault(from), true);
+            encoded = PyObj::fromCall(PyUnicode_EncodeFSDefault(from));
         } else {
-            encoded = PyObj(PyUnicode_AsEncodedString(from, codec.c_str(), "strict"), true);
+            encoded = PyObj::fromCall(PyUnicode_AsEncodedString(from, codec.c_str(), "strict"));
         }
-        if(!encoded.obj){ throw PyExceptionRaised; }
         return encoded.give();
     }
 
@@ -251,6 +267,7 @@ namespace ss{ namespace iter{
         Py_ssize_t size;
         const char *buf = PyUnicode_AsUTF8AndSize(buffer.obj, &size);
         if (!buf) { throw PyExceptionRaised; }
+
         current = Utf8((const bytes*)buf, size);
     }
     py_convert_fn(int64_t, Utf8) {

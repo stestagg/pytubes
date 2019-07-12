@@ -15,6 +15,17 @@ def test_convert_from_to_py(val, dtype, result):
     assert list(tubes.Each(val).to(dtype)) == result
 
 
+def test_to_str_codec():
+    tube = tubes.Each([b'\xff']).to(str, codec='latin1')
+    assert list(tube) == ['\xff']
+
+
+def test_to_str_invalid_utf8():
+    with pytest.raises(UnicodeDecodeError):
+        tube = tubes.Each([b'\xff']).to(str)
+        assert list(tube) == ['\xff']
+
+
 def test_convert_from_bool():
     assert list(tubes.Each([True, False]).to(bool).to(int)) == [1, 0]
     assert list(tubes.Each([True, False]).to(bool).to(float)) == [1., 0.]

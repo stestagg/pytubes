@@ -62,10 +62,13 @@ namespace ss{ namespace iter{
                     cdef DType dt = self.parent.dtype[0]
                     return (c_dtype_to_dtype(field_dtype_from_dtype(dt.type)), ) * len(self.items)
                 custom_iter: |
-                    cdef vector[string] fields = [f.encode('utf-8') for f in self.items]
+                    cdef vector[string] fields = self.items
                     cdef Iter *iter = name_lookup_from_dtype(parent.iter, fields)
                 methods: >
-                    cdef lookup_name(self, str name, default):
+                    cdef lookup_name_str(self, str name, default, codec='utf-8'):
+                        return self.lookup_name(name.encode(codec), default)
+
+                    cdef lookup_name(self, bytes name, default):
                         try:
                             index = self.items.index(name)
                         except ValueError:

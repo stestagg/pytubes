@@ -19,21 +19,21 @@ namespace ss{ namespace iter{
     }
 
     template<> inline PyObj to_py<int64_t>(const void *val) {
-        return PyObj(PyLong_FromLongLong(*(const int64_t *)val));
+        return PyObj::fromCall(PyLong_FromLongLong(*(const int64_t *)val));
     }
 
     template<> inline PyObj to_py<double>(const void *val) {
-        return PyObj(PyFloat_FromDouble(*(const double *)val), true);
+        return PyObj::fromCall(PyFloat_FromDouble(*(const double *)val));
     }
 
     template <> inline PyObj to_py<ByteSlice>(const void *val) {
         ByteSlice *v = (ByteSlice *)val;
-        return PyObj(PyBytes_FromStringAndSize((const char *)v->start, v->len), true);
+        return PyObj::fromCall(PyBytes_FromStringAndSize((const char *)v->start, v->len));
     }
 
     template <> inline PyObj to_py<Utf8>(const void *val) {
         ByteSlice *v = (ByteSlice *)val;
-        return PyObj(PyUnicode_FromStringAndSize((const char *)v->start, v->len), true);
+        return PyObj::fromCall(PyUnicode_FromStringAndSize((const char *)v->start, v->len));
     }
 
     template <> inline PyObj to_py<PyObj>(const void *val) {
