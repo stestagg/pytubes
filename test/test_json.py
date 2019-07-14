@@ -82,3 +82,28 @@ def test_passing_json_test_suite_cases(filename):
 @pytest.mark.parametrize("sample", SAMPLE_JSON)
 def test_json(sample):
     assert list(tubes.Each([sample]).to(str).json())[0] == json.loads(sample)
+
+
+def test_reading_json_with_blank_lines():
+    SAMPLE = """{}
+[1, 2, 3]
+
+{"a": 2, "b": "c"}
+
+9
+"""
+    values = list(tubes.Each([SAMPLE]).to(bytes).split().skip_if(lambda x: x.is_blank()).json())
+    assert values == [{}, [1, 2, 3], {'a': 2, 'b': 'c'}, 9]
+
+
+def test_reading_json_with_multiple_blank_lines():
+    SAMPLE = """
+[1, 2, 3]
+
+
+
+9
+"""
+    values = list(tubes.Each([SAMPLE]).to(bytes).split().skip_if(tubes.is_blank).json())
+    assert values == [[1, 2, 3], 9]
+
