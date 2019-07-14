@@ -4,6 +4,7 @@
 
 using namespace ss::iter;
 
+
 TEST_CASE( "Count iter counts", "[count]" ) {
 
     CountIter it(0);
@@ -14,6 +15,7 @@ TEST_CASE( "Count iter counts", "[count]" ) {
     REQUIRE(*value_ptr == 1);
 
 }
+
 
 TEST_CASE( "Count iter from negative start", "[count]" ) {
 

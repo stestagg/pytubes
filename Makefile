@@ -22,7 +22,7 @@ wheels: clean
 test: test-cpp test-py
 
 test-py: install
-	py.test -vs test
+	py.test -s test
 
 doc:
 	(cd docs && make html)

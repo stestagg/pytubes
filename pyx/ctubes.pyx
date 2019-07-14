@@ -514,6 +514,35 @@ cdef class Tube:
             condition_tube = conditional(self)
         return SkipUnless(self, condition_tube)
 
+    def skip_if(self, conditional):
+        """
+        Compatibility: tube.skip_if(lambda x: x.to(bool))
+
+        ``conditional`` must either be a callable that takes a single tube
+        argument (the parent), and returns a ``bool`` tube, or a  ``bool`` tube.
+
+        Iterates over conditional and the parent together, yielding values only
+        where the result of conditional is False.
+
+        Stops only when either the input __or__ conditional raise ``StopIteration``.
+        This can be sligtly unexpected in, for example, this case:
+        :code:`Count().skip_if(lambda x: x.gt(2))`
+        in which case, the result is :code:`[0, 1, 2]`, but iteration over the
+        tube will never complete because ``skip_if`` isn't clever enough to
+        work out that the condition tube will never return another ``True``.
+        In this case, an explicit :code:`.first(n)` will limit the run time.
+
+        >>> list(Count().skip_if(lambda x: x.lt(5)).first(2))
+        [5, 6]
+        >>> list(Count().skip_if(Each([False, True, False]).to(bool)))
+        [0, 2]
+        """
+        if isinstance(conditional, Tube):
+            condition_tube = conditional
+        else:
+            condition_tube = conditional(self)
+        return SkipIf(self, condition_tube)
+
     def enumerate(self, start=0):
         """
         Compatibility: tube.enumerate()
@@ -543,6 +572,20 @@ cdef class Tube:
 
         """
         return Zip([self, other])
+
+    def len(self):
+        """
+        Compatibility: list(tube.len())
+
+        Return the length of the value
+
+        >>> list(Each(['', 'b', 'ba', 'ban']).to(str).len())
+        [0, 1, 2, 3]
+        """
+        return StrLen(self)
+
+    def is_blank(self):
+        return self.len().equals(0)
 
     def equals(self, value):
         """
@@ -602,6 +645,10 @@ cdef class Tube:
         ["file1 contents", "file2 contents"]
         """
         return Chunk(self, num)
+
+
+def is_blank(tube):
+    return tube.is_blank()
 
 
 include "iter_defs.pxi"
