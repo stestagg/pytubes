@@ -21,9 +21,8 @@ action "Build Docs" {
 }
 
 action "Tests Complete" {
-  uses = "actions/bin/sh@master"
+  uses = "./.github/actions/checkpoint"
   needs = ["Run Tests", "Build Docs"]
-  args = ["true"]
 }
 
 action "Build wheel 3.5" {
@@ -45,9 +44,8 @@ action "Build wheel 3.7" {
 }
 
 action "Build Complete" {
-  uses = "actions/bin/sh@master"
+  uses = "./.github/actions/checkpoint"
   needs = ["Build wheel 3.5", "Build wheel 3.6", "Build wheel 3.7"]
-  args = ["true"]
 }
 
 action "Test wheelhouse" {
@@ -70,7 +68,6 @@ action "Update Docs" {
 }
 
 action "Deploy Complete" {
-  uses = "actions/bin/sh@master"
+  uses = "./.github/actions/checkpoint"
   needs = ["Update Docs"]
-  args = ["true"]
 }
