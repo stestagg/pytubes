@@ -15,6 +15,7 @@ run-tests
 .pytest_cache/
 *.dSYM/
 .DS_Store
+docs/_build
 
 # Generated build files
 test-run.o
