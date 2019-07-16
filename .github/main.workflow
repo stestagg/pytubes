@@ -1,15 +1,15 @@
-workflow "Build & Test" {
+workflow "Build & Test Pytubes" {
   on = "push"
-  resolves = ["GitHub Action for Docker"]
+  resolves = ["Build & Test"]
 }
 
-action "Build" {
-  uses = "actions/docker/cli@8cdf801b322af5f369e00d85e9cf3a7122f49108"
+action "Build Image" {
+  uses = "actions/docker/cli@86ff551d26008267bb89ac11198ba7f1d807b699"
   args = "build -t stestagg/pytubes ."
 }
 
-action "GitHub Action for Docker" {
+action "Build & Test" {
   uses = "actions/docker/cli@86ff551d26008267bb89ac11198ba7f1d807b699"
-  needs = ["Build"]
-  args = "run stestagg/pytubes make test"
+  needs = ["Build Image"]
+  args = "run --rm stestagg/pytubes -c 'make test'"
 }
