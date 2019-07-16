@@ -1,0 +1,725 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>pytubes API &#8212; pytubes 0.5 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Pytubes’ Performance" href="performance.html" />
+    <link rel="prev" title="Usage" href="intro_usage.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-tubes">
+<span id="pytubes-api"></span><span id="api"></span><h1>pytubes API<a class="headerlink" href="#module-tubes" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="tube-base-class">
+<h2>Tube Base Class<a class="headerlink" href="#tube-base-class" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tubes.Tube">
+<em class="property">class </em><code class="sig-prename descclassname">tubes.</code><code class="sig-name descname">Tube</code><a class="headerlink" href="#tubes.Tube" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base class for all tubes.  Pipelines are typically built by calling
+the methods defines on this class.</p>
+<dl class="method">
+<dt id="tubes.Tube.chunk">
+<code class="sig-name descname">chunk</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">size_t num</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.chunk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">Json</span></code></p>
+<p>Recursively look at the inputs to find an Each() tube.  If a single
+Each() tube with a list/tuple contents is found, split the value into
+<code class="docutils literal notranslate"><span class="pre">num</span></code> sized chunks, and chain them together.</p>
+<p>This is a bit of a hack to support some tricky use-cases (for example
+reading very large gzipped files requires treating every file as a
+different gzip stream, so calling .chunk(1) allows this to work)</p>
+<p>It’s also an experiment to see how multi-threading may work in the future</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s2">&quot;file.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;file2.gz&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">read_files</span><span class="p">()</span><span class="o">.</span><span class="n">gunzip</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">Trailing data in gzip stream</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s2">&quot;file.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;file2.gz&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">read_files</span><span class="p">()</span><span class="o">.</span><span class="n">gunzip</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="go">[&quot;file1 contents&quot;, &quot;file2 contents&quot;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.csv">
+<code class="sig-name descname">csv</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">headers=True</em>, <em class="sig-param">sep=u'</em>, <em class="sig-param">'</em>, <em class="sig-param">split=True</em>, <em class="sig-param">skip_empty_rows=True</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Interpret the input values as rows of a CSV file.
+Each input to csv() is treated as a separate row in the file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – [default: <cite>True</cite>] If true, will read the first
+input value as a tab-separated list of field names,
+allowing subsequent access to values by name, as well as by index.</p></li>
+<li><p><strong>sep</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – [default: ‘,’] A single-character string that is
+used as the field separator when reading rows.</p></li>
+<li><p><strong>split</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – [default: True] If <cite>True</cite>, split the input bytes
+on newlines, to identify rows.  If <cite>False</cite>, each input value is assumed
+to be a separate row.</p></li>
+<li><p><strong>skip_empty_rows</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Skip over blank rows in the in input (note
+whitespace causes a row to be considered non-blank)</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;sample.csv&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">read_files</span><span class="p">()</span><span class="o">.</span><span class="n">csv</span><span class="p">())</span>
+<span class="go">[(b&#39;abc&#39;, b&#39;def&#39;), (b&#39;ghi&#39;, b&#39;jkl&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a,b&#39;</span><span class="p">,</span> <span class="s1">&#39;c,d&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">csv</span><span class="p">())</span>
+<span class="go">[(b&#39;a&#39;, b&#39;b&#39;), (b&#39;c&#39;, b&#39;d&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a,b&#39;</span><span class="p">,</span> <span class="s1">&#39;c,d&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">))</span>
+<span class="go">[b&#39;c&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a,b&#39;</span><span class="p">,</span> <span class="s1">&#39;c,d&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+<span class="go">[&#39;b&#39;, &#39;d&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.enum">
+<code class="sig-name descname">enum</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">codec=u'utf-8'</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.enum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+<p>Convert the input to a python object, storing and returning duplicate
+values where possible to reduce allocation overhead</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.enumerate">
+<code class="sig-name descname">enumerate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">start=0</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.enumerate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">Json</span></code></p>
+<p>Similar to the python builtin :func:<code class="docutils literal notranslate"><span class="pre">enumerate</span></code> function, prefix
+the tube’s dtype with an Int64 counter, starting from <code class="docutils literal notranslate"><span class="pre">start</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">enumerate</span><span class="p">())</span>
+<span class="go">[(0, &#39;a&#39;), (1, &#39;b&#39;), (2, &#39;c&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">enumerate</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[(10, &#39;a&#39;), (11, &#39;b&#39;), (12, &#39;c&#39;)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.equals">
+<code class="sig-name descname">equals</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.equals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Compare the values in parent against a static value, and output a <code class="docutils literal notranslate"><span class="pre">bool</span></code>
+tube with the result of that comparison.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;apple&#39;</span><span class="p">,</span> <span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="s1">&#39;cloud&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="s1">&#39;banana&#39;</span><span class="p">))</span>
+<span class="go">[False, True, False]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="kc">False</span><span class="p">))</span>
+<span class="go">[True, True, False]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.first">
+<code class="sig-name descname">first</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">size_t num</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.first" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">Json</span></code></p>
+<p>Create a tube that yields no more than the first <cite>num</cite> items from its parent.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="go">[1]</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[1, 2, 3, 4, 5]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">key</em>, <em class="sig-param">default=UNDEFINED</em>, <em class="sig-param">codec=u'utf-8'</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">Json</span></code></p>
+<p>Efficiently read the field <code class="docutils literal notranslate"><span class="pre">key</span></code> from the input object and
+return it’s value.</p>
+<p>If field is missing and a <code class="docutils literal notranslate"><span class="pre">default</span></code> is provided, return <code class="docutils literal notranslate"><span class="pre">default</span></code>,
+otherwise raise.</p>
+<p><code class="docutils literal notranslate"><span class="pre">default</span></code> must be a valid value for the input type.
+For example, if the input is a Json dtype, default must be a string/bytes
+value that is valid JSON (e.g. <code class="docutils literal notranslate"><span class="pre">'null'</span></code>)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;{&quot;a&quot;: 1}&#39;</span><span class="p">,</span> <span class="s1">&#39;{&quot;a&quot;: 2}&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">))</span>
+<span class="go">[1, 2]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;{&quot;a&quot;: 1}&#39;</span><span class="p">,</span> <span class="s1">&#39;{&quot;b&quot;: 2}&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">KeyError</span>: <span class="n">Field not found</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;{&quot;a&quot;: 1}&#39;</span><span class="p">,</span> <span class="s1">&#39;{&quot;b&quot;: 2}&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">))</span>
+<span class="go">[1, None]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.group_id">
+<code class="sig-name descname">group_id</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.group_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+<p>Assuming the input is sorted, for each unique value in the input, return a
+unique integer ID for that value. If the input isn’t sorted, return a value
+that increments every time the input changes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">group_id</span><span class="p">())</span>
+<span class="go">[0, 0, 1, 1, 2, 3]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.gt">
+<code class="sig-name descname">gt</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.gt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Return a bool tube, that is True if the input is greater than value, otherwise False</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Count</span><span class="p">()</span><span class="o">.</span><span class="n">skip_unless</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="go">[5, 6]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.gunzip">
+<code class="sig-name descname">gunzip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">stream=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.gunzip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">Json</span></code></p>
+<p>zlib/gzip decompress the input bytes, returning a view of up to 16
+megabytes of decompressed data.</p>
+<p>By default, this assumes that each input slice is an entire stream
+(i.e. from map_files).  Setting <cite>stream=True</cite> treats all input values
+as part of a single gzip stream.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s2">&quot;file.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;file2.gz&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">map_files</span><span class="p">()</span><span class="o">.</span><span class="n">gunzip</span><span class="p">())</span>
+<span class="go">[&quot;file1 contents&quot;, &quot;file2 contents&quot;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s2">&quot;file.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;file2.gz&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">read_files</span><span class="p">()</span><span class="o">.</span><span class="n">gunzip</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="go">[&quot;file1 contents&quot;, &quot;file2 contents&quot;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.is_blank">
+<code class="sig-name descname">is_blank</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.is_blank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+<p>Returns true if the length of the input is 0, otherwise false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.json">
+<code class="sig-name descname">json</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Interpret the input as JSON documents.
+The JSON parser is <em>not</em> validating, and will accept invalid JSON.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;[]&#39;</span><span class="p">,</span> <span class="s1">&#39;null&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">tubes</span><span class="o">.</span><span class="n">Utf8</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+<span class="go">[1, {}, [], None]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;neil&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">tubes</span><span class="o">.</span><span class="n">Utf8</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+<span class="go">[None]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.len">
+<code class="sig-name descname">len</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.len" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+<p>Return the length of the bytes/string value.
+For <cite>bytes</cite> types, this returns the byte length of the value, for <cite>str</cite> types, 
+the number of characters is returned.</p>
+<p>Note, technically, the length returned for <cite>str</cite> types is the count of unicode
+codepoints.  This is not always equal to the number of visual characters, especially
+when, for example, modifiers are used.  For example: 👋🏽 _may_ appear as a single 
+symbol, but is counted as two characters here.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;ba&#39;</span><span class="p">,</span> <span class="s1">&#39;ban&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">len</span><span class="p">())</span>
+<span class="go">[0, 1, 2, 3]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.lt">
+<code class="sig-name descname">lt</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.lt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Return a bool tube, that is True if the input is less than value, otherwise False</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Count</span><span class="p">()</span><span class="o">.</span><span class="n">skip_unless</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+<span class="go">[0, 1, 2, 3]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.map_files">
+<code class="sig-name descname">map_files</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.map_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible Dtypes: <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">Utf8</span></code></p>
+<p>For each filename from the input, open the file and mmap it to a
+byte slice.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.multi">
+<code class="sig-name descname">multi</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*makers</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">Json</span></code></p>
+<p>Perform multiple operations on a tube, and return a tube with <cite>n</cite> slots</p>
+<p><code class="docutils literal notranslate"><span class="pre">makers</span></code> should be a callable that takes the input tube, and returns a
+tuple of tubes derived from the input.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Count</span><span class="p">()</span><span class="o">.</span><span class="n">multi</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">[(True, False, False), (False, True, False), (False, False, True)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.ndarray">
+<code class="sig-name descname">ndarray</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*slot_info</em>, <em class="sig-param">estimated_rows=32768</em>, <em class="sig-param">fields=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.ndarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new numpy <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> with appropriate numpy dtype, and
+fill it with the results of the tube.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>estimated_rows</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – A hint to pytubes as to how many rows are
+expected in the completed array.  This affects
+the way in which the ndarray is resized during
+iteration.</p></li>
+<li><p><strong>fields</strong> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the created numpy array is 1-dimentional, using
+structured types.  Fields names are string slot numbers.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, all slots must have an identical type, produces
+an n-dimentional array, with each slot in a different dimension.</p></li>
+<li><p><strong>slot_info</strong> – Provide metadata about each slot to help create the ndarray
+Currently required by bytes types to set the column size.
+The n-th slot_info value is used to affect the numpy
+dtype of the n-th slot of the input.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;abcd&#39;</span><span class="p">,</span> <span class="s1">&#39;efgh&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">array([b&#39;ab&#39;, b&#39;ef&#39;], dtype=&#39;|S3&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;abcd&#39;</span><span class="p">,</span> <span class="s1">&#39;efgh&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="go">array([b&#39;abcd&#39;, b&#39;efgh&#39;], dtype=&#39;|S5&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tubes.Tube.one">
+<code class="sig-name descname">one</code><a class="headerlink" href="#tubes.Tube.one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return just the first value from the tube, useful as a debugging aid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.pa_table">
+<code class="sig-name descname">pa_table</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">fields</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.pa_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new pyarrow <code class="docutils literal notranslate"><span class="pre">Array</span></code> or <code class="docutils literal notranslate"><span class="pre">Table</span></code>, and fill it with the
+results of the tube.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fields</strong> – The names of the Table columns</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;abcd&#39;</span><span class="p">,</span> <span class="s1">&#39;efgh&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span><span class="o">.</span><span class="n">pa_table</span><span class="p">()</span>
+<span class="go">array([b&#39;ab&#39;, b&#39;ef&#39;], dtype=&#39;|S3&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;abcd&#39;</span><span class="p">,</span> <span class="s1">&#39;efgh&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="go">array([b&#39;abcd&#39;, b&#39;efgh&#39;], dtype=&#39;|S5&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.read_fileobj">
+<code class="sig-name descname">read_fileobj</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.read_fileobj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible Dtypes: <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Each item in the input must be a binary file obj.</p>
+<p>Returns an iterator that reads the contents of each file obj in chunks,
+and returns it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.read_files">
+<code class="sig-name descname">read_files</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.read_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible Dtypes: <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">Utf8</span></code></p>
+<p>For each filename from the input, open the file and read successive
+chunks of data from it.  Each new file will start at  the beginning of
+a slice, but a single file may result in multiple slices.</p>
+<p>Care must be taken when using this with iterators that have file-level
+context (for example gunzip()) as file boundaries are not communicated.</p>
+<p><cite>chunk(1)</cite> may be used to process files in isolation before compbining the
+iterators.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;file1.txt&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">read_files</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="go">[&#39;file 1, line 1&#39;, &#39;file 1, line 2&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;file1.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;file2.txt&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">read_files</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="go">[&#39;file 1 line 2&#39;, &#39;file 1 line 3&#39;, &#39;file 2 line 2&#39;, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.skip">
+<code class="sig-name descname">skip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">size_t num</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.skip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">Json</span></code></p>
+<p>Create a tube that skips the first <cite>num</cite> items, yielding any furthe times.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="go">[2, 3, 4, 5]</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.skip_if">
+<code class="sig-name descname">skip_if</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">conditional</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.skip_if" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">conditional</span></code> must either be a callable that takes a single tube
+argument (the parent), and returns a <code class="docutils literal notranslate"><span class="pre">bool</span></code> tube, or a  <code class="docutils literal notranslate"><span class="pre">bool</span></code> tube.</p>
+<p>Iterates over conditional and the parent together, yielding values only
+where the result of conditional is False.</p>
+<p>Stops only when either the input __or__ conditional raise <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code>.
+This can be sligtly unexpected in, for example, this case:
+<code class="code docutils literal notranslate"><span class="pre">Count().skip_if(lambda</span> <span class="pre">x:</span> <span class="pre">x.gt(2))</span></code>
+in which case, the result is <code class="code docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1,</span> <span class="pre">2]</span></code>, but iteration over the
+tube will never complete because <code class="docutils literal notranslate"><span class="pre">skip_if</span></code> isn’t clever enough to
+work out that the condition tube will never return another <code class="docutils literal notranslate"><span class="pre">True</span></code>.
+In this case, an explicit <code class="code docutils literal notranslate"><span class="pre">.first(n)</span></code> will limit the run time.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Count</span><span class="p">()</span><span class="o">.</span><span class="n">skip_if</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">lt</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="go">[5, 6]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Count</span><span class="p">()</span><span class="o">.</span><span class="n">skip_if</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">bool</span><span class="p">)))</span>
+<span class="go">[0, 2]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.skip_unless">
+<code class="sig-name descname">skip_unless</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">conditional</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.skip_unless" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">conditional</span></code> must either be a callable that takes a single tube
+argument (the parent), and returns a <code class="docutils literal notranslate"><span class="pre">bool</span></code> tube, or a  <code class="docutils literal notranslate"><span class="pre">bool</span></code> tube.</p>
+<p>Iterates over conditional and the parent together, yielding values only
+where the result of conditional is True.</p>
+<p>Stops only when either the input __or__ conditional raise <code class="docutils literal notranslate"><span class="pre">StopIteration</span></code>.
+This can be sligtly unexpected in, for example, this case:
+<code class="code docutils literal notranslate"><span class="pre">Count().skip_unless(lambda</span> <span class="pre">x:</span> <span class="pre">x.lt(3))</span></code>
+in which case, the result is <code class="code docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1,</span> <span class="pre">2]</span></code>, but iteration over the
+tube will never complete because <code class="docutils literal notranslate"><span class="pre">skip_unless</span></code> isn’t clever enough to
+work out that the condition tube will never return another <code class="docutils literal notranslate"><span class="pre">True</span></code>.
+In this case, an explicit <code class="code docutils literal notranslate"><span class="pre">.first(n)</span></code> will limit the run time.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Count</span><span class="p">()</span><span class="o">.</span><span class="n">skip_unless</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="go">[5, 6]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Count</span><span class="p">()</span><span class="o">.</span><span class="n">skip_unless</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">bool</span><span class="p">)))</span>
+<span class="go">[1]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.slot">
+<code class="sig-name descname">slot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">size_t num</em>, <em class="sig-param">default=UNDEFINED</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.slot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">Json</span></code></p>
+<p>Return slot number <code class="docutils literal notranslate"><span class="pre">num</span></code> from the parent iter.  This is only useful
+when dealing with multi-slot tubes.</p>
+<p>If the value in the slot can be considered undefined (for example json missing value)
+then <code class="docutils literal notranslate"><span class="pre">default</span></code> is returned if provided, otherwise <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> is raised.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.split">
+<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">sep=u'n'</em>, <em class="sig-param">trim=u''</em>, <em class="sig-param">skip_empty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+<p>Split the input view  on the character <cite>sep</cite>.  This behaves similarly
+to the python <code class="xref py py-func docutils literal notranslate"><span class="pre">str.split()</span></code> function.</p>
+<p>This iterator will typically produce multiple values for each input
+value, as each split produces a new output value.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a.b.c&#39;</span><span class="p">,</span> <span class="s1">&#39;d.e&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+<span class="go">[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;, &#39;e&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;ab</span><span class="se">\n</span><span class="s1">cd&#39;</span><span class="p">,</span> <span class="s1">&#39;ef</span><span class="se">\n</span><span class="s1">gh&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="go">[&#39;ab&#39;, &#39;cd&#39;, &#39;ef&#39;, &#39;gh&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.to">
+<code class="sig-name descname">to</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*types</em>, <em class="sig-param">codec=u'utf-8'</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the input to the specified dtype.</p>
+<p>Supported conversions:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>To→</p></th>
+<th class="head" rowspan="2"><p>Null</p></th>
+<th class="head" rowspan="2"><p>Bool</p></th>
+<th class="head" rowspan="2"><p>Int64</p></th>
+<th class="head" rowspan="2"><p>float</p></th>
+<th class="head" rowspan="2"><p>bytes</p></th>
+<th class="head" rowspan="2"><p>str</p></th>
+<th class="head" rowspan="2"><p>object</p></th>
+<th class="head" rowspan="2"><p>Json</p></th>
+</tr>
+<tr class="row-even"><th class="head"><p>↓From</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td><p>Null</p></td>
+<td><p>✓</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Bool</p></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Int64</p></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>float</p></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>bytes</p></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>str</p></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>object</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+<tr class="row-even"><td><p>Json</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+<td><p>✓</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.to_py">
+<code class="sig-name descname">to_py</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.to_py" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">Null</span></code>, <code class="docutils literal notranslate"><span class="pre">Bool</span></code>, <code class="docutils literal notranslate"><span class="pre">Int64</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code>, <code class="docutils literal notranslate"><span class="pre">Json</span></code></p>
+<p>Convert a tube of any type to python objects.</p>
+<p>This is not typically needed, as calling <code class="docutils literal notranslate"><span class="pre">__iter__</span></code> on a tube implicitly
+converts values to python</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.tsv">
+<code class="sig-name descname">tsv</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">headers=True</em>, <em class="sig-param">sep=u't'</em>, <em class="sig-param">split=True</em>, <em class="sig-param">skip_empty_rows=True</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.tsv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compatible input types: <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Interpret the input values as rows of a TSV file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>headers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – [default: <code class="docutils literal notranslate"><span class="pre">True</span></code>] If <code class="docutils literal notranslate"><span class="pre">True</span></code>, will read the first
+input value as a tab-separated list of field names,
+allowing subsequent access to values by name, as well as by index.</p></li>
+<li><p><strong>sep</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – [default: ‘     ‘] A single-character string that is
+used as the field separator when reading rows.</p></li>
+<li><p><strong>split</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – [default: <code class="docutils literal notranslate"><span class="pre">True</span></code>] If <code class="docutils literal notranslate"><span class="pre">True</span></code>, split the input bytes
+on newlines, to identify rows.  If <code class="docutils literal notranslate"><span class="pre">False</span></code>, each input value is assumed
+to be a separate row.</p></li>
+<li><p><strong>skip_empty_rows</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Skip over blank rows in the in input (note
+whitespace causes a row to be considered non-blank)</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;sample.tsv&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">read_files</span><span class="p">()</span><span class="o">.</span><span class="n">tsv</span><span class="p">())</span>
+<span class="go">[(b&#39;abc&#39;, b&#39;def&#39;), (b&#39;ghi&#39;, b&#39;jkl&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a</span><span class="se">\t</span><span class="s1">b&#39;</span><span class="p">,</span> <span class="s1">&#39;c</span><span class="se">\t</span><span class="s1">d&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">tsv</span><span class="p">())</span>
+<span class="go">[(b&#39;a&#39;, b&#39;b&#39;), (b&#39;c&#39;, b&#39;d&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a</span><span class="se">\t</span><span class="s1">b&#39;</span><span class="p">,</span> <span class="s1">&#39;c</span><span class="se">\t</span><span class="s1">d&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">tsv</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">))</span>
+<span class="go">[b&#39;c&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a|b&#39;</span><span class="p">,</span> <span class="s1">&#39;c|d&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">tsv</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+<span class="go">[&#39;b&#39;, &#39;d&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tubes.Tube.zip">
+<code class="sig-name descname">zip</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">other</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.zip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine two inputs into one, by joining their dtypes, and iterating both
+together.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">first</span> <span class="o">=</span> <span class="n">Each</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">second</span> <span class="o">=</span> <span class="n">Each</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">second</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="go">((DType[Utf8],), (DType[Int64],))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">second</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span>
+<span class="go">(DType[Utf8], DType[Int64])</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="nb">list</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">second</span><span class="p">))</span>
+<span class="go">[(&#39;a&#39;, 1), (&#39;b&#39;, 2), (&#39;c&#39;, 3)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="other-classes">
+<h2>Other Classes<a class="headerlink" href="#other-classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tubes.Each">
+<em class="property">class </em><code class="sig-prename descclassname">tubes.</code><code class="sig-name descname">Each</code><a class="headerlink" href="#tubes.Each" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over the provided python object, as an input to a tube.
+Takes one argument, which should either be a python iterator/generator,
+or an iterable.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
+<span class="go">[1, 2, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">())</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">[0, 1, 2, 3, 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Each</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)))</span>
+<span class="go">[0, 2, 4, 6, 8]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="tubes.Count">
+<em class="property">class </em><code class="sig-prename descclassname">tubes.</code><code class="sig-name descname">Count</code><a class="headerlink" href="#tubes.Count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterator that behaves similarly to <a class="reference external" href="https://docs.python.org/3/library/itertools.html#itertools.count" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">itertools.count()</span></code></a>.</p>
+<p>Takes an optional numeric argument <code class="docutils literal notranslate"><span class="pre">start</span></code> that sets the
+first number returned by Count()  [default:0]</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Count</span><span class="p">()</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">[0, 1, 2, 3, 4]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">Count</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">[10, 11, 12, 13, 14]</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="tubes.Count.start">
+<code class="sig-name descname">start</code><a class="headerlink" href="#tubes.Count.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>start: ‘size_t’</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pytubes API</a><ul>
+<li><a class="reference internal" href="#tube-base-class">Tube Base Class</a></li>
+<li><a class="reference internal" href="#other-classes">Other Classes</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="intro_usage.html" title="previous chapter">Usage</a></li>
+      <li>Next: <a href="performance.html" title="next chapter">Pytubes’ Performance</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Offset Design Ltd.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/tubes.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
