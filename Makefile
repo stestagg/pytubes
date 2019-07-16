@@ -24,7 +24,7 @@ test: test-cpp test-py
 test-py: install
 	py.test -s test
 
-doc:
+doc: install
 	(cd docs && make html)
 
 install:
@@ -64,4 +64,4 @@ run-tests: test-run.o $(CPP_TEST_FILES) $(HPP_FILES)
 test-run.o: src/test.cpp
 	$(CXX) $(STD) $(PY_C_FLAGS) -fPIC -Ivendor/ -c -o test-run.o src/test.cpp
 
-.PHONY: build
+.PHONY: build install

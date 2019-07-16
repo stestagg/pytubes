@@ -489,10 +489,10 @@ cdef class Tube:
         """
         Compatibility: tube.skip_unless(lambda x: x.to(bool))
 
-        ``conditional`` must either be a callable that takes a single tube
-        argument (the parent), and returns a ``bool`` tube, or a  ``bool`` tube.
+        ``conditional`` must either be a pre-made ``bool`` tube, or a callable that takes a single tube
+        argument (the parent), and returns a ``bool`` tube.
 
-        Iterates over conditional and the parent together, yielding values only
+        Iterates over ``conditional`` and the parent together, yielding values only
         where the result of conditional is True.
 
         Stops only when either the input __or__ conditional raise ``StopIteration``.
@@ -518,8 +518,8 @@ cdef class Tube:
         """
         Compatibility: tube.skip_if(lambda x: x.to(bool))
 
-        ``conditional`` must either be a callable that takes a single tube
-        argument (the parent), and returns a ``bool`` tube, or a  ``bool`` tube.
+        ``conditional`` must either be a pre-made ``bool`` tube, or a callable that takes a single tube
+        argument (the parent), and returns a ``bool`` tube.
 
         Iterates over conditional and the parent together, yielding values only
         where the result of conditional is False.
@@ -577,14 +577,33 @@ cdef class Tube:
         """
         Compatibility: list(tube.len())
 
-        Return the length of the value
+        Return the length of the bytes/string value.
+        For `bytes` types, this returns the byte length of the value, for `str` types, 
+        the number of characters is returned.
+
+        Note, technically, the length returned for `str` types is the count of unicode
+        codepoints.  This is not always equal to the number of visual characters, especially
+        when, for example, modifiers are used.  For example: 👋🏽 _may_ appear as a single 
+        symbol, but is counted as two characters here.
 
         >>> list(Each(['', 'b', 'ba', 'ban']).to(str).len())
         [0, 1, 2, 3]
+        >>> list(Each(['£', '👋🏽']).to(str).len()) 
+        [1, 2]
+        >>> list(Each(['£', '👋🏽']).to(bytes).len())
+        [2, 8]
         """
         return StrLen(self)
 
     def is_blank(self):
+        """
+        Compatibility: list(tube.len())
+
+        Returns true if the length of the input is 0, otherwise false.
+
+        >>> list(Each(['', 'b', 'ba', 'ban']).to(str).is_blank())
+        [True, False, False, False]
+        """
         return self.len().equals(0)
 
     def equals(self, value):
