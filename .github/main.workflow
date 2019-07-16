@@ -3,13 +3,6 @@ workflow "Build & Test Pytubes" {
   resolves = ["Update Docs"]
 }
 
-action "Update Docs" {
-  uses = "./"
-  args = "update-docs"
-  needs = ["Versioned"]
-  secrets = ["ACCESS_TOKEN"]
-}
-
 action "Versioned" {
   uses = "./.github/actions/sh"
   args = "python tools/update_version.py"
@@ -69,18 +62,15 @@ action "If Tag" {
   needs = ["Build Complete"]
 }
 
-action "Deploy Docs" {
-  uses = "./.github/actions/update_docs"
-  needs = ["Build Complete", "If Tag"]
-  env = {
-    BRANCH = "gh-pages"
-    FOLDER = "docs/_build/html"
-  }
+action "Update Docs" {
+  uses = "./" 
+  args = "update-docs"
+  needs = ["If Tag"]
   secrets = ["ACCESS_TOKEN"]
 }
 
 action "Deploy Complete" {
   uses = "actions/bin/sh@master"
-  needs = ["Deploy Docs"]
+  needs = ["Update Docs"]
   args = ["true"]
 }
