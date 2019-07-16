@@ -1,16 +1,23 @@
-FROM python:slim
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y build-essential
+FROM quay.io/pypa/manylinux2010_x86_64
 
-COPY build_requirements.txt /root/requirements.txt
+RUN yum install -y rh-python35-python-devel
 
-RUN pip3 install --upgrade pip
-RUN pip install -r /root/requirements.txt
+COPY build_requirements.txt /tmp/requirements.txt
 
-COPY . /root
-WORKDIR /root
-RUN cd /root && make install
+RUN (. /opt/rh/rh-python35/enable && pip install --upgrade pip && pip install -r /tmp/requirements.txt)
 
-RUN apt-get install -y gdb
+COPY . /pristine
+WORKDIR /pristine
 
-ENTRYPOINT ["/bin/bash"]
+RUN (. /opt/rh/rh-python35/enable && make clean)
+
+ENTRYPOINT ["tools/entrypoint.sh"]
+
+LABEL "com.github.actions.name"="Run action using the pytubes build docker environment"
+LABEL "com.github.actions.description"=""
+LABEL "com.github.actions.icon"="mic"
+LABEL "com.github.actions.color"="purple"
+
+LABEL "repository"="http://github.com/stestagg/pytubes"
+LABEL "homepage"="http://github.com/stestagg/pytubes"
+LABEL "maintainer"="Stestagg <stestagg@gmail.com>"

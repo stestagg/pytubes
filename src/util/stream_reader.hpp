@@ -49,7 +49,7 @@ namespace ss{ namespace iter{
                         // Try to get the next chunk from upstream
                         do_next(chain);
                         remaining_source = *input;
-                    } catch (StopIterationExc e) {
+                    } catch (StopIterationExc &e) {
                         // Parent has no more to give, so set done state, but check if
                         // there's anything left over that was unterminated..
                         remaining_source = Slice<T>::Null();

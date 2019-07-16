@@ -61,7 +61,7 @@ def build_anylinux(ver):
     check_call(
         "docker", "run", "-it", "--rm",
         '-v', "%s:/pytubes" % PROJECT_DIR,
-        "quay.io/pypa/manylinux1_x86_64",
+        "quay.io/pypa/manylinux2010_x86_64",
         "/pytubes/tools/build_anylinux.sh", ver
     )
 

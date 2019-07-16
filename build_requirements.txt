@@ -3,9 +3,10 @@ jinja2
 pytest
 pyyaml
 recommonmark
-sphinx
+sphinx <= 1.9.0
 wheel
 numpy
+fin
 
 pandas
 pyarrow==0.13.0

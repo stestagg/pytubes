@@ -1,7 +1,9 @@
-import pyarrow as pa
 import tubes
 
 if hasattr(tubes.Tube, 'pa_table'):
+
+    import pyarrow as pa
+    
     def test_enumerate():
         tube = tubes.Count(2).enumerate().first(4)
         table = tube.pa_table(('a', 'b'))

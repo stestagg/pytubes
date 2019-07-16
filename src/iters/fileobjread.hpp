@@ -4,18 +4,17 @@
 
 namespace ss{ namespace iter{
 
-#define BUFFER_SIZE (8 * 1024 * 1024)
 
 class ReadFileObjIter : public Iter {
     /*<-
         Iter:
-            ReadFileObjIter: [Chain, AnyIter]
+            ReadFileObjIter: [Chain, AnyIter, size_t]
         Tube:
             ReadFileObj:
-                props: [{type: Tube, name: parent, dtypes: [Object]}]
+                props: [{type: Tube, name: parent, dtypes: [Object]}, {type: size_t, name: size, default: 8_388_608}]
                 dtype: return (ByteSlice, )
                 chains: ((self.parent, ), )
-                iter: [ReadFileObjIter, ["iters_to_c_chain(chains[0])", parent.iter]]
+                iter: [ReadFileObjIter, ["iters_to_c_chain(chains[0])", parent.iter, self.size]]
     ->*/
 
     const PyObj *file_obj;
@@ -27,9 +26,9 @@ class ReadFileObjIter : public Iter {
     SlotPointer slot;
 
 public:
-    ReadFileObjIter(Chain chain, AnyIter parent)
+    ReadFileObjIter(Chain chain, AnyIter parent, size_t buffer_size)
         : file_obj(parent->get_slots()[0]),
-          buffer_size(PyLong_FromLong(BUFFER_SIZE)),
+          buffer_size(PyLong_FromLong(buffer_size)),
           read_str(PyUnicode_FromString("read")),
           file_finished(true),
           chain(chain),

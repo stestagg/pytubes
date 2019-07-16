@@ -1,0 +1,42 @@
+{% extends "alabaster/layout.html" %}
+
+{% block relbar_top %}
+<style>
+	.related.top{
+		color: #888;
+		font-style: italic;
+	}
+	#version-sel {
+		cursor: pointer;
+		color: #888;
+	    border: 0 transparent;
+		border-bottom: 1px dotted #666;
+	    padding: 1px;
+	    font-size: 90%;
+	    line-height: 1;
+	    background: white;
+	    -webkit-appearance: none;
+	    background-position-x: 244px;
+	    outline-style: none; 
+	    -moz-outline-style:none; 
+	}
+	#version-sel:active{
+		outline-style: none; 
+	    -moz-outline-style:none; 	
+	}
+	#version-sel:hover {
+		border-bottom-style: solid;
+	}
+
+
+</style>
+<div class="related top">
+    &nbsp;
+    Version: {{ version }}
+    <select onchange="location = '/versions/' + this.options[this.selectedIndex].value" id="version-sel">
+    	<option value="{{version}}">Switch</option>
+    	<!-- PYTUBES-BEGIN-VERSION-LIST -->
+    	<!-- PYTUBES-END-VERSION-LIST -->
+    </select>
+</div>
+{% endblock %}

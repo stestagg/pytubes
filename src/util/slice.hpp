@@ -109,6 +109,16 @@ namespace ss{
             return slice::_static_startswith_impl<0, T, First, More...>(start);
         }
 
+        inline bool startswith(Slice<T> &other) {
+            if (len < other->len) { return false; }
+            return std::equal(other.begin(), other.end(), begin());
+        }
+
+        inline bool endswith(Slice<T> &other) {
+            if (len < other->len) { return false; }
+            return std::equal(other.begin(), other.end(), begin());
+        }
+
         inline const T *find_first(T value) const {
             return std::find(begin(), &start[len], value);
         }

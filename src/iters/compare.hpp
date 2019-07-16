@@ -50,7 +50,6 @@ namespace ss{ namespace iter{
                 return result;
             }
         };
-
     }
 
     template<class T, class Cmp>

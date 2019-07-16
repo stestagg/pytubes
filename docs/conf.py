@@ -16,17 +16,18 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
 
+import tubes
 
 # -- Project information -----------------------------------------------------
+# The short X.Y version
+version = ".".join(str(p) for p in tubes.__version__)
+# The full version, including alpha/beta/rc tags
+release = version
 
 project = 'pytubes'
-copyright = '2018, Offset Design Ltd'
+copyright = '2019, Offset Design Ltd'
 author = 'Steve Stagg'
 
-# The short X.Y version
-version = '0.5'
-# The full version, including alpha/beta/rc tags
-release = '0.5'
 
 
 # -- General configuration ---------------------------------------------------
@@ -86,7 +87,14 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'fixed_sidebar': True,
+    'description': 'Piping data into python',
+    'github_user': 'stestagg',
+    'github_repo': 'pytubes',
+    'show_relbar_top': True,
+
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -101,67 +109,12 @@ html_static_path = ['_static']
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-html_sidebars = {"**": ['localtoc.html', 'relations.html', 'searchbox.html']}
-
-
-# -- Options for HTMLHelp output ---------------------------------------------
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'pytubesdoc'
-
-
-# -- Options for LaTeX output ------------------------------------------------
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'pytubes.tex', 'pytubes Documentation',
-     'Steve Stagg', 'manual'),
-]
-
-
-# -- Options for manual page output ------------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'pytubes', 'pytubes Documentation',
-     [author], 1)
-]
-
-
-# -- Options for Texinfo output ----------------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'pytubes', 'pytubes Documentation',
-     author, 'pytubes', 'One line description of project.',
-     'Miscellaneous'),
-]
-
-
-# -- Extension configuration -------------------------------------------------
+html_sidebars = {"**": [
+    'about.html',
+    'navigation.html',
+    'relations.html',
+    'searchbox.html',
+]}
 
 autoclass_content = "both"
 

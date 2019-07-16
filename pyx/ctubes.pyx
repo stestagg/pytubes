@@ -268,16 +268,16 @@ cdef class Tube:
             return ReadFile(self.to(ByteSlice, codec="fs"))
         return ReadFile(self)
 
-    def read_fileobj(self):
+    def read_fileobj(self, size=8_388_608):
         """
         Compatible Dtypes: ``object``
 
         Each item in the input must be a binary file obj.
 
-        Returns an iterator that reads the contents of each file obj in chunks,
-        and returns it.
+        Returns an iterator that reads the contents of each file obj in `size` 
+        sized chunks and returns it.
         """
-        return ReadFileObj(self)
+        return ReadFileObj(self, size)
 
     def gunzip(self, stream=False):
         """

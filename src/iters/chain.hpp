@@ -100,13 +100,15 @@ namespace ss{ namespace iter{
     public:
         ChainIter(std::vector<Chain> chains, std::vector<AnyIter> inputs)
             : chains(chains),
-              inputs(inputs),
-              slots(make_slots(this->inputs[0])),
-              slot_pointers(make_slot_pointers(this->slots)),
-              cur_chain(this->chains.begin()),
-              cur_input(this->inputs.begin()),
-              input_slots((*this->cur_input)->get_slots())
-            {}
+              inputs(inputs)
+            {
+                throw_if(ValueError, !inputs.size(), "Chain cannot be created from empty inputs")
+                slots = make_slots(this->inputs[0]);
+                slot_pointers = make_slot_pointers(this->slots);
+                cur_chain = this->chains.begin();
+                cur_input = this->inputs.begin();
+                input_slots = (*this->cur_input)->get_slots();
+            }
 
         Slice<SlotPointer> get_slots(){
             return Slice<SlotPointer>(slot_pointers);
@@ -120,7 +122,8 @@ namespace ss{ namespace iter{
                 if(cur_chain == chains.end()) { throw StopIteration; }
                 ++cur_input;
                 throw_if(RuntimeError, cur_input == inputs.end(),
-                    "Chain Ran out of input iterators, but still has input chains left?!");
+                    "Chain ran out of input iterators, but still has input chains left.  "
+                    "This should not be possible, and indicates a bug in the implementation");
                 input_slots = (*cur_input)->get_slots();
                 return next();
             }

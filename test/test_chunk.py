@@ -19,5 +19,11 @@ def test_chunk_with_generator():
         list(tubes.Each(itertools.count()).chunk(2))
 
 
+def test_chunk_empty_input():
+	tube = tubes.Each([]).chunk(2)
+	with pytest.raises(ValueError):
+		list(tube)
+
+
 if __name__ == '__main__':
     test_chunking()
