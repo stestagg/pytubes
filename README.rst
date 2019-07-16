@@ -4,9 +4,6 @@ pytubes
 .. image:: https://travis-ci.org/stestagg/pytubes.svg?branch=master
     :target: https://travis-ci.org/stestagg/pytubes
 
-.. image:: https://readthedocs.org/projects/pytubes/badge/
-    :target: https://pytubes.readthedocs.io/en/latest/
-
 Source: https://github.com/stestagg/pytubes
 
 Pytubes is a library that optimizes loading datasets into memory.
