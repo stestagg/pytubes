@@ -4,15 +4,14 @@ workflow "Build & Test Pytubes" {
 }
 
 action "Update Docs" {
-  uses = "./" 
+  uses = "./"
   args = "update-docs"
   needs = ["Versioned"]
   secrets = ["ACCESS_TOKEN"]
 }
 
-
 action "Versioned" {
-  uses = "./.github/actions/sh" 
+  uses = "./.github/actions/sh"
   args = "python tools/update_version.py"
 }
 
@@ -64,13 +63,11 @@ action "Test wheelhouse" {
   needs = ["Build Complete"]
 }
 
-
 action "If Tag" {
   uses = "actions/bin/filter@master"
   args = "tag"
   needs = ["Build Complete"]
 }
-
 
 action "Deploy Docs" {
   uses = "./.github/actions/update_docs"
@@ -81,7 +78,6 @@ action "Deploy Docs" {
   }
   secrets = ["ACCESS_TOKEN"]
 }
-
 
 action "Deploy Complete" {
   uses = "actions/bin/sh@master"
