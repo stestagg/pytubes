@@ -5,13 +5,13 @@ workflow "Build & Test Pytubes" {
 
 action "Versioned" {
   uses = "./.github/actions/sh"
-  args = "python tools/update_version.py"
+  args = "python tools/scripts/update-version.py"
 }
 
 action "Run Tests" {
   uses = "./"
   needs = ["Versioned"]
-  args = "set"
+  args = "py3 make test"
 }
 
 action "Build Docs" {

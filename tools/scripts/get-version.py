@@ -4,9 +4,6 @@ import re
 
 THIS_FILE = pathlib.Path(__file__).resolve()
 
-import sys
-print(">>>", THIS_FILE, file=sys.stderr)
-
 PROJECT_DIR = THIS_FILE.parent.parent.parent
 VERSION_FILE = PROJECT_DIR / "pyx" / "version.pxi"
 

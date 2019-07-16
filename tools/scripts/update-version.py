@@ -1,15 +1,13 @@
-from os import path, environ
+import pathlib
+from os import environ
 import re
 
 RELEASE_TAG_PATTERN = r"refs/tags/\d.\d.\d"
 
-PROJECT_DIR = path.dirname(path.dirname(__file__))
-VERSION_FILE = path.join(PROJECT_DIR, 'pyx', 'version.pxi')
+THIS_FILE = pathlib.Path(__file__).resolve()
 
-def main():
-    with open(VERSION_FILE, "r") as fh:
-        print("%s.%s.%s" % re.match(r'__version__\s*=\s*\((\d+),\s*(\d+),\s*(\d+)\)', fh.read()).groups())
-
+PROJECT_DIR = THIS_FILE.parent.parent.parent
+VERSION_FILE = PROJECT_DIR / "pyx" / "version.pxi"
 
 def get_version():
     ref = environ.get("GITHUB_REF", "__LOCAL__")
@@ -24,7 +22,8 @@ def get_version():
     return (0, 0, 99)
 
 
+
 if __name__ == '__main__':
     version = get_version()
-    with open(VERSION_FILE, "w") as fh:
+    with VERSION_FILE.open("w") as fh:
         fh.write(f"__version__ = {repr(version)}\n")
