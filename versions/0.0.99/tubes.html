@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>pytubes API &#8212; pytubes 0.5 documentation</title>
+    <title>pytubes API &#8212; pytubes 0.0.99 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Pytubes’ Performance" href="performance.html" />
-    <link rel="prev" title="Usage" href="intro_usage.html" />
+    <link rel="prev" title="Getting Started" href="intro_usage.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -25,12 +25,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head><body>
-  
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pytubes</a></h1>
 
-    <div class="document">
+
+
+<p class="blurb">Piping data into python</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=stestagg&repo=pytubes&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro_usage.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pytubes API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tube-base-class">Tube Base Class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other-classes">Other Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Pytubes’ Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="detail.html">More Detail</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="intro_usage.html" title="previous chapter">Getting Started</a></li>
+      <li>Next: <a href="performance.html" title="next chapter">Pytubes’ Performance</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
+<style>
+	.related.top{
+		color: #888;
+		font-style: italic;
+	}
+	#version-sel {
+		cursor: pointer;
+		color: #888;
+	    border: 0 transparent;
+		border-bottom: 1px dotted #666;
+	    padding: 1px;
+	    font-size: 90%;
+	    line-height: 1;
+	    background: white;
+	    -webkit-appearance: none;
+	    background-position-x: 244px;
+	    outline-style: none; 
+	    -moz-outline-style:none; 
+	}
+	#version-sel:active{
+		outline-style: none; 
+	    -moz-outline-style:none; 	
+	}
+	#version-sel:hover {
+		border-bottom-style: solid;
+	}
+
+
+</style>
+<div class="related top">
+    &nbsp;
+    Version: 0.0.99
+    <select onchange="location = '/versions/' + this.options[this.selectedIndex].value" id="version-sel">
+    	<option value="0.0.99">Switch</option>
+    	<!-- PYTUBES-BEGIN-VERSION-LIST --><option value="0.0.99">0.0.99</option><!-- PYTUBES-END-VERSION-LIST -->
+    </select>
+</div>
+
 
           <div class="body" role="main">
             
@@ -359,11 +450,11 @@ results of the tube.</p>
 
 <dl class="method">
 <dt id="tubes.Tube.read_fileobj">
-<code class="descname">read_fileobj</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.read_fileobj" title="Permalink to this definition">¶</a></dt>
+<code class="descname">read_fileobj</code><span class="sig-paren">(</span><em>self</em>, <em>size=8388608</em><span class="sig-paren">)</span><a class="headerlink" href="#tubes.Tube.read_fileobj" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compatible Dtypes: <code class="docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Each item in the input must be a binary file obj.</p>
-<p>Returns an iterator that reads the contents of each file obj in chunks,
-and returns it.</p>
+<p>Returns an iterator that reads the contents of each file obj in <cite>size</cite> 
+sized chunks and returns it.</p>
 </dd></dl>
 
 <dl class="method">
@@ -489,76 +580,36 @@ value, as each split produces a new output value.</p>
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">To→</th>
-<th class="head" rowspan="2">Bool</th>
-<th class="head" rowspan="2">Null</th>
-<th class="head" rowspan="2">Int64</th>
-<th class="head" rowspan="2">float</th>
 <th class="head" rowspan="2">bytes</th>
 <th class="head" rowspan="2">str</th>
 <th class="head" rowspan="2">object</th>
 <th class="head" rowspan="2">Json</th>
+<th class="head" rowspan="2">Bool</th>
+<th class="head" rowspan="2">Null</th>
+<th class="head" rowspan="2">Int64</th>
+<th class="head" rowspan="2">float</th>
 </tr>
 <tr class="row-even"><th class="head">↓From</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-odd"><td>Bool</td>
-<td>✓</td>
-<td>&#160;</td>
-<td>✓</td>
-<td>✓</td>
-<td>✓</td>
-<td>✓</td>
-<td>✓</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>Null</td>
-<td>&#160;</td>
-<td>✓</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>✓</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-odd"><td>Int64</td>
-<td>✓</td>
-<td>&#160;</td>
-<td>✓</td>
-<td>✓</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>✓</td>
-<td>&#160;</td>
-</tr>
-<tr class="row-even"><td>float</td>
-<td>✓</td>
-<td>&#160;</td>
-<td>✓</td>
-<td>✓</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>✓</td>
-<td>&#160;</td>
-</tr>
 <tr class="row-odd"><td>bytes</td>
 <td>✓</td>
+<td>✓</td>
+<td>✓</td>
 <td>&#160;</td>
 <td>✓</td>
 <td>&#160;</td>
-<td>✓</td>
-<td>✓</td>
 <td>✓</td>
 <td>&#160;</td>
 </tr>
 <tr class="row-even"><td>str</td>
+<td>&#160;</td>
+<td>✓</td>
 <td>✓</td>
 <td>&#160;</td>
 <td>✓</td>
 <td>&#160;</td>
-<td>&#160;</td>
-<td>✓</td>
 <td>✓</td>
 <td>&#160;</td>
 </tr>
@@ -573,12 +624,52 @@ value, as each split produces a new output value.</p>
 <td>✓</td>
 </tr>
 <tr class="row-even"><td>Json</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
 <td>&#160;</td>
 <td>&#160;</td>
 <td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>Bool</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>&#160;</td>
+<td>✓</td>
 <td>&#160;</td>
 <td>✓</td>
 <td>✓</td>
+</tr>
+<tr class="row-even"><td>Null</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>✓</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>✓</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>Int64</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>✓</td>
+<td>&#160;</td>
+<td>✓</td>
+<td>&#160;</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="row-even"><td>float</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>✓</td>
+<td>&#160;</td>
+<td>✓</td>
+<td>&#160;</td>
 <td>✓</td>
 <td>✓</td>
 </tr>
@@ -698,43 +789,10 @@ first number returned by Count()  [default:0]</p>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">pytubes API</a><ul>
-<li><a class="reference internal" href="#tube-base-class">Tube Base Class</a></li>
-<li><a class="reference internal" href="#other-classes">Other Classes</a></li>
-</ul>
-</li>
-</ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="intro_usage.html" title="previous chapter">Usage</a></li>
-      <li>Next: <a href="performance.html" title="next chapter">Pytubes’ Performance</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
+    <div class="clearer"></div>
+  </div>
     <div class="footer">
-      &copy;2018, Offset Design Ltd.
+      &copy;2019, Offset Design Ltd.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
