@@ -5,8 +5,8 @@ RUN apt-get install -y build-essential
 
 LABEL "com.github.actions.name"="Run shell script with useful python version"
 LABEL "com.github.actions.description"=""
-LABEL "com.github.actions.icon"="mic"
-LABEL "com.github.actions.color"="purple"
+LABEL "com.github.actions.icon"="terminal"
+LABEL "com.github.actions.color"="red"
 
 LABEL "repository"="http://github.com/stestagg/pytubes"
 LABEL "homepage"="http://github.com/stestagg/pytubes"

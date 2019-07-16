@@ -15,8 +15,8 @@ ENTRYPOINT ["tools/entrypoint.sh"]
 
 LABEL "com.github.actions.name"="Run action using the pytubes build docker environment"
 LABEL "com.github.actions.description"=""
-LABEL "com.github.actions.icon"="mic"
-LABEL "com.github.actions.color"="purple"
+LABEL "com.github.actions.icon"="share-2"
+LABEL "com.github.actions.color"="blue"
 
 LABEL "repository"="http://github.com/stestagg/pytubes"
 LABEL "homepage"="http://github.com/stestagg/pytubes"
