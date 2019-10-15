@@ -20,7 +20,12 @@ namespace ss{ namespace iter {
 	        PyObj builtins = PyObj::fromCall(
 	            PyImport_ImportModule("builtins")
 	        );
-	        UNDEFINED = PyObject_GetAttrString(builtins.obj, "object");
+	        PyObj object = PyObj::fromCall(
+	        	PyObject_GetAttrString(builtins.obj, "object")
+	        );
+	        UNDEFINED = PyObj::fromCall(
+	        	PyObject_CallFunction(object.obj, NULL)
+	        );
 	        UNDEFINED.assert_created();
 	    }
 
