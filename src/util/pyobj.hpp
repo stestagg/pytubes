@@ -31,6 +31,10 @@ public:
         return PyObject_HasAttrString(obj, attr);
     }
 
+    inline bool was_created() const {
+        return obj != 0;
+    }
+
     inline void assert_created() const {
         if(obj == 0) throw PyExceptionRaised;
     }
@@ -38,6 +42,7 @@ public:
 
     inline PyObj(PyObj&& o) noexcept : obj(o.obj) { o.obj = 0; }
     inline PyObj& operator=(const PyObj& other) { Py_XDECREF(obj); obj = other.obj; Py_INCREF(obj); return *this;}
+    inline PyObj& operator=(PyObject *other) { Py_XDECREF(obj); obj = other; return *this; }
     inline PyObj& operator=(PyObj&& other) { Py_XDECREF(obj); obj = other.obj; other.obj=0; return *this;}
 
     // give() is used to move the owned pointer to the receiver without calling DECREF

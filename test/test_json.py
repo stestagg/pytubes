@@ -107,3 +107,14 @@ def test_reading_json_with_multiple_blank_lines():
     values = list(tubes.Each([SAMPLE]).to(bytes).split().skip_if(tubes.is_blank).json())
     assert values == [[1, 2, 3], 9]
 
+
+BAD_JSON = [
+    '{',
+    '[',
+    '"'
+]
+
+@pytest.mark.parametrize("sample", BAD_JSON)
+def test_bad_json(sample):
+    with pytest.raises(ValueError):
+        tubes.Each([sample]).to(str).json().one

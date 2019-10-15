@@ -179,12 +179,15 @@ namespace ss{ namespace json{
                 throw_if(InvalidJson, source.len < 5, "Expected false, found '", source, "'");
                 return Value<T>(Type::Bool, source);
             case '"':
+                throw_if(InvalidJson, source.len < 2, "Unterminated string found, '", source, "'");
                 source = source.slice_from(1);
                 return Value<T>(Type::String, source.slice_to(source.len - 1));
             case '{':
+                throw_if(InvalidJson, source.len < 2, "Unterminated object found, '", source, "'");
                 source = source.slice_from(1);
                 return Value<T>(Type::Object, source.slice_to(source.len - 1));
             case '[':
+                throw_if(InvalidJson, source.len < 2, "Unterminated array found, '", source, "'");
                 source = source.slice_from(1);
                 return Value<T>(Type::Array, source.slice_to(source.len - 1));
             default:

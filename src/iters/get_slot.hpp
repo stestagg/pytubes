@@ -7,14 +7,6 @@
 
 namespace ss{ namespace iter{
 
-    template<class T> bool is_undefined(T *val){ return false; }
-    template<> bool is_undefined(const JsonUtf8 *val) {
-        return val->type == json::Type::Unset;
-    }
-    template<class T> bool is_undefined(const Slice<T> *val) {
-        return val->is(Slice<T>::Null());
-    }
-
     template<class T>
     class SlotGetIter : public Iter {
         /*<-

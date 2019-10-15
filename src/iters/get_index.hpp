@@ -50,10 +50,55 @@ namespace ss{ namespace iter{
         }
     };
 
+    template<> struct index_get_impl<PyObj, bool> {
+        using Enabled = true_type;
+
+        SkipList<PyObj> skips;
+        SkipList<PyObj> indexes;
+
+        index_get_impl(SkipList<PyObj> skips) : skips(skips) {
+            // Reconstruct the indexes from skiplist
+            size_t cur = 0;
+            indexes.reserve(skips.size());
+            for (auto const &skip: skips) {
+                cur += skip.skip;
+                indexes.push_back(SkipListItem<PyObj>(cur, skip.destination));
+                cur += 1;
+            }
+        }
+
+        inline void read_nosequence(const PyObj& obj) {
+            for (auto &index : indexes) {
+                *(index.destination) = (index.skip == 0) ? obj : UNDEFINED;
+            }
+        }
+
+        inline void read_sequence(const PyObj& obj) {
+            Py_ssize_t  len = PySequence_Fast_GET_SIZE(obj.obj);
+            for (auto &index : indexes) {
+                if (index.skip < len) { 
+                    (*index.destination) = PyObj(PySequence_Fast_GET_ITEM(obj.obj, index.skip));
+                } else {
+                    (*index.destination) = UNDEFINED;
+                }
+            }
+        }
+
+        inline void read(const PyObj &parent) {
+            PyObj value = PyObj(PySequence_Fast(parent.obj, "TODO"), true);
+            if (!value.was_created()) {
+                PyErr_Clear();
+                read_nosequence(parent);       
+            } else {
+                read_sequence(value);                
+            }
+        }
+    };
+
     template<class T>
     SkipList<T> _make_skip_list(const std::vector<size_t> &indexes, const std::vector<size_t> &skips, const Array<T> &slots){
         SkipList<T> skip_list;
-        throw_if(ValueError, indexes.size() != skips.size(), "Inconsistent number of indeces and skips values");
+        throw_if(ValueError, indexes.size() != skips.size(), "Inconsistent number of indices and skips values");
         size_t index = 0;
         for (auto &slot_index : indexes) {
             auto skip = skips[index];

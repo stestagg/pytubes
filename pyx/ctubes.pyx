@@ -24,6 +24,10 @@ include "version.pxi"
 include "iter.pxi"
 
 
+cdef extern from '../src/iter.hpp' namespace 'ss::iter':
+    void init_pytubes_internal()
+
+
 cdef class DType:
     cdef scalar_type.ScalarType type
     cdef readonly str name
@@ -672,3 +676,4 @@ def is_blank(tube):
 
 include "iter_defs.pxi"
 include "chunk.pxi"
+init_pytubes_internal()

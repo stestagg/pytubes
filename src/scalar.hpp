@@ -136,6 +136,7 @@ namespace iter{
     template<> struct field_type_t<JsonUtf8> {using type = JsonUtf8;};
     template<> struct field_type_t<TsvRow> {using type = ByteSlice;};
     template<> struct field_type_t<CsvRow> {using type = ByteSlice;};
+    template<> struct field_type_t<PyObj> {using type = PyObj;};
 
     template<class T>
     constexpr inline ScalarType field_dtype() {

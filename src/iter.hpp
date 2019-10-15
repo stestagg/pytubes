@@ -6,6 +6,7 @@
 #include "bytes.hpp"
 #include "slot.hpp"
 #include "scalar.hpp"
+#include "undefined.hpp"
 
 // This is quite ugly, but I'm unsure of a better way to do this
 // CppExn2Pyerr is the default Cython C++>Python exception converter
@@ -59,6 +60,10 @@ namespace ss{ namespace iter{
       } catch(...) {
         __Pyx_CppExn2PyErr();
       }
+    }
+
+    inline void init_pytubes_internal() {
+        init_undefined();
     }
 
 }}
