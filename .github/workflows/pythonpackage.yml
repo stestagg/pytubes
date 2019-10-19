@@ -19,7 +19,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        echo $pythonLocation
+        ls /opt/hostedtoolcache/Python/3.7.4/x64/lib
         python -m pip install --upgrade pip
         pip install -r build_requirements.txt
     - name: Build
