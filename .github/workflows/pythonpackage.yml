@@ -20,7 +20,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Select Xcode
       run: xcode-select --switch /Applications/Xcode_10.2.1.app/Contents/Developer
-      if: contains(${{ matrix.os }}, 'mac')
+      if: contains('${{ matrix.os }}', 'mac')
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
