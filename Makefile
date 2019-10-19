@@ -56,7 +56,7 @@ clean-py:
 	-rm -rf pytubes.egg-info
 
 test-cpp: run-tests
-	./run-tests
+	LD_LIBRARY_PATH=$(PY_LIBRARY_PATH) ./run-tests
 
 run-tests: test-run.o $(CPP_TEST_FILES) $(HPP_FILES)
 	LD_LIBRARY_PATH=$(PY_LIBRARY_PATH) $(CXX) $(STD) $(PY_C_FLAGS) -fPIC -Ivendor/  -o run-tests test-run.o $(CPP_TEST_FILES) $(PY_EXTRA_LD_FLAGS) $(PY_LD_FLAGS)
