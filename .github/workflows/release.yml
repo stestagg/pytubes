@@ -45,3 +45,10 @@ jobs:
       run: pip3 install -r build_requirements.txt
     - name: Make wheels
       run: pip3 wheel . -w wheelhouse/
+    - name: Make export dir
+      run: mkdir export && cp wheelhouse/pytubes*.whl export/
+    - name: "Upload wheel"
+      uses: actions/upload-artifact@v1
+      with:
+        name: macos-${{ matrix.python-version }}
+        path: export

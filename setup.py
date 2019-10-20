@@ -22,8 +22,8 @@ import subprocess
 import sys
 
 from Cython.Build import cythonize
-from setuptools.command.build_clib import build_clib
-from setuptools import setup, Extension
+from distutils.command.build_clib import build_clib
+from distutils.core import setup, Extension
 
 
 PROJECT_ROOT = path.dirname(path.abspath(__file__))
