@@ -1,0 +1,28 @@
+name: Create Release
+
+on:
+  push:
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 4
+      matrix:
+        os: [ubuntu-18.04, macOS-10.14]
+        python-version: [36, 37]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v1
+    - name: Build linux wheel ${{ matrix.python-version }}
+      uses: "./"
+      args: "make-wheel cp${{ matrix.python-version}}-cp%{{matrix.python-version}}m"
+      if: contains(matrix.os, 'ubuntu')
+    - name: Select Xcode
+      run: sudo xcode-select --switch /Applications/Xcode_10.2.1.app/Contents/Developer
+      if: contains(matrix.os, 'macOS')
+    - name: Select Xcode
+      run: make bdist-wheel
+      if: contains(matrix.os, 'macOS')
