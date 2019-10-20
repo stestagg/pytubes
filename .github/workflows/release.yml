@@ -17,7 +17,7 @@ jobs:
     - name: Build linux wheel ${{ matrix.python-version }}
       uses: "./"
       with:
-        args: "make-wheel cp${{ matrix.python-version}}-cp%{{matrix.python-version}}m"
+        args: "make-wheel cp${{ matrix.python-version}}-cp${{matrix.python-version}}m"
       
 
   osx:
