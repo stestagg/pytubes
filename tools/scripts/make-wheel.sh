@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -eux
 
 export PATH=/opt/python/$1/bin:$PATH
 
