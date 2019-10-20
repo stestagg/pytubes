@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-        python-version: [37]
+        python-version: [cp37-cp37m]
 
     steps:
     - name: Checkout repo
@@ -17,7 +17,16 @@ jobs:
     - name: Build linux wheel ${{ matrix.python-version }}
       uses: "./"
       with:
-        args: "make-wheel cp${{ matrix.python-version}}-cp${{matrix.python-version}}m"
+        args: "make-wheel ${{ matrix.python-version}}"
+    - name: Test wheel
+      uses: "./"
+      with:
+        args: "test-wheel ${{ matrix.python-version}}"
+    - name: "Upload wheel"
+      uses: actions/upload-artifact@v1
+      with:
+        name: linux-${{ matrix.python-version }}
+        path: wheelhouse/pytubes-*.whl
       
 
   osx:
