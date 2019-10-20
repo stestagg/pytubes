@@ -25,5 +25,5 @@ jobs:
       run: sudo xcode-select --switch /Applications/Xcode_10.2.1.app/Contents/Developer
       if: contains(matrix.os, 'macOS')
     - name: Select Xcode
-      run: make bdist-wheel
+      run: python setup.py bdist-wheel
       if: contains(matrix.os, 'macOS')
