@@ -33,6 +33,6 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select --switch /Applications/Xcode_10.2.1.app/Contents/Developer
     - name: Build Deps
-      run: pip install -r build_requirements.txt
+      run: pip3 install -r build_requirements.txt
     - name: Make wheels
-      run: python setup.py bdist-wheel
+      run: python3 setup.py bdist-wheel
