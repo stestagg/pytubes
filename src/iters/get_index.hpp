@@ -76,7 +76,7 @@ namespace ss{ namespace iter{
         inline void read_sequence(const PyObj& obj) {
             Py_ssize_t  len = PySequence_Fast_GET_SIZE(obj.obj);
             for (auto &index : indexes) {
-                if (index.skip < len) { 
+                if (index.skip < (size_t)len) { 
                     (*index.destination) = PyObj(PySequence_Fast_GET_ITEM(obj.obj, index.skip));
                 } else {
                     (*index.destination) = UNDEFINED;

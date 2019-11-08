@@ -31,6 +31,10 @@ public:
         return PyObject_HasAttrString(obj, attr);
     }
 
+    inline PyObj get_attr(const char *attr) const {
+        return PyObj::fromCall(PyObject_GetAttrString(obj, attr));   
+    }
+
     inline bool was_created() const {
         return obj != 0;
     }
