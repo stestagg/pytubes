@@ -35,7 +35,7 @@ cdef class BridgedBuffer:
 cdef inline bridge_buffer(shared_ptr[Buffer] buf):
     cdef BridgedBuffer shared = BridgedBuffer()
     shared.arrow_buffer = buf
-    return shared
+    return shared.get()
 
 
 cdef public object pyarrow_make_simple_array(const char *type_name, shared_ptr[ArrayData] array_data_ptr):
@@ -45,14 +45,14 @@ cdef public object pyarrow_make_simple_array(const char *type_name, shared_ptr[A
     pa_type = getattr(pyarrow, type_name_str.decode('utf8'))()
     bridged_buffers = []
     for buf_ptr in array_data.buffers:
-        bridged_buffers.append(bridge_buffer(buf_ptr).get())
+        bridged_buffers.append(bridge_buffer(buf_ptr))
     return pyarrow.Array.from_buffers(pa_type, array_data.length, bridged_buffers)
 
 
 cdef public object pyarrow_make_str_array(shared_ptr[ArrayData] array_data_ptr):
     cdef ArrayData *array_data = array_data_ptr.get()
-    values_array = bridge_buffer(array_data.buffers[1]).get()
-    data_array = bridge_buffer(array_data.buffers[2]).get()
+    values_array = bridge_buffer(array_data.buffers[1])
+    data_array = bridge_buffer(array_data.buffers[2])
     return pyarrow.StringArray.from_buffers(array_data.length, values_array, data_array)
 
 
@@ -64,12 +64,9 @@ cpdef pa_from_tube(Tube tube, fields):
     cdef Chain root_chain = iters_to_c_chain(made_chains[None, tube])
 
     cdef Slice[SlotPointer] slots = output_iter.iter.get().get_slots()
-
-    field_bytes = [f.encode('utf-8') for f in fields]
     
     arrays = fill_arrays(
         output_iter.iter,
-        field_bytes,
         root_chain
     )
     cdef list columns = [] 

@@ -124,7 +124,7 @@ def make_int_col(length):
     return random.randint(-1e9, 1e9, size=(length, ))
 make_int_col.dtype = int
 
-@pytest.mark.parametrize("seed", [random.randint(2147483648) for i in range(60)])
+@pytest.mark.parametrize("seed", [random.randint(2147483648) for i in range(10)])
 def test_fuzz_pa(seed):
     random.seed(seed)
     num_rows = random.randint(1000)

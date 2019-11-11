@@ -42,7 +42,6 @@ public:
     inline void assert_created() const {
         if(obj == 0) throw PyExceptionRaised;
     }
-    
 
     inline PyObj(PyObj&& o) noexcept : obj(o.obj) { o.obj = 0; }
     inline PyObj& operator=(const PyObj& other) { Py_XDECREF(obj); obj = other.obj; Py_INCREF(obj); return *this;}

@@ -171,16 +171,9 @@ namespace ss{ namespace iter{
 
     std::vector<PyObj> fill_arrays(
         AnyIter iter,
-        std::vector<std::string> field_names,
         Chain &chain
     ) {
         Slice<SlotPointer> slots = iter.get()->get_slots();
-        throw_if(ValueError, field_names.size() != slots.len,
-            "fields must be exactly the same length as the number of tube slots.  ",
-            field_names.size(),
-            " field names provided, tube has ",
-            slots.len,
-            " slots");
         std::vector<std::unique_ptr<PaArrayFiller>> fillers{};
         fillers.reserve(slots.len);
 
