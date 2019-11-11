@@ -17,7 +17,7 @@ cdef extern from 'arrow/array.h' namespace 'arrow':
         vector[shared_ptr[Buffer]] buffers
 
 cdef extern from "../src/util/pyarrow.hpp" namespace "ss::iter":
-    vector[PyObj] fill_arrays(AnyIter iter, vector[string] fields, Chain &chain) except +
+    vector[PyObj] fill_arrays(AnyIter iter, Chain &chain) except +
 
 
 cdef class BridgedBuffer:
