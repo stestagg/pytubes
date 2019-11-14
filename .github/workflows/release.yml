@@ -56,3 +56,18 @@ jobs:
       with:
         name: macos-${{ matrix.python-version }}
         path: export
+  collect:
+    needs: [osx, linux]
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: macos-37
+          path: wheelhouse/
+      - uses: actions/download-artifact@master
+        with:
+          name: linux-cp37-cp37m
+          path: wheelhouse/
+      - name: list
+        run: tree wheelhouse
+      
