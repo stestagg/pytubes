@@ -10,23 +10,17 @@ namespace ss{ namespace codec{
     static PyObj utf8_encoder = 0;
     static PyObj utf8_decoder = 0;
 
-    PyObj &_get_utf8_encoder() {
-        if (utf8_encoder.obj == 0) {
-            utf8_encoder.obj = PyCodec_Encoder("utf8");
-            utf8_encoder.assert_created();
-        }
-        return utf8_encoder;
+    inline void init_codec() {
+        utf8_encoder.obj = PyCodec_Encoder("utf8");
+        utf8_encoder.assert_created();
+        utf8_encoder.incref();
+
+        utf8_decoder.obj = PyCodec_Decoder("utf8");
+        utf8_decoder.assert_created();
+        utf8_decoder.incref();
     }
 
-    PyObj &_get_utf8_decoder() {
-        if (utf8_decoder.obj == 0) {
-            utf8_decoder.obj = PyCodec_Decoder("utf8");
-            utf8_decoder.assert_created();
-        }
-        return utf8_decoder;
-    }
-
-    PyObj _get_py_decoder(std::string name) {
+    inline PyObj _get_py_decoder(std::string name) {
         return PyObj::fromCall(PyCodec_Decoder(name.c_str()));
     }
 
@@ -89,10 +83,10 @@ namespace ss{ namespace codec{
 
     };
 
-    std::unique_ptr<ToUtf8Encoder> get_encoder(const std::string &codec, const ByteSlice *from) {
+    inline std::unique_ptr<ToUtf8Encoder> get_encoder(const std::string &codec, const ByteSlice *from) {
         PyObj py_decoder = _get_py_decoder(codec);
         if (from == NULL) { return std::unique_ptr<ToUtf8Encoder>(new NullEncoder(from));}
-        if (py_decoder.obj == _get_utf8_decoder().obj) {
+        if (py_decoder.obj == utf8_decoder.obj) {
             return std::unique_ptr<ToUtf8Encoder>(new Utf8ToUtf8Encoder(from));
         }
         return std::unique_ptr<ToUtf8Encoder>( new CodecToUtf8Encoder(py_decoder, from));

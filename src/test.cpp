@@ -4,6 +4,10 @@
 
 #include <Python.h>
 
+
+void __Pyx_CppExn2PyErr() {};
+
+
 struct LogPyErrors : Catch::TestEventListenerBase {
 
     using TestEventListenerBase::TestEventListenerBase; // inherit constructor

@@ -8,6 +8,8 @@
 #include "scalar.hpp"
 #include "undefined.hpp"
 
+#include "util/codec.hpp"
+
 // This is quite ugly, but I'm unsure of a better way to do this
 // CppExn2Pyerr is the default Cython C++>Python exception converter
 // We call this if next() raises an exception that isn't StopIteration
@@ -64,6 +66,7 @@ namespace ss{ namespace iter{
 
     inline void init_pytubes_internal() {
         init_undefined();
+        ss::codec::init_codec();
     }
 
 }}

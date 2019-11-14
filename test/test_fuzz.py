@@ -120,9 +120,11 @@ def make_float_col(length):
     return random.rand(length)
 make_float_col.dtype = float
 
+
 def make_int_col(length):
     return random.randint(-1e9, 1e9, size=(length, ))
 make_int_col.dtype = int
+
 
 @pytest.mark.parametrize("seed", [random.randint(2147483648) for i in range(10)])
 def test_fuzz_pa(seed):
