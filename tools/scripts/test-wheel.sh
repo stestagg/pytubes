@@ -10,4 +10,4 @@ WH=$GITHUB_WORKSPACE/wheelhouse
 pip install pytest
 pip install $WH/pytubes-*.whl
 
-pytest .
+pytest test
