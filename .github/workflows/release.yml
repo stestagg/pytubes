@@ -69,5 +69,5 @@ jobs:
           name: linux-cp37-cp37m
           path: wheelhouse/
       - name: list
-        run: tree wheelhouse
+        run: ls -lahr wheelhouse
       
