@@ -154,13 +154,18 @@ ARROW_SOURCES = $(shell find vendor/arrow/cpp/src/arrow \
 	-not -path '*adapters*'\
 )
 ARROW_OBJECTS = $(patsubst vendor/arrow/cpp/src/arrow/%.cc,$(BUILD_DIR)/arrow/%.o,$(ARROW_SOURCES))
+ARROW_CONFIG_H = vendor/arrow/cpp/src/arrow/util/config.h
+
 
 $(BUILD_DIR)/arrow.a: $(ARROW_OBJECTS)
 	ar rcs $(BUILD_DIR)/arrow.a $(ARROW_OBJECTS)
 
-$(BUILD_DIR)/arrow/%.o: vendor/arrow/cpp/src/arrow/%.cc
+$(BUILD_DIR)/arrow/%.o: vendor/arrow/cpp/src/arrow/%.cc $(ARROW_CONFIG_H)
 	mkdir -p $(shell dirname $@)
 	$(CXX) $(STD) -Ivendor/double-conversion -Ivendor/arrow/cpp/src -fPIC -c -o $@ $<
+
+$(ARROW_CONFIG_H): tools/arrow.config.h
+	cp tools/arrow.config.h $(ARROW_CONFIG_H)
 
 
 DOUBLE_SOURCES = $(shell find vendor/double-conversion/double-conversion \
