@@ -33,14 +33,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-10.14]
+        os: [macOS-latest]
         python-version: [37]
 
     steps:
     - name: Checkout repo
       uses: actions/checkout@v1
     - name: Select Xcode
-      run: sudo xcode-select --switch /Applications/Xcode_10.2.1.app/Contents/Developer
+      run: sudo xcode-select --switch /Applications/Xcode_11.1.app/Contents/Developer
     - name: Build Deps
       run: pip3 install -r build_requirements.txt
     - name: Make wheels
