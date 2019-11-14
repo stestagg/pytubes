@@ -40,13 +40,6 @@ def hash_file(*parts):
         return hashlib.sha1(fh.read().strip()).hexdigest()
 
 
-def write_pyx_defs(args):
-    script = PROJECT_ROOT / "pyx" / "config.pxi"
-    with open(script, 'w') as fh:
-        for key, value in args.items():
-            fh.write("DEF %s=%s\n" % (key, value))
-
-
 def update_iter_defs():
     """
     Cython wrapper classes are generated for each iterator, (make_cdef.py)

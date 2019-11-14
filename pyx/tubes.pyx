@@ -18,7 +18,6 @@ by using traditional python methods.
 
 """
 
-include "config.pxi"
 
 include "version.pxi"
 include "iter.pxi"
