@@ -8,9 +8,8 @@ ROOT=$PWD
 
 pip install -r $ROOT/build_requirements.txt
 
-pip uninstall -y pyarrow
+make clean install
 
-make clean-py clean-cpp test-py
 pip wheel . -w wheelhouse/
 
 WHEEL=wheelhouse/pytubes-*-$1-linux_x86_64.whl
