@@ -57,7 +57,17 @@ def update_iter_defs():
             fh.write(result)
 
 
+def update_arrow_config():
+    config_source = PROJECT_ROOT / 'tools' / 'arrow.config.h'
+    config_dest = PROJECT_ROOT / 'vendor' / 'arrow' / 'cpp' / 'src' / 'arrow' / 'util' / 'config.h'
+    with config_source.open('rb') as from_file:
+        with config_dest.open('wb') as to_file:
+            to_file.write(from_file.read())
+
+
+
 update_iter_defs()
+update_arrow_config()
 
 zlib = ('zlib', {
     'sources': glob.glob('vendor/zlib/*.c'),
