@@ -41,6 +41,8 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v1
+      with:
+        submodules: true
     - name: Select Xcode
       run: sudo xcode-select --switch /Applications/Xcode_11.1.app/Contents/Developer
     - name: Build Deps
