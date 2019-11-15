@@ -183,7 +183,7 @@ namespace ss{ namespace iter{
         {}
 
         template<class F> inline void convert_from() {
-            PyObj uni = PyObj(PyObject_Repr(from->obj), true);
+            PyObj uni = PyObj::fromCall(PyObject_Repr(from->obj));
             Py_ssize_t size;
             const char * obj_desc = PyUnicode_AsUTF8AndSize(uni.obj, &size);
             throw_py<ValueError>(
@@ -210,14 +210,13 @@ namespace ss{ namespace iter{
                 convert_from<double>();
             } else if (PyLong_Check(p)) {
                 convert_from<int64_t>();
-            } else {
+            } else {                
                 convert_from<PyObject *>();
             }
         }
     };
 
     #define py_convert_fn(F, T) template<> template<> inline void Converter<PyObj, T>::convert_from<F>()
-
     // PyObj > Null
     py_convert_fn(NullType, NullType) { current = std::tuple<>(); }
 

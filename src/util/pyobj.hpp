@@ -31,6 +31,10 @@ public:
         return PyObject_HasAttrString(obj, attr);
     }
 
+    inline PyObj get_attr(const char *attr) const {
+        return PyObj::fromCall(PyObject_GetAttrString(obj, attr));   
+    }
+
     inline bool was_created() const {
         return obj != 0;
     }
@@ -38,7 +42,6 @@ public:
     inline void assert_created() const {
         if(obj == 0) throw PyExceptionRaised;
     }
-    
 
     inline PyObj(PyObj&& o) noexcept : obj(o.obj) { o.obj = 0; }
     inline PyObj& operator=(const PyObj& other) { Py_XDECREF(obj); obj = other.obj; Py_INCREF(obj); return *this;}

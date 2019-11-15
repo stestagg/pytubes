@@ -1,0 +1,40 @@
+name: Build pytubes
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 4
+      matrix:
+        os: [ubuntu-18.04, macOS-10.14]
+        python-version: [3.6, 3.7]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Select Xcode
+      run: sudo xcode-select --switch /Applications/Xcode_10.2.1.app/Contents/Developer
+      if: contains(matrix.os, 'mac')
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r build_requirements.txt
+    - name: Build extension
+      run: make build
+    - name: Build test runner
+      run: make run-tests
+    - name: Install
+      run: make install
+    - name: Run c tests
+      run: make test-cpp
+    - name: Run py tests
+      run: make test-py
+    - name: Make docs
+      run: make doc

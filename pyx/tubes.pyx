@@ -18,7 +18,6 @@ by using traditional python methods.
 
 """
 
-include "config.pxi"
 
 include "version.pxi"
 include "iter.pxi"
@@ -83,8 +82,7 @@ DTYPE_MAP = {
 
 include "pyiter.pxi"
 include "ndarray.pxi"
-IF HAVE_PYARROW:
-    include "arrow.pxi"
+include "arrow.pxi"
 
 
 cdef class Tube:
@@ -148,21 +146,16 @@ cdef class Tube:
         """
         return ndarray_from_tube(self, slot_info, estimated_rows, fields=fields)
 
-    IF HAVE_PYARROW:
-        def pa_table(self, fields):
-            """
-            Create a new pyarrow ``Array`` or ``Table``, and fill it with the
-            results of the tube.
+    def to_pyarrow(self, fields):
+        """
+        Create a new pyarrow ``Array`` or ``Table``, and fill it with the
+        results of the tube.
 
-            :param fields: The names of the Table columns
+        :param fields: The names of the Table columns
 
-            >>> Each(['abcd', 'efgh']).to(bytes).pa_table()
-            array([b'ab', b'ef'], dtype='|S3')
-            >>> Each(['abcd', 'efgh']).to(bytes).ndarray(4)
-            array([b'abcd', b'efgh'], dtype='|S5')
-
-            """
-            return pa_from_tube(self, fields)
+        >>> TODO
+        """
+        return pa_from_tube(self, fields)
 
     cdef _repr(self, stop=None):
         cdef Tube tube_input

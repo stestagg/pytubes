@@ -136,6 +136,7 @@ def make_cdef(file_names):
     fns = []
 
     for file_name in file_names:
+        file_name = path.abspath(file_name)
         for block in find_blocks(file_name):
             if "Fn" in block:
                 fns.append((file_name, block["Fn"]))

@@ -6,6 +6,7 @@
 #include <typeinfo>
 #include <new>
 #include <stdexcept>
+#include <arrow/status.h>
 
 // This is a micro-optimization based on throws being unlikely
 // Taken from rapidjson source.
@@ -102,6 +103,16 @@ namespace ss{
     template<class T, class ...Args>
     NORETURN(inline void) throw_py(Args const &... args){
         throw T(make_str(args...));
+    }
+
+    inline void assert_arrow(const arrow::Status &&res) {
+        if (res.ok()) {
+            return;
+        }
+        if (res.IsOutOfMemory()) {
+            throw MemoryError();
+        }
+        throw_py<ValueError>(res.CodeAsString(), ": ", res.message());   
     }
 
 }
