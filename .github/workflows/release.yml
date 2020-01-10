@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-        python-version: [cp37-cp37m]
+        python-version: [cp37-cp37m, cp38-cp38m]
 
     steps:
     - name: Checkout repo
@@ -36,7 +36,7 @@ jobs:
     strategy:
       matrix:
         os: [macOS-latest]
-        python-version: [37]
+        python-version: [37, 38]
 
     steps:
     - name: Checkout repo
