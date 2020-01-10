@@ -122,7 +122,7 @@ setup(
     author_email="stestagg@gmail.com",
     python_requires=">=3.4.0",
     url="https://github.com/stestagg/pytubes",
-    install_requires=['numpy', 'pyarrow'],
+    install_requires=['numpy'],
     include_package_data=True,
     license='MIT',
     classifiers=[

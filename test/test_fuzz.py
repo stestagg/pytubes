@@ -126,24 +126,25 @@ def make_int_col(length):
 make_int_col.dtype = int
 
 
-@pytest.mark.parametrize("seed", [random.randint(2147483648) for i in range(10)])
-def test_fuzz_pa(seed):
-    random.seed(seed)
-    num_rows = random.randint(1000)
-    num_cols = random.randint(100)
-    types = [random.choice([make_str_col, make_int_col, make_float_col]) for _ in range(num_cols)]
-    cols = [m(num_rows) for m in types]
-    col_names = ['%i: %s' % (i, rand_chars()) for i in range(num_cols)]
-    given = list(zip(*cols))
-    given_pod = [[x.item() for x in r] for r in given]
-    
-    slot_tube = tubes.Each(given_pod).multi(lambda x: [x.get(i).to(t.dtype) for i, t in enumerate(types)])
-    result = slot_tube.to_pyarrow(col_names)
-    table = result.to_pandas()
-    assert tuple(table.columns) == tuple(col_names)
-    for col_name, col in zip(col_names, cols):
-        result = table[col_name]
-        assert all(result == col)
+if pyarrow.HAVE_PYARROW:
+    @pytest.mark.parametrize("seed", [random.randint(2147483648) for i in range(10)])
+    def test_fuzz_pa(seed):
+        random.seed(seed)
+        num_rows = random.randint(1000)
+        num_cols = random.randint(100)
+        types = [random.choice([make_str_col, make_int_col, make_float_col]) for _ in range(num_cols)]
+        cols = [m(num_rows) for m in types]
+        col_names = ['%i: %s' % (i, rand_chars()) for i in range(num_cols)]
+        given = list(zip(*cols))
+        given_pod = [[x.item() for x in r] for r in given]
+        
+        slot_tube = tubes.Each(given_pod).multi(lambda x: [x.get(i).to(t.dtype) for i, t in enumerate(types)])
+        result = slot_tube.to_pyarrow(col_names)
+        table = result.to_pandas()
+        assert tuple(table.columns) == tuple(col_names)
+        for col_name, col in zip(col_names, cols):
+            result = table[col_name]
+            assert all(result == col)
 
 
 if __name__ == '__main__':

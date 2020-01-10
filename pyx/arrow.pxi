@@ -1,5 +1,10 @@
 
-import pyarrow
+try:
+    import pyarrow
+    HAVE_PYARROW=1
+except ImportError:
+    HAVE_PYARROW = 0
+
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 from libcpp.memory cimport unique_ptr

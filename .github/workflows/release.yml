@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-        python-version: ['3.7', '3.8']
+        python-version: ['cp37-cp37m', 'cp37-cp37']
 
     steps:
     - name: Checkout repo
