@@ -50,7 +50,7 @@ jobs:
     - name: Make wheels
       run: pip3 wheel . -w wheelhouse/
     - name: "Install wheel"
-      run: pip install wheelhouse/pytubes*.whl
+      run: pip3 install wheelhouse/pytubes*.whl
     - name: "Test wheel"
       run: pip3 install numpy pyarrow pandas pytest && pytest test
     - name: Make export dir
