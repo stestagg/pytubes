@@ -9,17 +9,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-        python-version: ['cp37-cp37m', 'cp37-cp37']
+        python-version: ['cp37-cp37m', 'cp38-cp38']
 
     steps:
     - name: Checkout repo
       uses: actions/checkout@v1
       with:
         submodules: true
-    - name: Setup python
-      uses: actions/setup-python@v1
-      with:
-        python-version: '${{ matrix.python-version }}'
     - name: Build linux wheel ${{ matrix.python-version }}
       uses: "./"
       with:
