@@ -19,7 +19,7 @@ jobs:
     - name: Setup python
       uses: actions/setup-python@v1
       with:
-        python-version: '${{ python-version }}'
+        python-version: '${{ matrix.python-version }}'
     - name: Build linux wheel ${{ matrix.python-version }}
       uses: "./"
       with:
@@ -70,7 +70,15 @@ jobs:
           path: wheelhouse/
       - uses: actions/download-artifact@master
         with:
-          name: linux-cp37-cp37m
+          name: macos-38
+          path: wheelhouse/
+      - uses: actions/download-artifact@master
+        with:
+          name: linux-3.7
+          path: wheelhouse/
+      - uses: actions/download-artifact@master
+        with:
+          name: linux-3.8
           path: wheelhouse/
       - name: list
         run: ls -lahr wheelhouse
