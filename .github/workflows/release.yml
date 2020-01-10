@@ -49,6 +49,10 @@ jobs:
       run: pip3 install -r build_requirements.txt
     - name: Make wheels
       run: pip3 wheel . -w wheelhouse/
+    - name: "Install wheel"
+      run: pip install wheelhouse/pytubes*.whl
+    - name: "Test wheel"
+      run: pip install numpy pyarrow pandas && pytest test
     - name: Make export dir
       run: mkdir export && cp wheelhouse/pytubes*.whl export/
     - name: "Upload wheel"
@@ -70,11 +74,11 @@ jobs:
           path: wheelhouse/
       - uses: actions/download-artifact@master
         with:
-          name: linux-3.7
+          name: linux-cp37-cp37m
           path: wheelhouse/
       - uses: actions/download-artifact@master
         with:
-          name: linux-3.8
+          name: linux-cp38-cp38
           path: wheelhouse/
       - name: list
         run: ls -lahr wheelhouse
