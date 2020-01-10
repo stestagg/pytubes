@@ -12,10 +12,16 @@ make clean install
 
 pip wheel . -w wheelhouse/
 
-WHEEL=wheelhouse/pytubes-*-$1-linux_x86_64.whl
+MAJOR_VERSION=${1%\.*}
+MINOR_VERSION=${1#*\.}
+SHORT_VER=${MAJOR_VERSION}${MINOR_VERSION}
+
+BIN_VER=cp${SHORT_VER}-cp${SHORT_VER}m
+
+WHEEL=wheelhouse/pytubes-*-$BIN_VER-linux_x86_64.whl
 auditwheel show $WHEEL
 auditwheel repair --plat manylinux2010_x86_64 -w wheelhouse/ $WHEEL
-rm wheelhouse/pytubes-*-$1-linux_x86_64.whl
+rm wheelhouse/pytubes-*-$BIN_VER-linux_x86_64.whl
 
 if [ ! -z x"$GITHUB_WORKSPACE" ]; then
 	WH=$GITHUB_WORKSPACE/wheelhouse

@@ -2,8 +2,6 @@
 
 set -eux
 
-export PATH=/opt/python/$1/bin:$PATH
-
 ROOT=$PWD
 WH=$GITHUB_WORKSPACE/wheelhouse
 
