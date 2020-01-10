@@ -126,7 +126,7 @@ def make_int_col(length):
 make_int_col.dtype = int
 
 
-if pyarrow.HAVE_PYARROW:
+if tubes.HAVE_PYARROW:
     @pytest.mark.parametrize("seed", [random.randint(2147483648) for i in range(10)])
     def test_fuzz_pa(seed):
         random.seed(seed)
