@@ -5,7 +5,7 @@ set -eux
 #export PATH=/opt/python/$1/bin:$PATH
 echo $PATH
 which python
-python --MAJOR_VERSION
+python --version
 which pip
 python -m pip install --upgrade pip
 which pip
