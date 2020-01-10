@@ -5,10 +5,10 @@ set -eux
 #export PATH=/opt/python/$1/bin:$PATH
 echo $PATH
 which python
-python --version
-which pip
-python -m pip install --upgrade pip
-which pip
+python3 --version
+which pip3
+python3 -m pip install --upgrade pip
+which pip3
 exit 1
 
 ROOT=$PWD
