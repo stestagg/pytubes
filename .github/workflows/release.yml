@@ -52,7 +52,7 @@ jobs:
     - name: "Install wheel"
       run: pip install wheelhouse/pytubes*.whl
     - name: "Test wheel"
-      run: pip install numpy pyarrow pandas && pytest test
+      run: pip3 install numpy pyarrow pandas pytest && pytest test
     - name: Make export dir
       run: mkdir export && cp wheelhouse/pytubes*.whl export/
     - name: "Upload wheel"
