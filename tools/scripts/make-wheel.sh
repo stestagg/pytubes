@@ -2,7 +2,10 @@
 
 set -eux
 
-export PATH=/opt/python/$1/bin:$PATH
+#export PATH=/opt/python/$1/bin:$PATH
+echo $PATH
+which python
+exit 1
 
 ROOT=$PWD
 
