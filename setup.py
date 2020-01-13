@@ -57,17 +57,8 @@ def update_iter_defs():
             fh.write(result)
 
 
-def update_arrow_config():
-    config_source = PROJECT_ROOT / 'tools' / 'arrow.config.h'
-    config_dest = PROJECT_ROOT / 'vendor' / 'arrow' / 'cpp' / 'src' / 'arrow' / 'util' / 'config.h'
-    with config_source.open('rb') as from_file:
-        with config_dest.open('wb') as to_file:
-            to_file.write(from_file.read())
-
-
 
 update_iter_defs()
-update_arrow_config()
 
 zlib = ('zlib', {
     'sources': glob.glob('vendor/zlib/*.c'),
@@ -81,32 +72,6 @@ DOUBLE_SOURCES = [
     if 'test' not in f.name and 'benchmark' not in f.name
 ]
 
-ARROW_SOURCE_ROOT = PROJECT_ROOT / 'vendor' / 'arrow' / 'cpp' / 'src' / 'arrow'
-
-ALL_ARROW_SOURCES = list(ARROW_SOURCE_ROOT.glob('**/*.cc'))
-PATHS_TO_EXCLUDE = {
-    'filesystem',
-    'flight',
-    'gpu',
-    'csv',
-    'compute',
-    'dataset',
-    'dbi',
-    'ipc',
-    'testing',
-    'json',
-    'python',
-    'adapters',
-}
-PATTERNS_TO_EXCLUDE = [
-    '*test*',
-    'file_parquet.cc',
-    'hdfs*.cc',
-    'compression*.cc',
-    'feather.cc',
-    'uri.cc',
-    '*benchmark*',
-]
 
 def should_be_excluded(fn):
     rel = fn.relative_to(ARROW_SOURCE_ROOT)
@@ -118,14 +83,8 @@ def should_be_excluded(fn):
             return True
 
 
-ARROW_SOURCES = [
-    str(f.relative_to(PROJECT_ROOT)) for f in ALL_ARROW_SOURCES 
-    if not should_be_excluded(f)
-]
-
-
 CTUBES_OPTIONS = {
-    'sources': ["pyx/tubes.pyx"] + DOUBLE_SOURCES + ARROW_SOURCES,
+    'sources': ["pyx/tubes.pyx"] + DOUBLE_SOURCES,
     'language': "c++",
     'include_dirs':  [
         'vendor',

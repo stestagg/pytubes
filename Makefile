@@ -132,41 +132,6 @@ $(BUILD_DIR)/zlib/%.o: vendor/zlib/%.c
 	mkdir -p $(shell dirname $@)
 	$(CC) -msse4 -Ivendor/zlib -fPIC -c -o $@ $<
 
-ARROW_SOURCES = $(shell find vendor/arrow/cpp/src/arrow \
-	-type f \
-	-name '*.cc' \
-	-not -name '*test*' \
-	-not -name 'file_parquet.cc' \
-	-not -name 'hdfs*.cc' \
-	-not -name 'compression*.cc' \
-	-not -name 'feather.cc' \
-	-not -name 'uri.cc' \
-	-not -name '*benchmark*' \
-	-not -path '*/filesystem/*' \
-	-not -path '*/flight/*' \
-	-not -path '*/gpu/*' \
-	-not -path '*/compute/*' \
-	-not -path '*/dbi/*' \
-	-not -path '*/ipc/*' \
-	-not -path '*/testing/*' \
-	-not -path '*/json/*' \
-	-not -path '*/python/*' \
-	-not -path '*adapters*'\
-)
-ARROW_OBJECTS = $(patsubst vendor/arrow/cpp/src/arrow/%.cc,$(BUILD_DIR)/arrow/%.o,$(ARROW_SOURCES))
-ARROW_CONFIG_H = vendor/arrow/cpp/src/arrow/util/config.h
-
-
-$(BUILD_DIR)/arrow.a: $(ARROW_OBJECTS)
-	ar rcs $(BUILD_DIR)/arrow.a $(ARROW_OBJECTS)
-
-$(BUILD_DIR)/arrow/%.o: vendor/arrow/cpp/src/arrow/%.cc $(ARROW_CONFIG_H)
-	mkdir -p $(shell dirname $@)
-	$(CXX) $(STD) -Ivendor/double-conversion -Ivendor/arrow/cpp/src -fPIC -c -o $@ $<
-
-$(ARROW_CONFIG_H): tools/arrow.config.h
-	cp tools/arrow.config.h $(ARROW_CONFIG_H)
-
 
 DOUBLE_SOURCES = $(shell find vendor/double-conversion/double-conversion \
 	-type f \
