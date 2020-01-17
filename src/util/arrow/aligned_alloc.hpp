@@ -1,14 +1,4 @@
-
 #pragma once
-
-#if defined(__GLIBC__) && ((__GLIBC__>=2 && __GLIBC_MINOR__ >= 8) || __GLIBC__>2) \
- && defined(__LP64__)
-  #define GLIBC_MALLOC_ALREADY_ALIGNED 1
-#else
-  #define GLIBC_MALLOC_ALREADY_ALIGNED 0
-#endif
-
-
 
 
 namespace ss {
@@ -53,9 +43,13 @@ namespace ss {
         inline const_pointer address(const_reference r) const { return &r; }
 
         pointer allocate(size_type n, typename std::allocator<void>::const_pointer hint = 0){
-        	return reinterpret_cast<T*>(alloc_type::alloc(n));
+          void * ptr = alloc_type::alloc(n * sizeof(T));
+          if(!ptr) throw std::bad_alloc();
+        	return reinterpret_cast<T*>(ptr);
         }
-        inline void deallocate(pointer p, size_type);
+        inline void deallocate(pointer p, size_type){
+          return alloc_type::free(p);
+        }
 
         inline void construct(pointer p, const_reference value) { new (p) value_type(value); }
         inline void destroy(pointer p) { p->~value_type(); }
@@ -77,12 +71,12 @@ namespace ss {
     #define MALLOC_ALIGNMENT 16
 #endif
 
-# if MALLOC_ALIGNMENT>=16
+#if MALLOC_ALIGNMENT>=16
     template<> inline void *Alloc<16>::alloc(size_t n) {
    		return malloc(n);
    	}
    	template<> inline void Alloc<16>::free(void *obj) {
-   		return free(obj);
+   		return ::free(obj);
    	}
 #endif
 
@@ -91,32 +85,47 @@ namespace ss {
     	return malloc(n);
    	}
    	template<> inline void Alloc<8>::free(void *obj) {
-   		return free(obj);
-   	} 
+   		return ::free(obj);
+   	}
  #endif
- 
+
  #if SSE_INSTR_SET > 0
+    #warning "using aligned allocate fn: mm_malloc"
     template<int N> inline void *Alloc<N>::alloc(size_t n) {
    		_mm_malloc(n, N);
    }
    template<int N> inline void Alloc<N>::free(void *obj) {
    		_mm_free(obj);
 	}
-#elif ((defined __QNXNTO__) || (defined _GNU_SOURCE) || ((defined _XOPEN_SOURCE) && (_XOPEN_SOURCE >= 600))) \
- 		&& (defined _POSIX_ADVISORY_INFO) && (_POSIX_ADVISORY_INFO > 0)
-
+#elif (defined(__APPLE__)) \
+      ||((defined __QNXNTO__) \
+        || (defined _GNU_SOURCE) \
+        || ((defined _XOPEN_SOURCE) && (_XOPEN_SOURCE >= 600))) \
+ 		    && (defined _POSIX_ADVISORY_INFO) && (_POSIX_ADVISORY_INFO > 0)
+  #warning "using aligned allocate fn: posix_memalign"
  	template<int N> inline void *Alloc<N>::alloc(size_t n) {
    		void* res;
-        const int failed = posix_memalign(&res,n,N);
-        if(failed) res = 0;
-        return res;
+      const int failed = posix_memalign(&res,N,n);
+      if(failed){
+        res = 0;
+      }
+      return res;
    }
    template<int N> inline void Alloc<N>::free(void *obj) {
-   		free(obj);
+   		::free(obj);
 	}
-    
+
+#else
+  #warning "using aligned allocate fn: aligned_alloc"
+  #include <stdlib.h>
+  template<int N> inline void *Alloc<N>::alloc(size_t n) {
+    if (n % N != 0) {n += n - (n % N);}
+    return aligned_alloc(N, n);
+  }
+  template<int N> inline void Alloc<N>::free(void *obj) {
+    free(obj);
+  }
+
 #endif
-
-
 
 }

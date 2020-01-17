@@ -47,6 +47,7 @@ namespace ss{ namespace iter{
     struct StoredSlot{
         SlotPointer ptr;
         StoredSlot(SlotPointer ptr) : ptr(ptr) {}
+        virtual ~StoredSlot() = default;
 
         virtual void update(SlotPointer) = 0;
         virtual void update(const void *ptr) = 0;

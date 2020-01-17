@@ -146,16 +146,16 @@ cdef class Tube:
         """
         return ndarray_from_tube(self, slot_info, estimated_rows, fields=fields)
 
-    # def to_pyarrow(self, fields):
-    #     """
-    #     Create a new pyarrow ``Array`` or ``Table``, and fill it with the
-    #     results of the tube.
+    def to_pyarrow(self, fields):
+        """
+        Create a new pyarrow ``Array`` or ``Table``, and fill it with the
+        results of the tube.
 
-    #     :param fields: The names of the Table columns
+        :param fields: The names of the Table columns
 
-    #     >>> TODO
-    #     """
-    #     return pa_from_tube(self, fields)
+        >>> TODO
+        """
+        return pa_from_tube(self, fields)
 
     cdef _repr(self, stop=None):
         cdef Tube tube_input

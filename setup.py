@@ -1,11 +1,18 @@
 import fnmatch
-from pathlib import Path
 import glob
-import os
-os.environ['CFLAGS'] = os.environ.get('CFLAGS', '') + ' -msse4'
 import hashlib
-from os import path
+import os
 import re
+import subprocess
+import sys
+from distutils.command.build_clib import build_clib
+from distutils.core import Extension, setup
+from os import path
+from pathlib import Path
+
+from Cython.Build import cythonize
+
+os.environ['CFLAGS'] = os.environ.get('CFLAGS', '') + ' -msse4'
 try:
     import numpy
 except ImportError:
@@ -13,12 +20,7 @@ except ImportError:
 else:
     np_get_include = numpy.get_include
 
-import subprocess
-import sys
 
-from Cython.Build import cythonize
-from distutils.command.build_clib import build_clib
-from distutils.core import setup, Extension
 
 
 PROJECT_ROOT = Path(__file__).absolute().parent
