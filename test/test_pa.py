@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-import pyarrow as pa
 import tubes
 
-=======
 try:
     import pyarrow as pa
 except ImportError:
