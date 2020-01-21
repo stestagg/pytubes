@@ -8,7 +8,8 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: ['3.7.x', '3.8.x']
+        python-version: ['3.7.x']
+        #, '3.8.x']
     steps:
     - name: Checkout repo
       uses: actions/checkout@v1
@@ -24,11 +25,14 @@ jobs:
     - name: Make wheels
       run: pip3 wheel . -w wheelhouse/
     - name: "Install wheel"
-      run: pip3 install wheelhouse/pytubes*.whl
-    - name: "Test wheel"
-      run: pip3 install numpy pyarrow pandas pytest && pytest test
-    - name: Make export dir
-      run: mkdir export && cp wheelhouse/pytubes*.whl export/
+      run: |
+        cd wheelhouse
+        dir
+    #   run: pip3 install wheelhouse/pytubes*.whl
+    # - name: "Test wheel"
+    #   run: pip3 install numpy pyarrow pandas pytest && pytest test
+    # - name: Make export dir
+    #   run: mkdir export && cp wheelhouse/pytubes*.whl export/
     # - name: "Upload wheel"
     #   uses: actions/upload-artifact@v1
     #   with:
