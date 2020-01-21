@@ -1,0 +1,54 @@
+name: Create Release
+
+on:
+  push:
+
+jobs:
+  win:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['cp37-cp37m', 'cp38-cp38']
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Build Deps
+      run: pip3 install -r build_requirements.txt
+    - name: Make wheels
+      run: pip3 wheel . -w wheelhouse/
+    - name: "Install wheel"
+      run: pip3 install wheelhouse/pytubes*.whl
+    - name: "Test wheel"
+      run: pip3 install numpy pyarrow pandas pytest && pytest test
+    - name: Make export dir
+      run: mkdir export && cp wheelhouse/pytubes*.whl export/
+    # - name: "Upload wheel"
+    #   uses: actions/upload-artifact@v1
+    #   with:
+    #     name: macos-${{ matrix.python-version }}
+    #     path: export
+  # collect:
+  #   needs: [osx, linux]
+  #   runs-on: ubuntu-18.04
+  #   steps:
+  #     - uses: actions/download-artifact@master
+  #       with:
+  #         name: macos-37
+  #         path: wheelhouse/
+  #     - uses: actions/download-artifact@master
+  #       with:
+  #         name: macos-38
+  #         path: wheelhouse/
+  #     - uses: actions/download-artifact@master
+  #       with:
+  #         name: linux-cp37-cp37m
+  #         path: wheelhouse/
+  #     - uses: actions/download-artifact@master
+  #       with:
+  #         name: linux-cp38-cp38
+  #         path: wheelhouse/
+  #     - name: list
+  #       run: ls -lahr wheelhouse
+      
