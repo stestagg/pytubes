@@ -103,7 +103,7 @@ namespace ss{
     }
 
 
-    #define throw_if(Ty, cond, args...) if(_SS_ERROR_UNLIKELY(cond)) { throw_py<Ty>(args);}
+    #define throw_if(Ty, cond, ...) if(_SS_ERROR_UNLIKELY(cond)) { throw_py<Ty>(__VA_ARGS__);}
     #define static_throw_if(Ty, cond) if(_SS_ERROR_UNLIKELY(cond)) { throw Ty;}
 
     template<class T, class ...Args>
