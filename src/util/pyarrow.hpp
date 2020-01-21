@@ -117,7 +117,6 @@ namespace ss{ namespace iter{
 
     template<>
     PyObj PAArrayFillerImpl<bool>::GetPaArray() {
-        using Buf = arrow::Buffer<bool>;
         size_t size = container.size();
         auto buf = arrow::Buffer<uint8_t>::unique(std::move(container.contents));
         PyObj bridged = PyObj::fromCall(pyarrow_make_buffer(std::move(buf)));
