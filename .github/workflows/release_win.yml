@@ -25,19 +25,18 @@ jobs:
     - name: Make wheels
       run: pip3 wheel . -w wheelhouse/
     - name: "Install wheel"
+      run: pip3 install wheelhouse\\pytubes*.whl
+    - name: "Test wheel"
+      run: pip3 install numpy pyarrow pandas pytest && pytest test
+    - name: Make export dir
       run: |
-        cd wheelhouse
-        dir
-    #   run: pip3 install wheelhouse/pytubes*.whl
-    # - name: "Test wheel"
-    #   run: pip3 install numpy pyarrow pandas pytest && pytest test
-    # - name: Make export dir
-    #   run: mkdir export && cp wheelhouse/pytubes*.whl export/
-    # - name: "Upload wheel"
-    #   uses: actions/upload-artifact@v1
-    #   with:
-    #     name: macos-${{ matrix.python-version }}
-    #     path: export
+        mkdir export
+        copy wheelhouse\\pytubes*.whl export/
+    - name: "Upload wheel"
+      uses: actions/upload-artifact@v1
+      with:
+        name: win-${{ matrix.python-version }}
+        path: export
   # collect:
   #   needs: [osx, linux]
   #   runs-on: ubuntu-18.04
