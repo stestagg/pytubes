@@ -9,8 +9,13 @@ from distutils.command.build_clib import build_clib
 from distutils.core import Extension, setup
 from os import path
 from pathlib import Path
+from pprint import pprint
 
 from Cython.Build import cythonize
+
+print('<<<<<<')
+pprint.pprint(os.environ)
+print('<<<<<<')
 
 os.environ['CFLAGS'] = os.environ.get('CFLAGS', '') + ' -msse4'
 try:
@@ -69,7 +74,7 @@ zlib = ('zlib', {
 
 DOUBLE_SOURCES = [
     str(f.relative_to(PROJECT_ROOT))
-    for f in 
+    for f in
     (PROJECT_ROOT / 'vendor' / 'double-conversion').glob('**/*.cc')
     if 'test' not in f.name and 'benchmark' not in f.name
 ]
