@@ -37,11 +37,6 @@ jobs:
       matrix:
         os: [macOS-latest]
         python-version: ['3.7.x', '3.8.x']
-    - name: Setup python
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-        architecture: 'x64'
     steps:
     - name: Checkout repo
       uses: actions/checkout@v1
