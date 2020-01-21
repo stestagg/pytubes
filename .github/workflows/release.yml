@@ -29,7 +29,7 @@ jobs:
       with:
         name: linux-${{ matrix.python-version }}
         path: wheelhouse
-      
+
 
   osx:
     runs-on: ${{ matrix.os }}
@@ -82,4 +82,40 @@ jobs:
           path: wheelhouse/
       - name: list
         run: ls -lahr wheelhouse
-      
+
+  win:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.7.x', '3.8.x']
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: 'x64'
+    - name: Build Deps
+      run: pip3 install -r build_requirements.txt
+    - name: Make wheels
+      run: pip3 wheel . -w wheelhouse/
+    - name: "Install wheel"
+      run: FOR %%W IN (wheelhouse\pytubes*.whl) DO CALL pip3 install %%W
+      shell: cmd
+    - name: "Test wheel"
+      run: |
+        pip3 install numpy pyarrow pandas pytest
+        pytest test
+    - name: Make export dir
+      run: |
+        mkdir export
+        FOR %%W IN (wheelhouse\pytubes*.whl) DO CALL copy %%W export\
+      shell: cmd
+    - name: "Upload wheel"
+      uses: actions/upload-artifact@v1
+      with:
+        name: win-${{ matrix.python-version }}
+        path: export
