@@ -114,7 +114,7 @@ CTUBES_OPTIONS = {
     'extra_compile_args': [
         c_arg('-std=c++11', '/std:c++14'),
         c_arg('-g', '/DEBUG:FASTLINK /Zi'),
-        c_arg('-O2', '/O2'),
+        c_arg('-O3', '/O2'),
         c_arg('-msse4', '/arch:SSE2')
     ],
     'extra_link_args': [

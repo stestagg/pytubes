@@ -90,7 +90,7 @@ namespace ss {
  #endif
 
  #if SSE_INSTR_SET > 0
-    #warning "using aligned allocate fn: mm_malloc"
+    #pragma message("using aligned allocate fn: mm_malloc")
     template<int N> inline void *Alloc<N>::alloc(size_t n) {
    		_mm_malloc(n, N);
    }
@@ -102,7 +102,7 @@ namespace ss {
         || (defined _GNU_SOURCE) \
         || ((defined _XOPEN_SOURCE) && (_XOPEN_SOURCE >= 600))) \
  		    && (defined _POSIX_ADVISORY_INFO) && (_POSIX_ADVISORY_INFO > 0)
-  #warning "using aligned allocate fn: posix_memalign"
+  #pragma message("using aligned allocate fn: posix_memalign")
  	template<int N> inline void *Alloc<N>::alloc(size_t n) {
    		void* res;
       const int failed = posix_memalign(&res,N,n);
@@ -114,9 +114,11 @@ namespace ss {
    template<int N> inline void Alloc<N>::free(void *obj) {
    		::free(obj);
 	}
+#elif defined(_WIN32)
+  #include <malloc.h>
 
 #else
-  #warning "using aligned allocate fn: aligned_alloc"
+  #pragma message("using aligned allocate fn: aligned_alloc")
   #include <stdlib.h>
   template<int N> inline void *Alloc<N>::alloc(size_t n) {
     if (n % N != 0) {n += n - (n % N);}
