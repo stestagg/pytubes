@@ -14,7 +14,7 @@ from pprint import pprint
 from Cython.Build import cythonize
 
 print('<<<<<<')
-pprint.pprint(os.environ)
+pprint(os.environ)
 print('<<<<<<')
 
 os.environ['CFLAGS'] = os.environ.get('CFLAGS', '') + ' -msse4'
