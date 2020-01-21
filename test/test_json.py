@@ -1,9 +1,8 @@
+import json
 import os
 import os.path as path
-import json
 
 import pytest
-
 import tubes
 
 try:
@@ -14,7 +13,7 @@ except NameError:
 THIS_DIR = path.dirname(__file__)
 
 def read_file(*parts):
-    with open(path.join(*parts)) as fh:
+    with open(path.join(*parts), encoding="UTF-8") as fh:
         return fh.read()
 
 #SAMPLE_JSON is a corpus of json snippets that should all be parsable.
