@@ -113,13 +113,13 @@ CTUBES_OPTIONS = {
     'libraries': [],
     'extra_compile_args': [
         c_arg('-std=c++11', '/std:c++14'),
-        c_arg('-g', '/DEBUG:FASTLINK /Zi'),
+        c_arg('-g', '/DEBUG:FASTLINK'),
         c_arg('-O3', '/O2'),
-        c_arg('-msse4', '/arch:SSE2')
+        c_arg('-msse4', '')
     ],
     'extra_link_args': [
-        c_arg('-std=c++11', '/std:c++14'),
-        c_arg('-g', '/DEBUG:FASTLINK /Zi'),
+        c_arg('-std=c++11', ''),
+        c_arg('-g', '/Zi'),
     ],
 }
 
