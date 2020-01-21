@@ -25,14 +25,14 @@ jobs:
     - name: Make wheels
       run: pip3 wheel . -w wheelhouse/
     - name: "Install wheel"
-      run: pip3 install wheelhouse\pytubes*.whl
+      run: FOR %%W IN wheelhouse\pytubes*.whl DO CALL pip3 install %%W
       shell: cmd
     - name: "Test wheel"
       run: pip3 install numpy pyarrow pandas pytest && pytest test
     - name: Make export dir
       run: |
         mkdir export
-        copy wheelhouse\\pytubes*.whl export/
+        FOR %%W IN wheelhouse\pytubes*.whl DO CALL copy %%W export\
       shell: cmd
     - name: "Upload wheel"
       uses: actions/upload-artifact@v1
