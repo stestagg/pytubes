@@ -1,4 +1,4 @@
-name: Create Release
+name: Create Release - win
 
 on:
   push:
@@ -8,12 +8,17 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: ['cp37-cp37m', 'cp38-cp38']
+        python-version: ['3.7.x', '3.8.x']
     steps:
     - name: Checkout repo
       uses: actions/checkout@v1
       with:
         submodules: true
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: 'x64'
     - name: Build Deps
       run: pip3 install -r build_requirements.txt
     - name: Make wheels
