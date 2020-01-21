@@ -116,7 +116,15 @@ namespace ss {
 	}
 #elif defined(_WIN32)
   #include <malloc.h>
-
+  #pragma message("using aligned allocate fn: _aligned_malloc")
+  template<int N> inline void *Alloc<N>::alloc(size_t n) {
+    void *ptr = _aligned_malloc(n, N);
+    if(!ptr) throw std::bad_alloc();
+    return ptr;
+  }
+  template<int N> inline void Alloc<N>::free(void *obj) {
+    _aligned_free(obj);
+  }
 #else
   #pragma message("using aligned allocate fn: aligned_alloc")
   #include <stdlib.h>
