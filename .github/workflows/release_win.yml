@@ -25,7 +25,7 @@ jobs:
     - name: Make wheels
       run: pip3 wheel . -w wheelhouse/
     - name: "Install wheel"
-      run: FOR %%W IN wheelhouse\pytubes*.whl DO CALL pip3 install %%W
+      run: FOR %%W IN (wheelhouse\pytubes*.whl) DO CALL pip3 install %%W
       shell: cmd
     - name: "Test wheel"
       run: pip3 install numpy pyarrow pandas pytest && pytest test
