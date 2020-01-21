@@ -36,8 +36,12 @@ jobs:
     strategy:
       matrix:
         os: [macOS-latest]
-        python-version: [37, 38]
-
+        python-version: ['3.7.x', '3.8.x']
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: 'x64'
     steps:
     - name: Checkout repo
       uses: actions/checkout@v1
@@ -45,6 +49,11 @@ jobs:
         submodules: true
     - name: Select Xcode
       run: sudo xcode-select --switch /Applications/Xcode_11.1.app/Contents/Developer
+    - name: Setup python
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: 'x64'
     - name: Build Deps
       run: pip3 install -r build_requirements.txt
     - name: Make wheels
@@ -60,29 +69,6 @@ jobs:
       with:
         name: macos-${{ matrix.python-version }}
         path: export
-  collect:
-    needs: [osx, linux]
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/download-artifact@master
-        with:
-          name: macos-37
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: macos-38
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: linux-cp37-cp37m
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: linux-cp38-cp38
-          path: wheelhouse/
-      - name: list
-        run: ls -lahr wheelhouse
-
   win:
     runs-on: windows-latest
     strategy:
@@ -119,3 +105,34 @@ jobs:
       with:
         name: win-${{ matrix.python-version }}
         path: export
+
+  collect:
+    needs: [osx, linux, win]
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: macos-37
+          path: wheelhouse/
+      - uses: actions/download-artifact@master
+        with:
+          name: macos-38
+          path: wheelhouse/
+      - uses: actions/download-artifact@master
+        with:
+          name: linux-cp37-cp37m
+          path: wheelhouse/
+      - uses: actions/download-artifact@master
+        with:
+          name: linux-cp38-cp38
+          path: wheelhouse/
+      - uses: actions/download-artifact@master
+        with:
+          name: win-3.8.x
+          path: wheelhouse/
+      - uses: actions/download-artifact@master
+        with:
+          name: win-3.7.x
+          path: wheelhouse/
+      - name: list
+        run: ls -lahr wheelhouse
