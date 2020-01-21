@@ -34,7 +34,7 @@ jobs:
     - name: Make export dir
       run: |
         mkdir export
-        FOR %%W IN wheelhouse\pytubes*.whl DO CALL copy %%W export\
+        FOR %%W IN (wheelhouse\pytubes*.whl) DO CALL copy %%W export\
       shell: cmd
     - name: "Upload wheel"
       uses: actions/upload-artifact@v1
