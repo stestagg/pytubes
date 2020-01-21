@@ -21,12 +21,12 @@ SAMPLE_JSON = [
     '[]', '{}', 'false', '1', '1.1',
     'null', '""', '[{}]', '{"a": []}',
     '[[[[[[[[[[]]]]]]]]]]',
-    read_file(THIS_DIR, "tricky_json.json")
 ]
 for i in range(0, 10, 2):
     SAMPLE_JSON.append('"' + ('\\' * i) + '"')
 for i in range(1, 10, 2):
     SAMPLE_JSON.append('"' + ('\\' * i) + '"1"')
+
 
 
 # Please note, the tubes json parser is *not* validating.  It assumes that the
@@ -80,6 +80,12 @@ def test_passing_json_test_suite_cases(filename):
 
 @pytest.mark.parametrize("sample", SAMPLE_JSON)
 def test_json(sample):
+    assert list(tubes.Each([sample]).to(str).json())[0] == json.loads(sample)
+
+
+@pytest.mark.parametrize("path", [(THIS_DIR, "tricky_json.json")])
+def test_json_file(path):
+    sample = read_file(*path)
     assert list(tubes.Each([sample]).to(str).json())[0] == json.loads(sample)
 
 
