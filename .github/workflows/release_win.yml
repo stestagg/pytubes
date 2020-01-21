@@ -28,7 +28,9 @@ jobs:
       run: FOR %%W IN (wheelhouse\pytubes*.whl) DO CALL pip3 install %%W
       shell: cmd
     - name: "Test wheel"
-      run: pip3 install numpy pyarrow pandas pytest && pytest test
+      run: |
+        pip3 install numpy pyarrow pandas pytest
+        pytest test
     - name: Make export dir
       run: |
         mkdir export
