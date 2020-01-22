@@ -6,9 +6,11 @@ export PATH=/opt/python/$1/bin:$PATH
 
 ROOT=$PWD
 
+pip install --upgrade pip
 pip install -r $ROOT/build_requirements.txt
 
-make clean install
+make -j4 clean
+make install
 
 pip wheel . -w wheelhouse/
 

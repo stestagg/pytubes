@@ -412,6 +412,10 @@ typedef uLong FAR uLongf;
 #  define Z_HAVE_UNISTD_H
 #endif
 
+#if defined(_MSC_VER) && defined(Z_HAVE_UNISTD_H)
+# undef Z_HAVE_UNISTD_H
+#endif
+
 #if 1    /* was set to #if 1 by ./configure */
 #  define Z_HAVE_STDARG_H
 #endif
@@ -447,6 +451,11 @@ typedef uLong FAR uLongf;
 #if defined(__WATCOMC__) && !defined(Z_HAVE_UNISTD_H)
 #  define Z_HAVE_UNISTD_H
 #endif
+
+#if defined(_MSC_VER) && defined(Z_HAVE_UNISTD_H)
+# undef Z_HAVE_UNISTD_H
+#endif
+
 #ifndef Z_SOLO
 #  if defined(Z_HAVE_UNISTD_H) || defined(_LARGEFILE64_SOURCE)
 #    include <unistd.h>         /* for SEEK_*, off_t, and _LFS64_LARGEFILE */

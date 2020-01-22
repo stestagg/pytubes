@@ -89,9 +89,10 @@ namespace ss {
    	}
  #endif
 
- #if SSE_INSTR_SET > 0
-    #warning "using aligned allocate fn: mm_malloc"
-    template<int N> inline void *Alloc<N>::alloc(size_t n) {
+#if SSE_INSTR_SET > 0
+  #pragma message("using aligned allocate fn: mm_malloc")
+
+  template<int N> inline void *Alloc<N>::alloc(size_t n) {
    		_mm_malloc(n, N);
    }
    template<int N> inline void Alloc<N>::free(void *obj) {
@@ -102,8 +103,10 @@ namespace ss {
         || (defined _GNU_SOURCE) \
         || ((defined _XOPEN_SOURCE) && (_XOPEN_SOURCE >= 600))) \
  		    && (defined _POSIX_ADVISORY_INFO) && (_POSIX_ADVISORY_INFO > 0)
-  #warning "using aligned allocate fn: posix_memalign"
- 	template<int N> inline void *Alloc<N>::alloc(size_t n) {
+
+  #pragma message("using aligned allocate fn: posix_memalign")
+
+  template<int N> inline void *Alloc<N>::alloc(size_t n) {
    		void* res;
       const int failed = posix_memalign(&res,N,n);
       if(failed){
@@ -114,9 +117,20 @@ namespace ss {
    template<int N> inline void Alloc<N>::free(void *obj) {
    		::free(obj);
 	}
-
+#elif defined(_WIN32)
+  #include <malloc.h>
+  #pragma message("using aligned allocate fn: _aligned_malloc")
+  template<int N> inline void *Alloc<N>::alloc(size_t n) {
+    void *ptr = _aligned_malloc(n, N);
+    if(!ptr) throw std::bad_alloc();
+    return ptr;
+  }
+  template<int N> inline void Alloc<N>::free(void *obj) {
+    _aligned_free(obj);
+  }
 #else
-  #warning "using aligned allocate fn: aligned_alloc"
+  #pragma message("using aligned allocate fn: aligned_alloc")
+
   #include <stdlib.h>
   template<int N> inline void *Alloc<N>::alloc(size_t n) {
     if (n % N != 0) {n += n - (n % N);}

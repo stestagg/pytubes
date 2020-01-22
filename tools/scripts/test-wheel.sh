@@ -8,6 +8,7 @@ ROOT=$PWD
 WH=$GITHUB_WORKSPACE/wheelhouse
 
 pip install pytest pandas numpy
+pip install pyarrow || true
 pip install $WH/pytubes-*.whl
 
 pytest test

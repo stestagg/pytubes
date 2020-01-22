@@ -71,6 +71,21 @@ namespace ss{ namespace iter{
         container.increment();
     }
 
+    // template<>
+    // void PAArrayFillerImpl<ByteSlice>::fill() {
+    //         assert_arrow(builder.Reserve(1));
+    //         assert_arrow(builder.ReserveData(ptr->len));
+    //         builder.UnsafeAppend(ptr->cbegin(), ptr->len);
+    // }
+
+    // template<>
+    // void PAArrayFillerImpl<Utf8>::fill() {
+    //         assert_arrow(builder.Reserve(1));
+    //         assert_arrow(builder.ReserveData(ptr->len));
+    //         builder.UnsafeAppend(ptr->cbegin(), ptr->len);
+    // }
+    // /* End fill() */
+
     template<>
     PyObj PAArrayFillerImpl<NullType>::GetPaArray() {
         PyObj buffers = PyObj::fromCall(PyList_New(1));
@@ -85,7 +100,6 @@ namespace ss{ namespace iter{
 
     template<>
     PyObj PAArrayFillerImpl<bool>::GetPaArray() {
-        using Buf = arrow::Buffer<bool>;
         size_t size = container.size();
         auto buf = arrow::Buffer<uint8_t>::unique(std::move(container.contents));
         PyObj bridged = PyObj::fromCall(pyarrow_make_buffer(std::move(buf)));
@@ -130,6 +144,14 @@ namespace ss{ namespace iter{
             PyObj::fromCall(pyarrow_make_buffer(std::move(contents))).obj
         ));
     }
+    // template<>
+    // PyObj PAArrayFillerImpl<Utf8>::GetPaArray() {
+    //     shared_ptr<arrow::ArrayData> array;
+    //     assert_arrow(builder.FinishInternal(&array));
+    //     PyObj rv = PyObj::fromCall(pyarrow_make_str_array(array));
+    //     if (PyErr_Occurred()) { throw PyExceptionRaised;}
+    //     return rv;
+    // }
 
     template<class T, class Enable>
     struct make_pa_filler{

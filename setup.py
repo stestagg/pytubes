@@ -12,17 +12,31 @@ from pathlib import Path
 
 from Cython.Build import cythonize
 
-os.environ['CFLAGS'] = os.environ.get('CFLAGS', '') + ' -msse4'
+def get_compiler():
+    import distutils.ccompiler
+    return distutils.ccompiler.get_default_compiler()
+
+
+IS_MSVC = get_compiler() == 'msvc'
+
+def c_arg(gcc_ver, win_ver):
+    return win_ver if IS_MSVC else gcc_ver
+
+
+os.environ['CFLAGS'] = os.environ.get('CFLAGS', '') + c_arg(' -msse4', '/arch:SSE2')
+
 try:
     import numpy
 except ImportError:
+    # Pytubes requires numpy to build, but
+    # doing this allows setup.py to be imported
+    # even if numpy isn't installed, something that's required to, for example
+    # work out that numpy is a dependency
     np_get_include = lambda: 'src'
 else:
     np_get_include = numpy.get_include
 
-
-
-
+    
 PROJECT_ROOT = Path(__file__).absolute().parent
 
 
@@ -69,7 +83,7 @@ zlib = ('zlib', {
 
 DOUBLE_SOURCES = [
     str(f.relative_to(PROJECT_ROOT))
-    for f in 
+    for f in
     (PROJECT_ROOT / 'vendor' / 'double-conversion').glob('**/*.cc')
     if 'test' not in f.name and 'benchmark' not in f.name
 ]
@@ -97,8 +111,16 @@ CTUBES_OPTIONS = {
         np_get_include(),
     ],
     'libraries': [],
-    'extra_compile_args': ['-std=c++11', '-g', '-O2', '-msse4'],
-    'extra_link_args': ['-std=c++11', '-g'],
+    'extra_compile_args': [
+        c_arg('-std=c++11', '/std:c++14'),
+        c_arg('-g', '/DEBUG:FASTLINK'),
+        c_arg('-O3', '/O2'),
+        c_arg('-msse4', '')
+    ],
+    'extra_link_args': [
+        c_arg('-std=c++11', ''),
+        c_arg('-g', '/Zi'),
+    ],
 }
 
 
@@ -122,7 +144,7 @@ setup(
     author_email="stestagg@gmail.com",
     python_requires=">=3.4.0",
     url="https://github.com/stestagg/pytubes",
-    install_requires=['numpy', 'pyarrow'],
+    install_requires=['numpy'],
     include_package_data=True,
     license='MIT',
     classifiers=[

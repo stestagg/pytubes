@@ -21,15 +21,22 @@
 #define _NOEXCEPT noexcept
 #endif
 
-#if defined(__clang__)
+#if defined(__clang__) || defined(_MSC_VER)
 
-#define NORETURN(x) [[noreturn]] x
+#define NORETURN_A [[noreturn]]
+#define NORETURN_B
 
 #else
 
-#define NORETURN(x) x __attribute__((noreturn))
+#define NORETURN_A
+#define NORETURN_B __attribute__((noreturn))
 
 #endif
+
+#define NORETURN(x) NORETURN_A x NORETURN_B
+
+
+
 
 template<typename... Ts> struct make_void { typedef void type;};
 template<typename... Ts> using void_t = typename make_void<Ts...>::type;
@@ -96,7 +103,7 @@ namespace ss{
     }
 
 
-    #define throw_if(Ty, cond, args...) if(_SS_ERROR_UNLIKELY(cond)) { throw_py<Ty>(args);}
+    #define throw_if(Ty, cond, ...) if(_SS_ERROR_UNLIKELY(cond)) { throw_py<Ty>(__VA_ARGS__);}
     #define static_throw_if(Ty, cond) if(_SS_ERROR_UNLIKELY(cond)) { throw Ty;}
 
     template<class T, class ...Args>
@@ -104,5 +111,4 @@ namespace ss{
         throw T(make_str(args...));
     }
 
-    
 }

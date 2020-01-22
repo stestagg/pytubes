@@ -1,10 +1,14 @@
 
-import pyarrow
+try:
+    import pyarrow
+    HAVE_PYARROW=1
+except ImportError:
+    HAVE_PYARROW = 0
+
 from cython.operator cimport dereference as deref
 from libcpp.vector cimport vector
 from libcpp.memory cimport unique_ptr
 from libc.stdint cimport uint8_t, int64_t, intptr_t
-
 
 cdef extern from * namespace "polyfill":
     """
