@@ -89,6 +89,7 @@ namespace ss {
    	}
  #endif
 
+#if SSE_INSTR_SET > 0
   #pragma message("using aligned allocate fn: mm_malloc")
 
   template<int N> inline void *Alloc<N>::alloc(size_t n) {
@@ -104,7 +105,7 @@ namespace ss {
  		    && (defined _POSIX_ADVISORY_INFO) && (_POSIX_ADVISORY_INFO > 0)
 
   #pragma message("using aligned allocate fn: posix_memalign")
- 	
+
   template<int N> inline void *Alloc<N>::alloc(size_t n) {
    		void* res;
       const int failed = posix_memalign(&res,N,n);
