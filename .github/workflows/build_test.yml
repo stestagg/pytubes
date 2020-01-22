@@ -2,6 +2,8 @@ name: Test change
 
 on:
   push:
+    branches-ignore:
+      - 'gh-pages'
   release:
     types: [created]
 
@@ -115,7 +117,7 @@ jobs:
         name: win-${{ matrix.python-version }}
         path: export
 
-  collect:
+  Upload Release Artifacts:
     if: github.event_name == 'release'
     needs: [osx, linux, win]
     runs-on: ubuntu-18.04
@@ -146,7 +148,7 @@ jobs:
           path: wheelhouse/
       - name: Create wheel package
         run: tar czf wheels.tgz wheelhouse/*.whl
-      - name: Uploade release artifacts
+      - name: Upload release artifacts
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -154,4 +156,20 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./wheels.tgz
           asset_name: wheels.tgz
+          asset_content_type: application/gzip
+
+      - uses: actions/download-artifact@master
+        with:
+          name: docs
+          path: docs/
+      - name: Create docs package
+        run: tar czf docs.tgz docs/
+      - name: Upload release artifacts
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./docs.tgz
+          asset_name: docs.tgz
           asset_content_type: application/gzip
