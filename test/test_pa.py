@@ -1,5 +1,6 @@
-import tubes
 import pyarrow as pa
+import tubes
+
 
 def test_doubles():
     tube = tubes.Count(2).to(float).first(4)
@@ -9,6 +10,21 @@ def test_doubles():
     assert table.to_pandas().to_dict() == {
         'a': {0: 2, 1: 3, 2: 4, 3: 5},
     }
+
+
+def test_int():
+    tube = tubes.Count().to(int).first(20_000)
+    table = tube.to_pyarrow(('a', ))
+    assert isinstance(table, pa.Table)
+    assert len(table) == 20_000
+    assert list(table.to_pandas()['a']) == list(range(20_000))
+
+
+def test_none():
+    tube = tubes.Each([None, None]).to(None)
+    table = tube.to_pyarrow(('x', ))
+    assert len(table) == 2
+    assert list(table.to_pandas().x) == [None, None]
 
 
 def test_enumerate():

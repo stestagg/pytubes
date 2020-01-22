@@ -24,7 +24,7 @@ public:
 
     PyObj static fromCall(PyObject *obj, bool already_retained=true) {
         if (obj == 0) throw PyExceptionRaised;
-        return std::move(PyObj(obj, already_retained));
+        return PyObj(obj, already_retained);
     }
 
     inline bool has_attr(const char *attr) const {
@@ -32,7 +32,7 @@ public:
     }
 
     inline PyObj get_attr(const char *attr) const {
-        return PyObj::fromCall(PyObject_GetAttrString(obj, attr));   
+        return PyObj::fromCall(PyObject_GetAttrString(obj, attr));
     }
 
     inline bool was_created() const {

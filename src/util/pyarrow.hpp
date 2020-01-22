@@ -1,137 +1,135 @@
 #pragma once
 
+#include "../util/arrow/buffer.hpp"
+#include "../util/arrow/containers.hpp"
+
 // TODO: this feels wrong...
 #undef __PYX_HAVE__tubes
 #undef __PYX_HAVE_API__tubes
-//extern "C" ss::PyObj pyarrow_make_double_array(size_t, std::shared_ptr<arrow::Buffer> );
 #include "../../pyx/tubes.h"
 
 #include "error.hpp"
 
-#include <arrow/array/builder_primitive.h>
-#include <arrow/array/builder_binary.h>
 
 namespace ss{ namespace iter{
 
     template<class T> struct PaType_t {  };
     template<> struct PaType_t<NullType> {
         using Enabled = true_type;
-        using PaType = arrow::NullType;
-        using PaBuilder = arrow::NullBuilder;
+        using ContainerType = arrow::NullContainer;
         static constexpr const char *PaTypeName = "null";
     };
     template<> struct PaType_t<bool> {
         using Enabled = true_type;
-        using PaType = arrow::BooleanType;
-        using PaBuilder = arrow::BooleanBuilder;
+        using ContainerType = arrow::BoolContainer;
         static constexpr const char *PaTypeName = "bool_";
     };
     template<> struct PaType_t<int64_t> {
         using Enabled = true_type;
-        using PaType = arrow::Int64Type;
-        using PaBuilder = arrow::Int64Builder;
+        using ContainerType = aligned64_vector<int64_t>;
         static constexpr const char *PaTypeName = "int64";
     };
     template<> struct PaType_t<double> {
         using Enabled = true_type;
-        using PaType = arrow::DoubleType;
-        using PaBuilder = arrow::DoubleBuilder;
+        using ContainerType = aligned64_vector<double>;
         static constexpr const char *PaTypeName = "float64";
-    };
-    template<> struct PaType_t<ByteSlice> {
-        using Enabled = true_type;
-        using PaType = arrow::BinaryType;
-        using PaBuilder = arrow::StringBuilder;
-        static constexpr const char *PaTypeName = "binary";
     };
     template<> struct PaType_t<Utf8> {
         using Enabled = true_type;
-        using PaType = arrow::StringType;
-        using PaBuilder = arrow::StringBuilder;
+        using ContainerType = arrow::StringContainer<uint8_t>;
         static constexpr const char *PaTypeName = "string";
     };
-    /*template<> struct PaType_t<PyObj> {
-        using PaBuilder = arrow:: NullBuilder;
-    };
-    template<> struct PaType_t<JsonUtf8> {
-        using PaBuilder = arrow:: NullBuilder;
-    };
-    template<> struct PaType_t<TsvRow> {
-        using PaBuilder = arrow:: NullBuilder;
-    };
-    template<> struct PaType_t<CsvRow> {
-        using PaBuilder = arrow:: NullBuilder;
-    };*/
 
     struct PaArrayFiller {
         virtual ~PaArrayFiller() = default;
         virtual void fill() = 0;
-        virtual PyObj GetPyobj() = 0;
+        virtual PyObj GetPaArray() = 0;
     };
 
     template<class T>
     struct PAArrayFillerImpl: PaArrayFiller {
         using PaType = PaType_t<T>;
-        using Builder = typename PaType::PaBuilder;
-        Builder builder;
+        using ContainerType = typename PaType::ContainerType;
+        ContainerType container;
         const T *ptr;
 
-        PAArrayFillerImpl(const T * ptr)
-            : builder(), ptr(ptr) {}
-
+        PAArrayFillerImpl(const T *ptr) : container(), ptr(ptr) {}
 
         void fill();
-        PyObj GetPyobj();
+        PyObj GetPaArray();
 
     };
 
     /* fill() */
     template<class T>
     void PAArrayFillerImpl<T>::fill() {
-        assert_arrow(builder.Append(*ptr));
+        container.emplace_back(*ptr);
     }
 
     template<>
     void PAArrayFillerImpl<NullType>::fill() {
-        assert_arrow(builder.AppendNull());
+        container.increment();
     }
 
     template<>
-    void PAArrayFillerImpl<ByteSlice>::fill() {
-            assert_arrow(builder.Reserve(1));
-            assert_arrow(builder.ReserveData(ptr->len));
-            builder.UnsafeAppend(ptr->cbegin(), ptr->len);
+    PyObj PAArrayFillerImpl<NullType>::GetPaArray() {
+        PyObj buffers = PyObj::fromCall(PyList_New(1));
+        PyList_SET_ITEM(buffers.obj, 0, PyObj(Py_None).give());
+        PyObj array = PyObj::fromCall(pyarrow_make_array(
+            PaType_t<NullType>::PaTypeName,
+            container.size(),
+            buffers.obj
+        ));
+        return array;
     }
 
     template<>
-    void PAArrayFillerImpl<Utf8>::fill() {
-            assert_arrow(builder.Reserve(1));
-            assert_arrow(builder.ReserveData(ptr->len));
-            builder.UnsafeAppend(ptr->cbegin(), ptr->len);
+    PyObj PAArrayFillerImpl<bool>::GetPaArray() {
+        using Buf = arrow::Buffer<bool>;
+        size_t size = container.size();
+        auto buf = arrow::Buffer<uint8_t>::unique(std::move(container.contents));
+        PyObj bridged = PyObj::fromCall(pyarrow_make_buffer(std::move(buf)));
+        PyObj buffers = PyObj::fromCall(PyList_New(2));
+        PyList_SET_ITEM(buffers.obj, 0, PyObj(Py_None).give());
+        PyList_SET_ITEM(buffers.obj, 1, bridged.give());
+        PyObj array = PyObj::fromCall(pyarrow_make_array(
+            PaType_t<bool>::PaTypeName,
+            size,
+            buffers.obj
+        ));
+        return array;
     }
-    /* End fill() */
 
     template<class T>
-    PyObj PAArrayFillerImpl<T>::GetPyobj() {
-        shared_ptr<arrow::ArrayData> array;
-        assert_arrow(builder.FinishInternal(&array));
-        PyObj rv = PyObj::fromCall(pyarrow_make_simple_array(
+    PyObj PAArrayFillerImpl<T>::GetPaArray() {
+        using Buf = arrow::Buffer<typename ContainerType::value_type>;
+        size_t size = container.size();
+        std::unique_ptr<Buf> buf(new Buf(std::move(container)));
+        PyObj bridged = PyObj::fromCall(
+            pyarrow_make_buffer(std::move(buf))
+        );
+        PyObj buffers = PyObj::fromCall(PyList_New(2));
+        PyList_SET_ITEM(buffers.obj, 0, PyObj(Py_None).give());
+        PyList_SET_ITEM(buffers.obj, 1, bridged.give());
+        PyObj array = PyObj::fromCall(pyarrow_make_array(
             PaType_t<T>::PaTypeName,
-            array
+            size,
+            buffers.obj
         ));
-        if (PyErr_Occurred()) { throw PyExceptionRaised;}
-        return rv;
+        return array;
     }
 
     template<>
-    PyObj PAArrayFillerImpl<Utf8>::GetPyobj() {
-        shared_ptr<arrow::ArrayData> array;
-        assert_arrow(builder.FinishInternal(&array));
-        PyObj rv = PyObj::fromCall(pyarrow_make_str_array(array));
-        if (PyErr_Occurred()) { throw PyExceptionRaised;}
-        return rv;
+    PyObj PAArrayFillerImpl<Utf8>::GetPaArray() {
+        size_t size = container.size();
+        auto contents = arrow::Buffer<uint8_t>::unique(std::move(container.contents));
+        auto offsets = arrow::Buffer<int32_t>::unique(std::move(container.offsets));
+        return PyObj::fromCall(pyarrow_make_str_array(
+            size,
+            PyObj::fromCall(pyarrow_make_buffer(std::move(offsets))).obj,
+            PyObj::fromCall(pyarrow_make_buffer(std::move(contents))).obj
+        ));
     }
-
 
     template<class T, class Enable>
     struct make_pa_filler{
@@ -148,24 +146,6 @@ namespace ss{ namespace iter{
     struct make_pa_filler<T, enable_if_t<PaType_t<T>::Enabled::value, bool>> {
         inline std::unique_ptr<PaArrayFiller> operator()(const SlotPointer ptr) {
             return std::unique_ptr<PaArrayFiller>(new PAArrayFillerImpl<T>((const T*)ptr));
-        }
-    };
-
-    ///
-    template<class T, class Enable>
-    struct pa_datatype_from_dtype{
-        NORETURN(inline std::shared_ptr<arrow::DataType>) operator()() {
-            throw_py<ValueError>(
-                "Unable to create pa table from ",
-                ScalarType_t<T>::type_name()
-                );
-        }
-    };
-
-    template<class T>
-    struct pa_datatype_from_dtype<T, enable_if_t<PaType_t<T>::Enabled::value, bool>> {
-        inline std::shared_ptr<arrow::DataType> operator()() {
-            return std::make_shared<typename PaType_t<T>::PaType>();
         }
     };
 
@@ -194,8 +174,9 @@ namespace ss{ namespace iter{
 
         std::vector<PyObj> arrays;
         for(size_t index=0; index < slots.len; ++index) {
-            arrays.push_back(fillers[index]->GetPyobj());
+            arrays.push_back(fillers[index]->GetPaArray());
         }
         return arrays;
     }
-}}
+}
+}
