@@ -34,28 +34,11 @@ namespace ss{ namespace iter{
         using ContainerType = aligned64_vector<double>;
         static constexpr const char *PaTypeName = "float64";
     };
-    // template<> struct PaType_t<ByteSlice> {
-    //     using Enabled = true_type;
-    //     using ContainerType = arrow::StringContainer<uint8_t>;
-    //     static constexpr const char *PaTypeName = "binary";
-    // };
     template<> struct PaType_t<Utf8> {
         using Enabled = true_type;
         using ContainerType = arrow::StringContainer<uint8_t>;
         static constexpr const char *PaTypeName = "string";
     };
-    /*template<> struct PaType_t<PyObj> {
-        using PaBuilder = arrow:: NullBuilder;
-    };
-    template<> struct PaType_t<JsonUtf8> {
-        using PaBuilder = arrow:: NullBuilder;
-    };
-    template<> struct PaType_t<TsvRow> {
-        using PaBuilder = arrow:: NullBuilder;
-    };
-    template<> struct PaType_t<CsvRow> {
-        using PaBuilder = arrow:: NullBuilder;
-    };*/
 
     struct PaArrayFiller {
         virtual ~PaArrayFiller() = default;
@@ -87,21 +70,6 @@ namespace ss{ namespace iter{
     void PAArrayFillerImpl<NullType>::fill() {
         container.increment();
     }
-
-    // template<>
-    // void PAArrayFillerImpl<ByteSlice>::fill() {
-    //         assert_arrow(builder.Reserve(1));
-    //         assert_arrow(builder.ReserveData(ptr->len));
-    //         builder.UnsafeAppend(ptr->cbegin(), ptr->len);
-    // }
-
-    // template<>
-    // void PAArrayFillerImpl<Utf8>::fill() {
-    //         assert_arrow(builder.Reserve(1));
-    //         assert_arrow(builder.ReserveData(ptr->len));
-    //         builder.UnsafeAppend(ptr->cbegin(), ptr->len);
-    // }
-    // /* End fill() */
 
     template<>
     PyObj PAArrayFillerImpl<NullType>::GetPaArray() {
@@ -162,15 +130,6 @@ namespace ss{ namespace iter{
             PyObj::fromCall(pyarrow_make_buffer(std::move(contents))).obj
         ));
     }
-    // template<>
-    // PyObj PAArrayFillerImpl<Utf8>::GetPaArray() {
-    //     shared_ptr<arrow::ArrayData> array;
-    //     assert_arrow(builder.FinishInternal(&array));
-    //     PyObj rv = PyObj::fromCall(pyarrow_make_str_array(array));
-    //     if (PyErr_Occurred()) { throw PyExceptionRaised;}
-    //     return rv;
-    // }
-
 
     template<class T, class Enable>
     struct make_pa_filler{
