@@ -3,7 +3,7 @@ name: Test change
 on:
   push:
     branches-ignore:
-      - 'gh-pages'
+      - gh-pages
   release:
     types: [created]
 
