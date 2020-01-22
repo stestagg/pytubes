@@ -1,7 +1,9 @@
-name: Create Release
+name: Test change
 
 on:
   push:
+  release:
+    types: [created]
 
 jobs:
   linux:
@@ -29,7 +31,6 @@ jobs:
       with:
         name: linux-${{ matrix.python-version }}
         path: wheelhouse
-
 
   osx:
     runs-on: ${{ matrix.os }}
@@ -67,6 +68,16 @@ jobs:
       with:
         name: macos-${{ matrix.python-version }}
         path: export
+    - name: "Build docs"
+      if: matrix.python-version == '3.8.x'
+      run: make doc
+    - name: "Upload docs"
+      if: matrix.python-version == '3.8.x'
+      uses: actions/upload-artifact@v1
+      with:
+        name: docs
+        path: docs/_build/html
+
   win:
     runs-on: windows-latest
     strategy:
@@ -105,16 +116,17 @@ jobs:
         path: export
 
   collect:
+    if: github.event_name == 'release'
     needs: [osx, linux, win]
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/download-artifact@master
         with:
-          name: macos-37
+          name: macos-3.7.x
           path: wheelhouse/
       - uses: actions/download-artifact@master
         with:
-          name: macos-38
+          name: macos-3.8.x
           path: wheelhouse/
       - uses: actions/download-artifact@master
         with:
@@ -132,5 +144,14 @@ jobs:
         with:
           name: win-3.7.x
           path: wheelhouse/
-      - name: list
-        run: ls -lahr wheelhouse
+      - name: Create wheel package
+        run: tar czf wheels.tgz wheelhouse/*.whl
+      - name: Uploade release artifacts
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.url }}
+          asset_path: ./wheels.tgz
+          asset_name: wheels.tgz
+          asset_content_type: application/gzip
