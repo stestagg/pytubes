@@ -10,7 +10,6 @@ from libcpp.vector cimport vector
 from libcpp.memory cimport unique_ptr
 from libc.stdint cimport uint8_t, int64_t, intptr_t
 
-
 cdef extern from * namespace "polyfill":
     """
     namespace polyfill {

@@ -34,28 +34,11 @@ namespace ss{ namespace iter{
         using ContainerType = aligned64_vector<double>;
         static constexpr const char *PaTypeName = "float64";
     };
-    // template<> struct PaType_t<ByteSlice> {
-    //     using Enabled = true_type;
-    //     using ContainerType = arrow::StringContainer<uint8_t>;
-    //     static constexpr const char *PaTypeName = "binary";
-    // };
     template<> struct PaType_t<Utf8> {
         using Enabled = true_type;
         using ContainerType = arrow::StringContainer<uint8_t>;
         static constexpr const char *PaTypeName = "string";
     };
-    /*template<> struct PaType_t<PyObj> {
-        using PaBuilder = arrow:: NullBuilder;
-    };
-    template<> struct PaType_t<JsonUtf8> {
-        using PaBuilder = arrow:: NullBuilder;
-    };
-    template<> struct PaType_t<TsvRow> {
-        using PaBuilder = arrow:: NullBuilder;
-    };
-    template<> struct PaType_t<CsvRow> {
-        using PaBuilder = arrow:: NullBuilder;
-    };*/
 
     struct PaArrayFiller {
         virtual ~PaArrayFiller() = default;
@@ -169,7 +152,6 @@ namespace ss{ namespace iter{
     //     if (PyErr_Occurred()) { throw PyExceptionRaised;}
     //     return rv;
     // }
-
 
     template<class T, class Enable>
     struct make_pa_filler{

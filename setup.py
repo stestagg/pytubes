@@ -12,7 +12,6 @@ from pathlib import Path
 
 from Cython.Build import cythonize
 
-
 def get_compiler():
     import distutils.ccompiler
     return distutils.ccompiler.get_default_compiler()
@@ -25,6 +24,7 @@ def c_arg(gcc_ver, win_ver):
 
 
 os.environ['CFLAGS'] = os.environ.get('CFLAGS', '') + c_arg(' -msse4', '/arch:SSE2')
+
 try:
     import numpy
 except ImportError:
@@ -36,7 +36,7 @@ except ImportError:
 else:
     np_get_include = numpy.get_include
 
-
+    
 PROJECT_ROOT = Path(__file__).absolute().parent
 
 

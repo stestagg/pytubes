@@ -111,5 +111,4 @@ namespace ss{
         throw T(make_str(args...));
     }
 
-
 }
