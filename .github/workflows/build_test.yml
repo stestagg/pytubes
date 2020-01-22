@@ -70,7 +70,7 @@ jobs:
         path: export
     - name: "Build docs"
       if: matrix.python-version == '3.8.x'
-      run: make doc
+      run: cd docs && make html
     - name: "Upload docs"
       if: matrix.python-version == '3.8.x'
       uses: actions/upload-artifact@v1
