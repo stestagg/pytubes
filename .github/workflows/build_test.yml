@@ -117,7 +117,7 @@ jobs:
         name: win-${{ matrix.python-version }}
         path: export
 
-  Upload Release Artifacts:
+  upload-release-assets:
     if: github.event_name == 'release'
     needs: [osx, linux, win]
     runs-on: ubuntu-18.04
