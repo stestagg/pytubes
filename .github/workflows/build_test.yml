@@ -121,42 +121,33 @@ jobs:
     if: github.event_name == 'release'
     needs: [osx, linux, win]
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        file: [macos-3.7.x, 
+               macos-3.8.x,
+               linux-cp37-cp37m,
+               win-3.8.x,
+               linux-cp38-cp38,
+               win-3.7.x
+              ]
     steps:
-      - uses: actions/download-artifact@master
+      - name: "Download wheel"
+        uses: actions/download-artifact@master
         with:
-          name: macos-3.7.x
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: macos-3.8.x
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: linux-cp37-cp37m
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: linux-cp38-cp38
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: win-3.8.x
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: win-3.7.x
-          path: wheelhouse/
-      - name: Create wheel package
-        run: tar czf wheels.tgz wheelhouse/*.whl
-      - name: Upload release artifacts
+          name: ${{ matrix.file }}
+          path: wh-${{ matrix.file }}/
+      - name: "Find filename"
+        id: filename
+        run: cd wh-${{ matrix.file }} && echo "::set-output name=file::${ls -1 *.whl}|head -n1}"
+      - name: "Upload release artifact"
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./wheels.tgz
-          asset_name: wheels.tgz
-          asset_content_type: application/gzip
+          asset_path: wh-${{ matrix.file }}/${{ steps.filename.outputs.file }}
+          asset_name: ${{ steps.filename.outputs.file }}
+          asset_content_type: application/zip
 
       - uses: actions/download-artifact@master
         with:
