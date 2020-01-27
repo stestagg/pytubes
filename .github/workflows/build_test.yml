@@ -126,7 +126,7 @@ jobs:
         name: win-${{ matrix.python-version }}
         path: export
 
-  upload-release-assets:
+  upload-release-assets-wheels:
     if: github.event_name == 'release'
     needs: [osx, linux, win]
     runs-on: ubuntu-18.04
@@ -158,6 +158,10 @@ jobs:
           asset_name: ${{ steps.filename.outputs.file }}
           asset_content_type: application/zip
 
+  upload-release-assets-sdist-docs:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-18.04
+    steps:
       - uses: actions/download-artifact@master
         with:
           name: docs
@@ -172,4 +176,20 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./docs.tgz
           asset_name: docs.tgz
+          asset_content_type: application/gzip
+      - uses: actions/download-artifact@master
+        with:
+          name: sdist
+          path: sdist/
+      - name: "Find filename"
+        id: filename
+        run: cd sdist/ && echo "::set-output name=file::$(ls -1 pytubes*.tar.gz|head -n1)"
+      - name: Upload sdist
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: sdist/${{ steps.filename.outputs.file }}
+          asset_name: ${{ steps.filename.outputs.file }}
           asset_content_type: application/gzip
