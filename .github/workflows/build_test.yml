@@ -9,7 +9,7 @@ on:
 
 jobs:
   linux:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }} 
     strategy:
       matrix:
         os: [ubuntu-18.04]
@@ -132,10 +132,10 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        file: [macos-3.7.x, 
+        file: [macos-3.7.x,
                macos-3.8.x,
                win-3.8.x,
-               win-3.7.x
+               win-3.7.x,
                linux-cp37-cp37m,
                linux-cp38-cp38,
               ]
@@ -161,6 +161,7 @@ jobs:
   upload-release-assets-sdist-docs:
     if: github.event_name == 'release'
     runs-on: ubuntu-18.04
+    needs: [osx, linux, win]
     steps:
       - uses: actions/download-artifact@master
         with:
