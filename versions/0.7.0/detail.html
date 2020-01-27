@@ -1,0 +1,240 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>More Detail &#8212; pytubes 0.7.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Pytubes’ Performance" href="performance.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pytubes</a></h1>
+
+
+
+<p class="blurb">Piping data into python</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=stestagg&repo=pytubes&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro_usage.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tubes.html">pytubes API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Pytubes’ Performance</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">More Detail</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-does-iteration-work">How does iteration work?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#concepts">Concepts</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="performance.html" title="previous chapter">Pytubes’ Performance</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+<style>
+	.related.top{
+		color: #888;
+		font-style: italic;
+	}
+	#version-sel {
+		cursor: pointer;
+		color: #888;
+	    border: 0 transparent;
+		border-bottom: 1px dotted #666;
+	    padding: 1px;
+	    font-size: 90%;
+	    line-height: 1;
+	    background: white;
+	    -webkit-appearance: none;
+	    background-position-x: 244px;
+	    outline-style: none; 
+	    -moz-outline-style:none; 
+	}
+	#version-sel:active{
+		outline-style: none; 
+	    -moz-outline-style:none; 	
+	}
+	#version-sel:hover {
+		border-bottom-style: solid;
+	}
+
+
+</style>
+<div class="related top">
+    &nbsp;
+    Version: 0.7.0
+    <select onchange="location = '/versions/' + this.options[this.selectedIndex].value" id="version-sel">
+    	<option value="0.7.0" selected>Switch</option>
+    	<!-- PYTUBES-BEGIN-VERSION-LIST --><option value="0.7.0">0.7.0</option><option value="0.6.0">0.6.0</option><option value="0.5.6">0.5.6</option><option value="0.5.5">0.5.5</option><!-- PYTUBES-END-VERSION-LIST -->
+    </select>
+    <!-- PYTUBES-BEGIN-VERSION-WARNING --><!-- PYTUBES-END-VERSION-WARNING -->
+</div>
+
+
+          <div class="body" role="main">
+            
+  <div class="section" id="more-detail">
+<h1>More Detail<a class="headerlink" href="#more-detail" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-does-iteration-work">
+<h2>How does iteration work?<a class="headerlink" href="#how-does-iteration-work" title="Permalink to this headline">¶</a></h2>
+<p>Calling iter() on a tube, either explicitly, or implicitly (by a call to list() or for-loop)
+causes a number of things to happen:</p>
+<ol class="arabic simple">
+<li>pytubes recurses over each tube, looking at its inputs to build directed dependency graph of each step</li>
+<li>This DAG is then partitioned into chains (see <cite>Concepts</cite>) of tubes that are iterated together</li>
+<li>The chains, and their contents are sorted so that each iter’s input are processed in the correct order.</li>
+<li>Each tube is then asked to create an iter, converting all arguments and inputs into their relevant C values</li>
+<li>The resulting chain of Iters are given to a cython Iter wrapper object that has a <code class="docutils literal notranslate"><span class="pre">__next__()</span></code> method that
+produces python values for each iteration.</li>
+</ol>
+<p>A lot of the cost of loading data using pure python is typically centered around function call overhead and allocating/copying object data.</p>
+<p>Pytubes tackles these bottlenecks by using a number of strategies:</p>
+<blockquote>
+<div><ul class="simple">
+<li>iterator hot-loops are pure c++ function calls</li>
+<li>zero-copy views onto array data</li>
+<li>strict epoch-based lifetime rules avoid reference counting or GC during iteration</li>
+<li>where possible, zero allocations during iteration</li>
+<li>avoiding creating python objects where possible</li>
+</ul>
+</div></blockquote>
+<p>These optimizations lead to significant performance improvements over pure python, despite offering complex loading functionality.</p>
+</div>
+<div class="section" id="concepts">
+<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
+<p>The idea of having an efficient c-based data loader library is quite straight-forward
+but the detail is quite subtle.  The main issues are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Python’s pure dynamic typing is hard to reconcile with type information needed for c-level performant code</li>
+<li>To be useful, data loaders have to handle a verywide variety of use-cases,
+which can easily lead to quadratic code complexity without careful abstraction management</li>
+</ul>
+</div></blockquote>
+<p>To implement a natural feeling interface to the library, the python-facing side
+tries to feel pythonic and generally tries to avoid deling with types explicitly.
+By the time the <code class="docutils literal notranslate"><span class="pre">Tube</span></code> is converted to an <code class="docutils literal notranslate"><span class="pre">Iter</span></code>, lots of type information has
+been resolved, and optimally connected.</p>
+<p>To achieve this while keeping the implementation managable, pytubes internally
+has a number of concepts:</p>
+<dl class="docutils">
+<dt>Tube:</dt>
+<dd><p class="first">A tube describes a number of steps to load data.  Tubes typically refer to
+parent tubes recursively, and store any parameters that configure the behaviour
+of the resulting iterator.  By themselves, they are pure cython classes, and
+do not deal with processing the actual data directly.</p>
+<p class="last">Instead, calling <a class="reference external" href="https://docs.python.org/3/library/functions.html#iter" title="(in Python v3.8)"><code class="xref py py-func docutils literal notranslate"><span class="pre">iter()</span></code></a> on a tube causes it to generate an Iter
+object which is a recursive C++ class that performs the actual data processing</p>
+</dd>
+<dt>Iter:</dt>
+<dd><p class="first">A set of C++ classes that implement the data processing implementation.</p>
+<p>They are entirely managed by cython wrappers and the Tube interface, so
+knowledge of them is not required for normal usage of the library.</p>
+<p>Internally, <code class="docutils literal notranslate"><span class="pre">Iter</span></code> s expose two methods:</p>
+<ul class="last simple">
+<li><code class="docutils literal notranslate"><span class="pre">get_slots()</span></code> which returns a vector
+of <cite>SlotPointers</cite> (glorified, type-checked c-pointers) that allow other Iterators
+to consume the data produced by this iter.</li>
+<li><dl class="first docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">next()</span></code> causes the iter to process the next item, and update its internal</dt>
+<dd>slots so they reflect upstream changes</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Dtype:</dt>
+<dd><p class="first">Each tube exposes a property <code class="docutils literal notranslate"><span class="pre">Tube.dtype</span></code> that defines the data type of each <code class="docutils literal notranslate"><span class="pre">Slot</span></code> in the iterator.</p>
+<p>Tubes can consume/produce multiple values per iteration, so Tube <code class="docutils literal notranslate"><span class="pre">dtype</span></code> s are tuples.
+Most tubes only have a single dtype entry, but some (e.g. <code class="xref py py-func docutils literal notranslate"><span class="pre">Tube.enumerate()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">Tube.multi()</span></code>) can
+have many.</p>
+<p class="last">Most tubes only look at/act on the first item of a dtype when getting values.  The <code class="xref py py-func docutils literal notranslate"><span class="pre">Tube.slot()</span></code> method
+can extract a single slot from a tube with many slots.</p>
+</dd>
+<dt>Slot:</dt>
+<dd><p class="first">Knowledge of slots is not required for normal usage of pytubes, but may be useful for a more in-depth
+understanding of how the library works.</p>
+<p>The underlying C++ Iter classes work by sharing pointers to iter-lifetime fixed
+memory locations.  Each time <code class="docutils literal notranslate"><span class="pre">next()</span></code> is called on an Iter, the values at these
+memory location change, but the addresses do not.  This can make iteration very efficient.</p>
+<p class="last">The memory locations for each value being handled by an <code class="docutils literal notranslate"><span class="pre">Iter</span></code> is referred to
+both as a <code class="docutils literal notranslate"><span class="pre">Slot</span></code>, and a <code class="docutils literal notranslate"><span class="pre">SlotPointer</span></code> in the code.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2019, Offset Design Ltd.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/detail.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

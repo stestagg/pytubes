@@ -1,0 +1,397 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Pytubes’ Performance &#8212; pytubes 0.5.5 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="More Detail" href="detail.html" />
+    <link rel="prev" title="pytubes API" href="tubes.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pytubes</a></h1>
+
+
+
+<p class="blurb">Piping data into python</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=stestagg&repo=pytubes&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro_usage.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tubes.html">pytubes API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pytubes’ Performance</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dataset-pypi-download-stats">Dataset: Pypi download stats</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#extracting-one-field">Extracting one field</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extracting-one-field-without-gunzip">Extracting one field without gunzip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extracting-multiple-fields">Extracting multiple fields</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multiple-fields-filtered">Multiple fields, Filtered</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="detail.html">More Detail</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tubes.html" title="previous chapter">pytubes API</a></li>
+      <li>Next: <a href="detail.html" title="next chapter">More Detail</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+<style>
+	.related.top{
+		color: #888;
+		font-style: italic;
+	}
+	#version-sel {
+		cursor: pointer;
+		color: #888;
+	    border: 0 transparent;
+		border-bottom: 1px dotted #666;
+	    padding: 1px;
+	    font-size: 90%;
+	    line-height: 1;
+	    background: white;
+	    -webkit-appearance: none;
+	    background-position-x: 244px;
+	    outline-style: none; 
+	    -moz-outline-style:none; 
+	}
+	#version-sel:active{
+		outline-style: none; 
+	    -moz-outline-style:none; 	
+	}
+	#version-sel:hover {
+		border-bottom-style: solid;
+	}
+
+
+</style>
+<div class="related top">
+    &nbsp;
+    Version: 0.5.5
+    <select onchange="location = '/versions/' + this.options[this.selectedIndex].value" id="version-sel">
+    	<option value="0.5.5" selected>Switch</option>
+    	<!-- PYTUBES-BEGIN-VERSION-LIST --><option value="0.7.0">0.7.0</option><option value="0.6.0">0.6.0</option><option value="0.5.6">0.5.6</option><option value="0.5.5">0.5.5</option><!-- PYTUBES-END-VERSION-LIST -->
+    </select>
+    <!-- PYTUBES-BEGIN-VERSION-WARNING --><div style="color:red;background: #ffe;">
+      You're currently viewing an older version of pytubes.
+      <a href="/versions/0.7.0/">Switch to 0.7.0</a>
+    </div><!-- PYTUBES-END-VERSION-WARNING -->
+</div>
+
+
+          <div class="body" role="main">
+            
+  <div class="section" id="pytubes-performance">
+<span id="performance"></span><h1>Pytubes’ Performance<a class="headerlink" href="#pytubes-performance" title="Permalink to this headline">¶</a></h1>
+<p>To assess performance, a number of sample workloads have been implemented, both
+in native python, and using pytubes, with their results being compared</p>
+<img alt="_images/perf_graph.png" src="_images/perf_graph.png" />
+<div class="section" id="dataset-pypi-download-stats">
+<h2>Dataset: Pypi download stats<a class="headerlink" href="#dataset-pypi-download-stats" title="Permalink to this headline">¶</a></h2>
+<p>Pypi provide package download logs via google bigquery.  These tables can be
+downloaded in a number of formats, including gzipped, line-separated JSON files.</p>
+<p>One day’s worth of download data for the 14th December 2017 was taken.  Google
+provided this data as 38 gzip compressed files, totalling 1.2GB (9.3GB uncompressed).
+How many records?:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tubes</span><span class="o">,</span> <span class="nn">glob</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">tubes</span><span class="o">.</span><span class="n">Each</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.jsonz&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">read_files</span><span class="p">()</span><span class="o">.</span><span class="n">gunzip</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span><span class="o">.</span><span class="n">enumerate</span><span class="p">()</span><span class="o">.</span><span class="n">slot</span><span class="p">(</span><span class="mi">0</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="mi">15</span><span class="p">,</span><span class="mi">612</span><span class="p">,</span><span class="mi">859</span>
+</pre></div>
+</div>
+<p>15 million package downloads happened on the 14th December 2017!.</p>
+<p>Each row looks similar to this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+   <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span><span class="s2">&quot;2017-12-14 00:42:55 UTC&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;country_code&quot;</span><span class="p">:</span><span class="s2">&quot;US&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;url&quot;</span><span class="p">:</span><span class="s2">&quot;/packages/02/ee/b6e02dc6529e82b75bb06823ff7d005b141037cb1416b10c6f00fc419dca/Pygments-2.2.0-py2.py3-none-any.whl&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;file&quot;</span><span class="p">:{</span>
+      <span class="s2">&quot;filename&quot;</span><span class="p">:</span><span class="s2">&quot;Pygments-2.2.0-py2.py3-none-any.whl&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;project&quot;</span><span class="p">:</span><span class="s2">&quot;pygments&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;2.2.0&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;bdist_wheel&quot;</span>
+   <span class="p">},</span>
+   <span class="s2">&quot;details&quot;</span><span class="p">:{</span>
+      <span class="s2">&quot;installer&quot;</span><span class="p">:{</span>
+         <span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;pip&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;9.0.1&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;python&quot;</span><span class="p">:</span><span class="s2">&quot;3.4.3&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;implementation&quot;</span><span class="p">:{</span>
+         <span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;CPython&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;3.4.3&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;distro&quot;</span><span class="p">:{</span>
+         <span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Amazon Linux AMI&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;2017.03&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;n/a&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;libc&quot;</span><span class="p">:{</span>
+            <span class="s2">&quot;lib&quot;</span><span class="p">:</span><span class="s2">&quot;glibc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;version&quot;</span><span class="p">:</span><span class="s2">&quot;2.17&quot;</span>
+         <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;system&quot;</span><span class="p">:{</span>
+         <span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Linux&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;release&quot;</span><span class="p">:</span><span class="s2">&quot;4.4.35-33.55.amzn1.x86_64&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;cpu&quot;</span><span class="p">:</span><span class="s2">&quot;x86_64&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;openssl_version&quot;</span><span class="p">:</span><span class="s2">&quot;OpenSSL 1.0.1k-fips 8 Jan 2015&quot;</span>
+   <span class="p">},</span>
+   <span class="s2">&quot;tls_protocol&quot;</span><span class="p">:</span><span class="s2">&quot;TLSv1.2&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;tls_cipher&quot;</span><span class="p">:</span><span class="s2">&quot;ECDHE-RSA-AES128-GCM-SHA256&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>So, many fields, with a nested structure (the nested structure actually doesn’t
+help pytubes’ performance, so this seems reasonable to have)</p>
+<div class="section" id="extracting-one-field">
+<h3>Extracting one field<a class="headerlink" href="#extracting-one-field" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="_static/perf1.html">Notebook 1</a></p>
+<p>Let’s say our analysis just requires a single field of this dataset for processing,
+for example, the country code, to examine which countries download the most.
+The python version:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">FILES</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;country_code&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>with pytubes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">tubes</span><span class="o">.</span><span class="n">Each</span><span class="p">(</span><span class="n">FILES</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">read_files</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">gunzip</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;country_code&quot;</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>results:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 33%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Version</p></td>
+<td><p>Pure Python</p></td>
+<td><p>pytubes</p></td>
+<td><p>Speedup</p></td>
+</tr>
+<tr class="row-even"><td><p>Time (s)</p></td>
+<td><p>254</p></td>
+<td><p>19.6</p></td>
+<td><p>12.9x</p></td>
+</tr>
+</tbody>
+</table>
+<p>About 1/2 of the pytubes time is spent gunzipping 9GB of data.</p>
+</div>
+<div class="section" id="extracting-one-field-without-gunzip">
+<h3>Extracting one field without gunzip<a class="headerlink" href="#extracting-one-field-without-gunzip" title="Permalink to this headline">¶</a></h3>
+<p>Doing the same thing as before, but with pre-expanded data gives a different picture:</p>
+<p><a class="reference external" href="_static/perf2.html">Notebook 2</a></p>
+<p>Python version:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">FILES</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;country_code&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Pytubes version:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">tubes</span><span class="o">.</span><span class="n">Each</span><span class="p">(</span><span class="n">FILES</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">read_files</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;country_code&quot;</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>results:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 33%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Version</p></td>
+<td><p>Pure Python</p></td>
+<td><p>pytubes</p></td>
+<td><p>Speedup</p></td>
+</tr>
+<tr class="row-even"><td><p>Time (s)</p></td>
+<td><p>208</p></td>
+<td><p>7.78</p></td>
+<td><p>26.7x</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="extracting-multiple-fields">
+<h3>Extracting multiple fields<a class="headerlink" href="#extracting-multiple-fields" title="Permalink to this headline">¶</a></h3>
+<p>Rather than just a single field, it may be more useful to extract multiple
+fields from each record.</p>
+<p>In this test, the following set of 12 fields are pulled from each record:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>timestamp
+country_code
+url
+file → filename
+file → project
+details → installer → name
+details → python
+details → system
+details → system → name
+details → cpu
+details → distro → libc → lib
+details → distro → libc → version
+</pre></div>
+</div>
+<p>and flattened into a tuple, the result is actually discarded (rather than collected
+into a list, as the memory pressure of loading datasets that large complicate things.)</p>
+<p>Code can be seen in the <a class="reference external" href="_static/perf3.html">Notebook 3</a></p>
+<p>The performance improvement here isn’t great, as the time is dominated
+by python allocation overheads.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 33%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Version</p></td>
+<td><p>Pure Python</p></td>
+<td><p>pytubes</p></td>
+<td><p>Speedup</p></td>
+</tr>
+<tr class="row-even"><td><p>Time (s)</p></td>
+<td><p>355</p></td>
+<td><p>87</p></td>
+<td><p>4x</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="multiple-fields-filtered">
+<h3>Multiple fields, Filtered<a class="headerlink" href="#multiple-fields-filtered" title="Permalink to this headline">¶</a></h3>
+<p>If the dataset can be filtered on loading, then we can regain some performance
+benefits, by avoiding the allocation overhead entirely.</p>
+<p>Loading a similar set of fields:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>timestamp
+country_code
+url
+file → filename
+file → project
+details → installer → name
+details → python
+details → system → name
+details → cpu
+details → distro → libc → lib
+details → distro → libc → version
+</pre></div>
+</div>
+<p>But only where the country_code is ‘GB’ gives:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 33%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Version</p></td>
+<td><p>Pure Python</p></td>
+<td><p>pytubes</p></td>
+<td><p>Speedup</p></td>
+</tr>
+<tr class="row-even"><td><p>Time (s)</p></td>
+<td><p>523</p></td>
+<td><p>7.43</p></td>
+<td><p>70.4x</p></td>
+</tr>
+</tbody>
+</table>
+<p>Code here:  <a class="reference external" href="_static/perf4.html">Notebook 4</a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2019, Offset Design Ltd.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/performance.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
