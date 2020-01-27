@@ -147,7 +147,7 @@ jobs:
           path: wh-${{ matrix.file }}/
       - name: "Find filename"
         id: filename
-        run: cd wh-${{ matrix.file }} && echo "::set-output name=file::${ls -1 *.whl}|head -n1}"
+        run: cd wh-${{ matrix.file }} && echo "::set-output name=file::$(ls -1 *.whl|head -n1)"
       - name: "Upload release artifact"
         uses: actions/upload-release-asset@v1.0.1
         env:
