@@ -79,6 +79,15 @@ jobs:
       with:
         name: docs
         path: docs/_build/html
+    - name: "Build sdist"
+      if: matrix.python-version == '3.7.x'
+      run: python setup.py sdist
+    - name: "Upload sdist"
+      if: matrix.python-version == '3.7.x'
+      uses: actions/upload-artifact@v1
+      with:
+        name: sdist
+        path: dist
 
   win:
     runs-on: windows-latest
@@ -125,10 +134,10 @@ jobs:
       matrix:
         file: [macos-3.7.x, 
                macos-3.8.x,
-               linux-cp37-cp37m,
                win-3.8.x,
-               linux-cp38-cp38,
                win-3.7.x
+               linux-cp37-cp37m,
+               linux-cp38-cp38,
               ]
     steps:
       - name: "Download wheel"
