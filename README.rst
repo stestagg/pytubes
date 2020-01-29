@@ -53,19 +53,3 @@ More Complex Example
     )
 >>> print(list(x)[-3])
 (15,612,767, '2017-12-14 09:33:31 UTC', 'GB', '/packages/29/9b/25ef61e948321296f029f53c9f67cc2b54e224db509eb67ce17e0df6044a/certifi-2017.11.5-py2.py3-none-any.whl', 'certifi-2017.11.5-py2.py3-none-any.whl', 'certifi', 'pip', '2.7.5', {'name': 'Linux', 'release': '2.6.32-696.10.3.el6.x86_64'}, 'Linux', 'x86_64', 'glibc', '2.17')
-
-Contents
---------
-
-.. role:: noshow
-
-:noshow:`If you're viewing this in github, please visit the docs at: https://docs.pytubes.com/`
-
-.. toctree::
-    :maxdepth: 3
-    :name: mastertoc
-
-    intro_usage
-    tubes
-    performance
-    detail
