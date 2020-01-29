@@ -9,7 +9,7 @@ on:
 
 jobs:
   linux:
-    runs-on: ${{ matrix.os }} 
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-18.04]
@@ -33,6 +33,11 @@ jobs:
       with:
         name: linux-${{ matrix.python-version }}
         path: wheelhouse
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.pypi_password }}
+        packages_dir: wheelhouse/
 
   osx:
     runs-on: ${{ matrix.os }}
@@ -70,6 +75,11 @@ jobs:
       with:
         name: macos-${{ matrix.python-version }}
         path: export
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.pypi_password }}
+        packages_dir: export/
     - name: "Build docs"
       if: matrix.python-version == '3.8.x'
       run: cd docs && make html
@@ -125,6 +135,12 @@ jobs:
       with:
         name: win-${{ matrix.python-version }}
         path: export
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.pypi_password }}
+        packages_dir: export
+
 
   upload-release-assets-wheels:
     if: github.event_name == 'release'
@@ -183,7 +199,7 @@ jobs:
           name: sdist
           path: sdist/
       - name: "Find filename"
-        id: filename
+        id: sdist_filename
         run: cd sdist/ && echo "::set-output name=file::$(ls -1 pytubes*.tar.gz|head -n1)"
       - name: Upload sdist
         uses: actions/upload-release-asset@v1.0.1
@@ -191,6 +207,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: sdist/${{ steps.filename.outputs.file }}
-          asset_name: ${{ steps.filename.outputs.file }}
+          asset_path: sdist/${{ steps.sdist_filename.outputs.file }}
+          asset_name: ${{ steps.sdist_filename.outputs.file }}
           asset_content_type: application/gzip
