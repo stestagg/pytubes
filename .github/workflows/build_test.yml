@@ -33,12 +33,6 @@ jobs:
       with:
         name: linux-${{ matrix.python-version }}
         path: wheelhouse
-    - name: Publish to PyPI
-      if: github.event_name == 'release'
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.pypi_password }}
-        packages_dir: wheelhouse/
 
   osx:
     runs-on: ${{ matrix.os }}
@@ -76,12 +70,6 @@ jobs:
       with:
         name: macos-${{ matrix.python-version }}
         path: export
-    - name: Publish to PyPI
-      if: github.event_name == 'release'
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.pypi_password }}
-        packages_dir: export/
     - name: "Build docs"
       if: matrix.python-version == '3.8.x'
       run: cd docs && make html
@@ -137,13 +125,6 @@ jobs:
       with:
         name: win-${{ matrix.python-version }}
         path: export
-    - name: Publish to PyPI
-      if: github.event_name == 'release'
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.pypi_password }}
-        packages_dir: export
-
 
   upload-release-assets-wheels:
     if: github.event_name == 'release'
@@ -176,6 +157,12 @@ jobs:
           asset_path: wh-${{ matrix.file }}/${{ steps.filename.outputs.file }}
           asset_name: ${{ steps.filename.outputs.file }}
           asset_content_type: application/zip
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.pypi_password }}
+          packages_dir: wh-${{matrix.file}}/
+
 
   upload-release-assets-sdist-docs:
     if: github.event_name == 'release'
@@ -213,3 +200,8 @@ jobs:
           asset_path: sdist/${{ steps.sdist_filename.outputs.file }}
           asset_name: ${{ steps.sdist_filename.outputs.file }}
           asset_content_type: application/gzip
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.pypi_password }}
+          packages_dir: sdist/
