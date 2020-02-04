@@ -1,0 +1,193 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pytubes &#8212; pytubes 0.7.4 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">pytubes</a></h1>
+
+
+
+<p class="blurb">Piping data into python</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=stestagg&repo=pytubes&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+<style>
+	.related.top{
+		color: #888;
+		font-style: italic;
+	}
+	#version-sel {
+		cursor: pointer;
+		color: #888;
+	    border: 0 transparent;
+		border-bottom: 1px dotted #666;
+	    padding: 1px;
+	    font-size: 90%;
+	    line-height: 1;
+	    background: white;
+	    -webkit-appearance: none;
+	    background-position-x: 244px;
+	    outline-style: none; 
+	    -moz-outline-style:none; 
+	}
+	#version-sel:active{
+		outline-style: none; 
+	    -moz-outline-style:none; 	
+	}
+	#version-sel:hover {
+		border-bottom-style: solid;
+	}
+
+
+</style>
+<div class="related top">
+    &nbsp;
+    Version: 0.7.4
+    <select onchange="location = '/versions/' + this.options[this.selectedIndex].value" id="version-sel">
+    	<option value="0.7.4" selected>Switch</option>
+    	<!-- PYTUBES-BEGIN-VERSION-LIST --><option value="0.7.4">0.7.4</option><option value="0.7.0">0.7.0</option><option value="0.6.0">0.6.0</option><option value="0.5.6">0.5.6</option><option value="0.5.5">0.5.5</option><!-- PYTUBES-END-VERSION-LIST -->
+    </select>
+    <!-- PYTUBES-BEGIN-VERSION-WARNING --><!-- PYTUBES-END-VERSION-WARNING -->
+</div>
+
+
+          <div class="body" role="main">
+            
+  <div class="section" id="pytubes">
+<h1>pytubes<a class="headerlink" href="#pytubes" title="Permalink to this headline">¶</a></h1>
+<p>Source: <a class="reference external" href="https://github.com/stestagg/pytubes">https://github.com/stestagg/pytubes</a></p>
+<p>Pytubes is a library that optimizes loading datasets into memory.</p>
+<p>At it’s core is a set of specialized C++ classes that can be chained together to load and manipulate data using a standard iterator pattern. Around this there is a cython extension module that makes defining and configuring a tube simple and straight-forward.</p>
+<div class="section" id="simple-example">
+<h2>Simple Example<a class="headerlink" href="#simple-example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tubes</span> <span class="kn">import</span> <span class="n">Each</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tube</span> <span class="o">=</span> <span class="p">(</span><span class="n">Each</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.json&quot;</span><span class="p">))</span>   <span class="c1"># Iterate over some filenames</span>
+<span class="go">        .read_files()                   # Read each file, chunk by chunk</span>
+<span class="go">        .split()                        # Split the file, line-by-line</span>
+<span class="go">        .json()                         # parse json</span>
+<span class="go">        .get(&#39;country_code&#39;, &#39;null&#39;))   # extract field named &#39;country_code&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">set</span><span class="p">(</span><span class="n">tube</span><span class="p">)</span>                           <span class="c1"># collect results in a set</span>
+<span class="go">{&#39;A1&#39;, &#39;AD&#39;, &#39;AE&#39;, &#39;AF&#39;, &#39;AG&#39;, &#39;AL&#39;, &#39;AM&#39;, &#39;AO&#39;, &#39;AP&#39;, ...}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="more-complex-example">
+<h2>More Complex Example<a class="headerlink" href="#more-complex-example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tubes</span> <span class="kn">import</span> <span class="n">Each</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">glob</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">Each</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*.jsonz&#39;</span><span class="p">))</span>
+<span class="go">        .map_files()</span>
+<span class="go">        .gunzip()</span>
+<span class="go">        .split(b&#39;\n&#39;)</span>
+<span class="go">        .json()</span>
+<span class="go">        .enumerate()</span>
+<span class="go">        .skip_unless(lambda x: x.slot(1).get(&#39;country_code&#39;, &#39;&quot;&quot;&#39;).to(str).equals(&#39;GB&#39;))</span>
+<span class="go">        .multi(lambda x: (</span>
+<span class="go">            x.slot(0),</span>
+<span class="go">            x.slot(1).get(&#39;timestamp&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;country_code&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;url&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;file&#39;, &#39;{}&#39;).get(&#39;filename&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;file&#39;, &#39;{}&#39;).get(&#39;project&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;details&#39;, &#39;{}&#39;).get(&#39;installer&#39;, &#39;{}&#39;).get(&#39;name&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;details&#39;, &#39;{}&#39;).get(&#39;python&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;details&#39;, &#39;{}&#39;).get(&#39;system&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;details&#39;, &#39;{}&#39;).get(&#39;system&#39;, &#39;{}&#39;).get(&#39;name&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;details&#39;, &#39;{}&#39;).get(&#39;cpu&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;details&#39;, &#39;{}&#39;).get(&#39;distro&#39;, &#39;{}&#39;).get(&#39;libc&#39;, &#39;{}&#39;).get(&#39;lib&#39;, &#39;null&#39;),</span>
+<span class="go">            x.slot(1).get(&#39;details&#39;, &#39;{}&#39;).get(&#39;distro&#39;, &#39;{}&#39;).get(&#39;libc&#39;, &#39;{}&#39;).get(&#39;version&#39;, &#39;null&#39;),</span>
+<span class="go">        ))</span>
+<span class="go">    )</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+<span class="go">(15,612,767, &#39;2017-12-14 09:33:31 UTC&#39;, &#39;GB&#39;, &#39;/packages/29/9b/25ef61e948321296f029f53c9f67cc2b54e224db509eb67ce17e0df6044a/certifi-2017.11.5-py2.py3-none-any.whl&#39;, &#39;certifi-2017.11.5-py2.py3-none-any.whl&#39;, &#39;certifi&#39;, &#39;pip&#39;, &#39;2.7.5&#39;, {&#39;name&#39;: &#39;Linux&#39;, &#39;release&#39;: &#39;2.6.32-696.10.3.el6.x86_64&#39;}, &#39;Linux&#39;, &#39;x86_64&#39;, &#39;glibc&#39;, &#39;2.17&#39;)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2019, Offset Design Ltd.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
