@@ -34,9 +34,11 @@
     &nbsp;
     Version: {{ version }}
     <select onchange="location = '/versions/' + this.options[this.selectedIndex].value" id="version-sel">
-    	<option value="{{version}}">Switch</option>
+    	<option value="{{version}}" selected>Switch</option>
     	<!-- PYTUBES-BEGIN-VERSION-LIST -->
     	<!-- PYTUBES-END-VERSION-LIST -->
     </select>
+    <!-- PYTUBES-BEGIN-VERSION-WARNING -->
+    <!-- PYTUBES-END-VERSION-WARNING -->
 </div>
 {% endblock %}

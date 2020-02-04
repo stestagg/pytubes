@@ -148,12 +148,29 @@ cdef class Tube:
 
     def to_pyarrow(self, fields):
         """
-        Create a new pyarrow ``Array`` or ``Table``, and fill it with the
-        results of the tube.
+        Return a new pyarrow ``Array`` or ``Table``, containing the results of
+        the tube.
+
+        Only available if the ``pyarrow`` module is available.
 
         :param fields: The names of the Table columns
 
-        >>> TODO
+        >>> tubes.Count(1).first(10).to_pyarrow(['val']).to_pandas()
+           val
+        0    1
+        1    2
+        ...
+        >>> tubes.Count(1)\\
+                .first(10)\\
+                .multi(lambda x: (
+                    x,
+                    x.to(float),
+                    x.gt(5)
+                )).to_pyarrow(['val', 'val float', 'is_big']).to_pandas()
+        val  val float  is_big
+        0    1        1.0   False
+        1    2        2.0   False
+        ...
         """
         if not HAVE_PYARROW:
             raise NameError("Pyarrow library could not be imported")

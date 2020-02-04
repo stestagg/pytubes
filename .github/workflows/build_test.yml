@@ -2,6 +2,8 @@ name: Test change
 
 on:
   push:
+    branches-ignore:
+      - gh-pages
   release:
     types: [created]
 
@@ -77,6 +79,15 @@ jobs:
       with:
         name: docs
         path: docs/_build/html
+    - name: "Build sdist"
+      if: matrix.python-version == '3.7.x'
+      run: python setup.py sdist
+    - name: "Upload sdist"
+      if: matrix.python-version == '3.7.x'
+      uses: actions/upload-artifact@v1
+      with:
+        name: sdist
+        path: dist
 
   win:
     runs-on: windows-latest
@@ -115,43 +126,106 @@ jobs:
         name: win-${{ matrix.python-version }}
         path: export
 
-  collect:
+  upload-release-assets-wheels:
     if: github.event_name == 'release'
     needs: [osx, linux, win]
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        file: [macos-3.7.x,
+               macos-3.8.x,
+               win-3.8.x,
+               win-3.7.x,
+               linux-cp37-cp37m,
+               linux-cp38-cp38,
+              ]
     steps:
-      - uses: actions/download-artifact@master
+      - name: "Download wheel"
+        uses: actions/download-artifact@master
         with:
-          name: macos-3.7.x
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: macos-3.8.x
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: linux-cp37-cp37m
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: linux-cp38-cp38
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: win-3.8.x
-          path: wheelhouse/
-      - uses: actions/download-artifact@master
-        with:
-          name: win-3.7.x
-          path: wheelhouse/
-      - name: Create wheel package
-        run: tar czf wheels.tgz wheelhouse/*.whl
-      - name: Uploade release artifacts
+          name: ${{ matrix.file }}
+          path: wh-${{ matrix.file }}/
+      - name: "Find filename"
+        id: filename
+        run: cd wh-${{ matrix.file }} && echo "::set-output name=file::$(ls -1 *.whl|head -n1)"
+      - name: "Upload release artifact"
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./wheels.tgz
-          asset_name: wheels.tgz
+          asset_path: wh-${{ matrix.file }}/${{ steps.filename.outputs.file }}
+          asset_name: ${{ steps.filename.outputs.file }}
+          asset_content_type: application/zip
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.pypi_password }}
+          packages_dir: wh-${{matrix.file}}/
+
+
+  upload-release-assets-sdist-docs:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-18.04
+    needs: [osx, linux, win]
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: docs
+          path: docs/
+      - name: Create docs package
+        run: tar czf docs.tgz docs/
+      - name: Upload release artifacts
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./docs.tgz
+          asset_name: docs.tgz
           asset_content_type: application/gzip
+      - name: Download sdist artifact
+        uses: actions/download-artifact@master
+        with:
+          name: sdist
+          path: sdist/
+      - name: Find the exact name of the sdist file
+        id: sdist_filename
+        run: cd sdist/ && echo "::set-output name=file::$(ls -1 pytubes*.tar.gz|head -n1)"
+      - name: Upload sdist file
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: sdist/${{ steps.sdist_filename.outputs.file }}
+          asset_name: ${{ steps.sdist_filename.outputs.file }}
+          asset_content_type: application/gzip
+      - name: Publish sdist to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.pypi_password }}
+          packages_dir: sdist/
+      - name: Get python 3 available for docs scripts
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+      - name: Checkout GH Pages branch
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+          path: gh-pages
+          token: ${{ secrets.DOCS_PUSH }}
+      - name: Set up git
+        run: |
+          git config --global user.email "pytubes@sta.gg"
+          git config --global user.name "Pytubes bot"
+      - name: Add current docs & update indexes
+        run: cd gh-pages && python3 add-version.py ../docs && python3 update-versions.py
+      - name: Stage, commit, and push gh-pages
+        run: |
+          cd gh-pages
+          git add -A
+          git commit -m "Add docs for release ${{ github.event.release.tag_name}}"
+          git push
