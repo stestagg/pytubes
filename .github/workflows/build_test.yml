@@ -206,6 +206,11 @@ jobs:
         with:
           password: ${{ secrets.pypi_password }}
           packages_dir: sdist/
+      - name: Get python 3 available for docs scripts
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
       - name: Checkout GH Pages branch
         uses: actions/checkout@v2
         with:
@@ -213,7 +218,7 @@ jobs:
           path: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Add current docs & update indexes
-        run: cd gh-pages && python add-version.py ../docs && python update-versions.py
+        run: cd gh-pages && python3 add-version.py ../docs && python3 update-versions.py
       - name: Stage, commit, and push gh-pages
         run: |
           cd gh-pages
