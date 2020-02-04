@@ -216,7 +216,7 @@ jobs:
         with:
           ref: gh-pages
           path: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DOCS_PUSH }}
       - name: Set up git
         run: |
           git config --global user.email "pytubes@sta.gg"
