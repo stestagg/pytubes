@@ -157,11 +157,11 @@ jobs:
           asset_path: wh-${{ matrix.file }}/${{ steps.filename.outputs.file }}
           asset_name: ${{ steps.filename.outputs.file }}
           asset_content_type: application/zip
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{ secrets.pypi_password }}
-          packages_dir: wh-${{matrix.file}}/
+      # - name: Publish to PyPI
+      #   uses: pypa/gh-action-pypi-publish@master
+      #   with:
+      #     password: ${{ secrets.pypi_password }}
+      #     packages_dir: wh-${{matrix.file}}/
 
 
   upload-release-assets-sdist-docs:
@@ -201,11 +201,11 @@ jobs:
           asset_path: sdist/${{ steps.sdist_filename.outputs.file }}
           asset_name: ${{ steps.sdist_filename.outputs.file }}
           asset_content_type: application/gzip
-      - name: Publish sdist to PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{ secrets.pypi_password }}
-          packages_dir: sdist/
+      # - name: Publish sdist to PyPI
+      #   uses: pypa/gh-action-pypi-publish@master
+      #   with:
+      #     password: ${{ secrets.pypi_password }}
+      #     packages_dir: sdist/
       - name: Get python 3 available for docs scripts
         uses: actions/setup-python@v1
         with:
@@ -217,6 +217,10 @@ jobs:
           ref: gh-pages
           path: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up git
+        run: |
+          git config --global user.email "pytubes@sta.gg"
+          git config --global user.name "Pytubes bot"
       - name: Add current docs & update indexes
         run: cd gh-pages && python3 add-version.py ../docs && python3 update-versions.py
       - name: Stage, commit, and push gh-pages
