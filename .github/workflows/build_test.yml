@@ -157,11 +157,11 @@ jobs:
           asset_path: wh-${{ matrix.file }}/${{ steps.filename.outputs.file }}
           asset_name: ${{ steps.filename.outputs.file }}
           asset_content_type: application/zip
-      # - name: Publish to PyPI
-      #   uses: pypa/gh-action-pypi-publish@master
-      #   with:
-      #     password: ${{ secrets.pypi_password }}
-      #     packages_dir: wh-${{matrix.file}}/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.pypi_password }}
+          packages_dir: wh-${{matrix.file}}/
 
 
   upload-release-assets-sdist-docs:
@@ -201,11 +201,11 @@ jobs:
           asset_path: sdist/${{ steps.sdist_filename.outputs.file }}
           asset_name: ${{ steps.sdist_filename.outputs.file }}
           asset_content_type: application/gzip
-      # - name: Publish sdist to PyPI
-      #   uses: pypa/gh-action-pypi-publish@master
-      #   with:
-      #     password: ${{ secrets.pypi_password }}
-      #     packages_dir: sdist/
+      - name: Publish sdist to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.pypi_password }}
+          packages_dir: sdist/
       - name: Get python 3 available for docs scripts
         uses: actions/setup-python@v1
         with:
