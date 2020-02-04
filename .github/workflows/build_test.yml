@@ -184,14 +184,15 @@ jobs:
           asset_path: ./docs.tgz
           asset_name: docs.tgz
           asset_content_type: application/gzip
-      - uses: actions/download-artifact@master
+      - name: Download sdist artifact
+        uses: actions/download-artifact@master
         with:
           name: sdist
           path: sdist/
-      - name: "Find filename"
+      - name: Find the exact name of the sdist file
         id: sdist_filename
         run: cd sdist/ && echo "::set-output name=file::$(ls -1 pytubes*.tar.gz|head -n1)"
-      - name: Upload sdist
+      - name: Upload sdist file
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -200,8 +201,22 @@ jobs:
           asset_path: sdist/${{ steps.sdist_filename.outputs.file }}
           asset_name: ${{ steps.sdist_filename.outputs.file }}
           asset_content_type: application/gzip
-      - name: Publish to PyPI
+      - name: Publish sdist to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.pypi_password }}
           packages_dir: sdist/
+      - name: Checkout GH Pages branch
+        uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+          path: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add current docs & update indexes
+        run: cd gh-pages && python add-version.py ../docs && python update-versions.py
+      - name: Stage, commit, and push gh-pages
+        run: |
+          cd gh-pages
+          git add -A
+          git commit -m "Add docs for release ${{ github.event.release.tag_name}}"
+          git push
