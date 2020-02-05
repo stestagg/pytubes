@@ -71,10 +71,10 @@ jobs:
         name: macos-${{ matrix.python-version }}
         path: export
     - name: "Build docs"
-      if: matrix.python-version == '3.8.x'
+      if: matrix.python-version == '3.7.x'
       run: cd docs && make html
     - name: "Upload docs"
-      if: matrix.python-version == '3.8.x'
+      if: matrix.python-version == '3.7.x'
       uses: actions/upload-artifact@v1
       with:
         name: docs

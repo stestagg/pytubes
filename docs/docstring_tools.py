@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+
 import tubes
 
 
@@ -25,7 +26,7 @@ def test_compatibility(test):
     for dtype, tube, value in make_tubes():
         try:
             eval(test, {"dtype": dtype, "tube": tube, "value": value})
-        except ValueError:
+        except (ValueError, RuntimeError):
             pass
         else:
             compatible.append('``{0}``'.format(dtype.name))
