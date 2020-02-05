@@ -148,6 +148,7 @@ cdef class Tube:
 
     def to_pyarrow(self, fields):
         """
+        Compatibility: tube.to_pyarrow(['a'])
         Return a new pyarrow ``Array`` or ``Table``, containing the results of
         the tube.
 

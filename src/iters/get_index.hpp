@@ -76,7 +76,7 @@ namespace ss{ namespace iter{
         inline void read_sequence(const PyObj& obj) {
             Py_ssize_t  len = PySequence_Fast_GET_SIZE(obj.obj);
             for (auto &index : indexes) {
-                if (index.skip < (size_t)len) { 
+                if (index.skip < (size_t)len) {
                     (*index.destination) = PyObj(PySequence_Fast_GET_ITEM(obj.obj, index.skip));
                 } else {
                     (*index.destination) = UNDEFINED;
@@ -85,12 +85,12 @@ namespace ss{ namespace iter{
         }
 
         inline void read(const PyObj &parent) {
-            PyObj value = PyObj(PySequence_Fast(parent.obj, "TODO"), true);
+            PyObj value = PyObj(PySequence_Fast(parent.obj, "Ignore"), true);
             if (!value.was_created()) {
                 PyErr_Clear();
-                read_nosequence(parent);       
+                read_nosequence(parent);
             } else {
-                read_sequence(value);                
+                read_sequence(value);
             }
         }
     };
