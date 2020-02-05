@@ -6,6 +6,9 @@
 #include "util/atoi.hpp"
 #include "util/codec.hpp"
 
+#include <double-conversion/string-to-double.h>
+#include <double-conversion/double-to-string.h>
+
 namespace ss{ namespace iter{
 
 
