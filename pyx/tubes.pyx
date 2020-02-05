@@ -174,7 +174,7 @@ cdef class Tube:
         ...
         """
         if not HAVE_PYARROW:
-            raise NameError("Pyarrow library could not be imported")
+            raise RuntimeError("Pyarrow library could not be imported")
         return pa_from_tube(self, fields)
 
     cdef _repr(self, stop=None):
