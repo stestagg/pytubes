@@ -148,6 +148,7 @@ cdef class Tube:
 
     def to_pyarrow(self, fields):
         """
+        Compatibility: tube.to_pyarrow(['a'])
         Return a new pyarrow ``Array`` or ``Table``, containing the results of
         the tube.
 
@@ -173,7 +174,7 @@ cdef class Tube:
         ...
         """
         if not HAVE_PYARROW:
-            raise NameError("Pyarrow library could not be imported")
+            raise RuntimeError("Pyarrow library could not be imported")
         return pa_from_tube(self, fields)
 
     cdef _repr(self, stop=None):

@@ -1,8 +1,10 @@
-import pytest
-import numpy.random as random
-import tubes
 import string
+
 import numpy
+import numpy.random as random
+import pytest
+import tubes
+
 
 def rand_chars():
     n_bytes = random.randint(0,10)
@@ -110,6 +112,29 @@ def test_fuzz_tsv(seed):
     assert len(expected_rows) == len(actual_rows)
 
 
+def any_double(n):
+    buffer = numpy.random.bytes(8 * n)
+    return numpy.frombuffer(buffer, dtype=numpy.double)
+
+def tiny_double(n):
+    return numpy.random.uniform(-1e-10, 1e10, size=n)
+
+def small_double(n):
+    return numpy.random.uniform(-10_000, 10_000, size=n)
+
+def large_double(n):
+    return numpy.random.uniform(-1e100, 1e100, size=n)
+
+
+@pytest.mark.parametrize("seed", [random.randint(2147483648) for i in range(10)])
+@pytest.mark.parametrize("maker", [any_double, tiny_double, small_double, large_double])
+def test_fuzz_random_double_to_str(seed, maker):
+    numpy.random.seed(seed)
+    array = maker(10240)
+    actual = list(tubes.Each(array).to(float).to(str))
+    expected = [str(x).replace('e-0', 'e-').replace('e+0', 'e+') for x in array]
+    assert actual == expected
+
 
 def make_str_col(length):
     return numpy.array([rand_chars() for _ in range(length)])
@@ -137,7 +162,7 @@ if tubes.HAVE_PYARROW:
         col_names = ['%i: %s' % (i, rand_chars()) for i in range(num_cols)]
         given = list(zip(*cols))
         given_pod = [[x.item() for x in r] for r in given]
-        
+
         slot_tube = tubes.Each(given_pod).multi(lambda x: [x.get(i).to(t.dtype) for i, t in enumerate(types)])
         result = slot_tube.to_pyarrow(col_names)
         table = result.to_pandas()

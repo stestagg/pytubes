@@ -31,3 +31,13 @@ def test_convert_from_bool():
     assert list(tubes.Each([True, False]).to(bool).to(float)) == [1., 0.]
     assert list(tubes.Each([True, False]).to(bool).to(bytes)) == [b'True', b'False']
     assert list(tubes.Each([True, False]).to(bool).to(str)) == ['True', 'False']
+
+@pytest.mark.parametrize("val, from_dtype, to_dtype, result", [
+    ([None], tubes.Null, tubes.Null, [None]),
+    (['1', '3.14', '-1', '1e100', 'inf'], str, float, [1, 3.14, -1, 1e100, float('inf')]),
+    (['1', '3.14', '-1', '1e+100', 'inf'], bytes, float, [1, 3.14, -1, 1e100, float('inf')]),
+    ([1, 3.14, -1, 1e100, float('inf')], float, bytes, [b'1.0', b'3.14', b'-1.0', b'1e+100', b'inf']),
+    ([1, 3.14, -1, 1e100, float('inf'), 1/3], float, str, ['1.0', '3.14', '-1.0', '1e+100', 'inf', '0.3333333333333333']),
+])
+def test_convert_types(val, from_dtype, to_dtype, result):
+    assert list(tubes.Each(val).to(from_dtype).to(to_dtype)) == result

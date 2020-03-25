@@ -6,6 +6,9 @@
 #include "util/atoi.hpp"
 #include "util/codec.hpp"
 
+#include <double-conversion/string-to-double.h>
+#include <double-conversion/double-to-string.h>
+
 namespace ss{ namespace iter{
 
 
@@ -43,7 +46,7 @@ namespace ss{ namespace iter{
         std::unique_ptr<ss::codec::ToUtf8Encoder> encoder;
         bool transparent;
 
-        Converter(const ByteSlice *from, const std::string &codec) 
+        Converter(const ByteSlice *from, const std::string &codec)
             : encoder(codec::get_encoder(codec, from))
         {
             transparent = encoder->is_transparent();
@@ -75,6 +78,12 @@ namespace ss{ namespace iter{
         }
     };
 
+    #define BYTES_UTF(T, U) typename std::enable_if< \
+        std::is_same<T, ByteSlice>::value || \
+        std::is_same<T, Utf8>::value \
+    , U>::type
+
+
     #define simple_convert(F, T, body) template<> struct Converter<F, T> : AnyConverter{ \
         const F *from; \
         T current; \
@@ -91,7 +100,7 @@ namespace ss{ namespace iter{
     simple_convert(ByteSlice, bool, { current = from->len != 0; });
     simple_convert(Utf8, bool, { current = from->len != 0; });
     simple_convert(bool, ByteSlice, { current = *from ? ByteSlice((bytes*)"True", 4) : ByteSlice((bytes*)"False", 5); });
-    simple_convert(bool, Utf8, { current = *from ? ByteSlice((bytes*)"True", 4) : ByteSlice((bytes*)"False", 5); });
+    simple_convert(bool, Utf8,      { current = *from ? ByteSlice((bytes*)"True", 4) : ByteSlice((bytes*)"False", 5); });
     simple_convert(int64_t, double, { current = *from; });
     simple_convert(double, int64_t, { current = *from; });
     simple_convert(ByteSlice, TsvRow, { current = TsvRow(*from, NULL); });
@@ -100,11 +109,71 @@ namespace ss{ namespace iter{
     simple_convert(ByteSlice, int64_t, { current = slice_to_int(*from); });
     simple_convert(Utf8, int64_t, { current = slice_to_int(*from); });
 
+    // simple_convert(Utf8, double, { current = ss::double_::from_slice<Utf8>(from); });
+    // simple_convert(ByteSlice, double, { current = ss::double_::from_slice<ByteSlice>(from); });
 
-    #define BYTES_UTF(T, U) typename std::enable_if< \
-        std::is_same<T, ByteSlice>::value || \
-        std::is_same<T, Utf8>::value \
-    , U>::type
+    // simple_convert(double, Utf8, { current = ss::double_::to_slice<Utf8>(from); });
+    // simple_convert(double, ByteSlice, { current = ss::double_::to_slice<ByteSlice>(from); });
+
+    template<class T> struct Converter<T, BYTES_UTF(T, double)> : AnyConverter {
+        static const int FLAGS = \
+            double_conversion::StringToDoubleConverter::ALLOW_SPACES_AFTER_SIGN |
+            double_conversion::StringToDoubleConverter::ALLOW_CASE_INSENSITIVITY;
+
+        const T *from;
+        double current;
+        double_conversion::StringToDoubleConverter converter;
+
+        Converter(const T* from, const std::string &codec)
+        : from(from),
+          converter(FLAGS, NAN, NAN, "inf", "nan") {}
+
+        SlotPointer get_slot() { return &current; }
+
+        inline void convert() {
+            int num_processed = 0;
+            current = converter.StringToDouble(
+                reinterpret_cast<const char*>(from->start),
+                from->len,
+                &num_processed
+            );
+
+        }
+
+    };
+
+    template<class T> struct Converter<BYTES_UTF(T, double), T> : AnyConverter {
+        static const int FLAGS = \
+            double_conversion::DoubleToStringConverter::EMIT_TRAILING_DECIMAL_POINT |
+            double_conversion::DoubleToStringConverter::EMIT_TRAILING_ZERO_AFTER_POINT |
+            double_conversion::DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN |
+            double_conversion::DoubleToStringConverter::UNIQUE_ZERO;
+
+        const double *from;
+        // According to double-conversion:
+        // The maximal number of digits that are needed to emit a double in base 10 == 17.
+        // Take 32 t be safe
+        char buffer[32];
+        T current;
+
+        double_conversion::StringBuilder builder;
+        double_conversion::DoubleToStringConverter converter;
+
+        Converter(const double* from, const std::string &codec)
+        : from(from),
+          current(reinterpret_cast<unsigned char *>(buffer), 0),
+          builder(buffer, 31),
+          converter(FLAGS, "inf", "nan", 'e', -4, 16, 3, 15) {};
+
+        SlotPointer get_slot() { return &current; }
+
+        inline void convert() {
+            builder.Reset();
+            converter.ToShortest(*from, &builder);
+            current.len = builder.Finalize();
+        }
+
+    };
 
     template<class T> struct Converter<BYTES_UTF(T, JsonUtf8), T> : AnyConverter {
         using Parser = json::parse::FailsafeParser<bytes>;
@@ -210,7 +279,7 @@ namespace ss{ namespace iter{
                 convert_from<double>();
             } else if (PyLong_Check(p)) {
                 convert_from<int64_t>();
-            } else {                
+            } else {
                 convert_from<PyObject *>();
             }
         }
