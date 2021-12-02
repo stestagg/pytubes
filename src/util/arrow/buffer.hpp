@@ -7,11 +7,13 @@ namespace ss{
     template<class T>
     using aligned64_vector = std::vector<T, AlignedAllocator<T, 64> >;
 
+    static const void *aligned_null = AlignedAllocator<uint8_t, 64>().allocate(0);
+
     namespace arrow {
 
         class AnyBuffer {
         public:
-            virtual void *data() = 0;
+            virtual const void *data() = 0;
             virtual size_t size() = 0;
 
             AnyBuffer() = default;
@@ -42,8 +44,14 @@ namespace ss{
                 vec = std::move(src);
             }
 
-            void *data() { return (void*)vec.data(); }
-            
+            const void *data() {
+                void *ptr = vec.data();
+                if (!ptr){
+                    return aligned_null;
+                }
+                return ptr;
+            }
+
             inline size_t size() {
                 return vec.size() * sizeof(T);
             }

@@ -20,7 +20,7 @@ def find_blocks(file_name):
         lines = [l for l in match.splitlines() if l.strip != ""]
         padding = len(lines[0]) - len(lines[0].lstrip())
         doc = "\n".join([l[padding:] for l in lines])
-        blocks.append(yaml.load(doc))
+        blocks.append(yaml.load(doc, Loader=yaml.Loader))
     return blocks
 
 

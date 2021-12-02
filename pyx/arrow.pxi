@@ -34,7 +34,7 @@ cdef extern from "../src/util/pyarrow.hpp" namespace "ss::iter":
 
 cdef extern from "../src/util/arrow/buffer.hpp" namespace "ss::arrow":
     cdef cppclass AnyBuffer:
-        void *data()
+        const void *data()
         size_t size()
 
 

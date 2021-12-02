@@ -89,3 +89,18 @@ else:
             'strval': '500004',
             'is_big': True
         }
+
+    def test_csv_issue():
+        table = (tubes
+            .Each(['a,b,c\n1,2,'])
+            .csv()
+            .multi(lambda x: (
+                x.get('a').to(str), 
+                x.get('c').to(str)
+            ))
+            .to_pyarrow(('a', 'c'))
+        )
+        assert table.to_pydict() == {
+            'a': ['1'],
+            'c': ['']
+        }

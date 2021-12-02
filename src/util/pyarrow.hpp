@@ -136,22 +136,16 @@ namespace ss{ namespace iter{
     template<>
     PyObj PAArrayFillerImpl<Utf8>::GetPaArray() {
         size_t size = container.size();
+
         auto contents = arrow::Buffer<uint8_t>::unique(std::move(container.contents));
         auto offsets = arrow::Buffer<int32_t>::unique(std::move(container.offsets));
+
         return PyObj::fromCall(pyarrow_make_str_array(
             size,
             PyObj::fromCall(pyarrow_make_buffer(std::move(offsets))).obj,
             PyObj::fromCall(pyarrow_make_buffer(std::move(contents))).obj
         ));
     }
-    // template<>
-    // PyObj PAArrayFillerImpl<Utf8>::GetPaArray() {
-    //     shared_ptr<arrow::ArrayData> array;
-    //     assert_arrow(builder.FinishInternal(&array));
-    //     PyObj rv = PyObj::fromCall(pyarrow_make_str_array(array));
-    //     if (PyErr_Occurred()) { throw PyExceptionRaised;}
-    //     return rv;
-    // }
 
     template<class T, class Enable>
     struct make_pa_filler{
