@@ -1,15 +1,15 @@
-FROM quay.io/pypa/manylinux2010_x86_64
+FROM quay.io/pypa/manylinux2014_x86_64
 
-RUN yum install -y rh-python35-python-devel
+RUN yum install -y rh-python38-python-devel rh-python38-python-pip
 
 COPY build_requirements.txt /tmp/requirements.txt
 
-RUN (. /opt/rh/rh-python35/enable && pip install --upgrade pip && pip install -r /tmp/requirements.txt)
+RUN (. /opt/rh/rh-python38/enable && python -m pip install --upgrade pip && python -m pip install -r /tmp/requirements.txt)
 
 COPY . /pristine
 WORKDIR /pristine
 
-RUN (. /opt/rh/rh-python35/enable && make clean)
+RUN (. /opt/rh/rh-python38/enable && make clean)
 
 ENTRYPOINT ["tools/entrypoint.sh"]
 
